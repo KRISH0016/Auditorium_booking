@@ -63,7 +63,7 @@
 
         // Fetch bookings from the server
         function fetchBookings() {
-          return fetch("http://localhost:3000/admin/bookings")
+          return fetch("https://auditorium-booking-i34f.onrender.com/admin/bookings")
             .then((response) => response.json())
             .catch((error) => {
               console.error("Error fetching bookings:", error);
@@ -257,7 +257,7 @@
 
         // Approve a booking
         function approveBooking(bookingId) {
-          fetch("http://localhost:3000/admin/approve", {
+          fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ bookingId: bookingId }),
@@ -280,7 +280,7 @@
 
         // Cancel a booking
         function cancelBooking(bookingId) {
-          fetch("http://localhost:3000/admin/cancel", {
+          fetch("https://auditorium-booking-i34f.onrender.com/admin/cancel", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ bookingId: bookingId }),
