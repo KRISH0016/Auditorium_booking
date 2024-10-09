@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel</title>
+    <!-- FullCalendar and dependencies -->
+    <link rel="icon" type="image/png" href="../images/logo.png" />
+    <!-- For .png files -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="../styles/styles-admin.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Admin Panel</h1>
+    </header>
+    <main>
+      <section class="bookings-section">
+        <h2>Bookings</h2>
+
+        <table id="bookings-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Dept</th>
+              <th>Event</th>
+              <th>Auditorium</th>
+              <th>Date</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Amenities</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="bookings-body">
+            <!-- Bookings will be dynamically added here -->
+          </tbody>
+        </table>
+        <div id="message-box" class="message-box"></div>
+        <button id="print-csv">Print CSV</button>
+      </section>
+      <section class="calendar-section">
+        <h2>Calendar View</h2>
+        <div id="calendar"></div>
+      </section>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const bookingsTable = document.getElementById("bookings-body");
+        const messageBox = document.getElementById("message-box");
+
+        // Fetch bookings from the server
+        function fetchBookings() {
+          return fetch("http://localhost:3000/admin/bookings")
+            .then((response) => response.json())
+            .catch((error) => {
+              console.error("Error fetching bookings:", error);
+              showMessage("Error fetching bookings", "error");
+            });
+        }
+
+        // Function to export bookings to CSV
+        function exportBookingsToCSV(bookings) {
+          const csvRows = [];
+          const headers = [
+            "Name",
+            "Dept",
+            "Event",
+            "Auditorium",
+            "Date",
+            "Start",
+            "End",
+            "Amenities",
+            "Status",
+          ];
+          csvRows.push(headers.join(","));
+
+          bookings.forEach((booking) => {
+            const auditoriumCode =
+              auditoriumMapping[booking.auditorium] || booking.auditorium;
+            const row = [
+              booking.user.name,
+              booking.user.dept,
+              booking.events_name,
+              auditoriumCode,
+              new Date(booking.date).toLocaleDateString(),
+              booking.start, // Start Time
+              booking.end, // End Time
+              booking.amenities.join("; "),
+              booking.status,
+            ];
+            csvRows.push(row.join(","));
+          });
+
+          const csvString = csvRows.join("\n");
+          const blob = new Blob([csvString], { type: "text/csv" });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.setAttribute("hidden", "");
+          a.setAttribute("href", url);
+          a.setAttribute("download", "bookings.csv");
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+
+        function updateCalendar(bookings) {
+          const auditoriumMapping = {
+            auditorium1: "KS",
+            auditorium2: "KK",
+            auditorium3: "Open Air Auditorium",
+          };
+
+          const newBookings = bookings
+            .map((booking) => {
+              const auditoriumCode =
+                auditoriumMapping[booking.auditorium] || booking.auditorium;
+
+              console.log(auditoriumCode);
+
+              let bookingDate;
+              try {
+                const dateParts = booking.date.split("T");
+                bookingDate = dateParts[0]; // Get the date part only
+              } catch (error) {
+                console.error("Invalid booking date:", error);
+                return null;
+              }
+
+              const startTime = booking.start.includes(":")
+                ? booking.start
+                : `${booking.start}:00`;
+              const endTime = booking.end.includes(":")
+                ? booking.end
+                : `${booking.end}:00`;
+
+              // Full date-time strings with the date and time
+              const start = `${bookingDate}T${startTime}`;
+              const end = `${bookingDate}T${endTime}`;
+
+              let correctedStart, correctedEnd;
+              try {
+                correctedStart = new Date(start).toISOString(); // Full ISO string
+                correctedEnd = new Date(end).toISOString(); // Full ISO string
+              } catch (error) {
+                console.error("Invalid start or end time:", start, end);
+                return null;
+              }
+
+              console.log("Returning " + booking._id);
+
+              return {
+                id: booking._id,
+                title: `${auditoriumCode} ${booking.events_name}`,
+                start: correctedStart, // Full date and time
+                end: correctedEnd, // Full date and time
+                backgroundColor:
+                  booking.status === "Approved" ? "green" : "grey",
+                borderColor: booking.status === "Approved" ? "green" : "grey",
+              };
+            })
+            .filter((booking) => booking !== null); // Filter out any invalid bookings
+
+          console.log("New Bookings: " + newBookings.length);
+          return newBookings;
+        }
+
+        function initializeCalendar(bookings) {
+          console.log("Bookings for calendar: ", bookings);
+
+          $("#calendar").fullCalendar({
+            header: {
+              left: "prev",
+              center: "title",
+              right: "next",
+            },
+            defaultView: "month",
+            displayEventTime: false, // Hide time next to title
+
+            events: async function (start, end, timezone, callback) {
+              try {
+                const newBookings = updateCalendar(bookings);
+                callback(newBookings);
+              } catch (err) {
+                console.log(err);
+              }
+            },
+            eventRender: function (event, element) {
+              console.log(event);
+              element.attr("title", event.tooltip); // Display full title on hover
+            },
+            eventClick: function (calEvent) {
+              console.log("Event clicked:", calEvent);
+            },
+          });
+        }
+
+        // Display bookings in the table
+        function displayBookings(bookings) {
+          bookingsTable.innerHTML = ""; // Clear the table body
+          const auditoriumMapping = {
+            auditorium1: "KS",
+            auditorium2: "KK",
+            auditorium3: "Open Air Auditorium",
+          };
+
+          bookings.forEach((booking) => {
+            const row = document.createElement("tr");
+            const auditoriumCode =
+              auditoriumMapping[booking.auditorium] || booking.auditorium;
+            try {
+              row.innerHTML = `
+              <td>${booking.user.name}</td>
+              <td>${booking.user.dept}</td>
+              <td>${booking.events_name}</td>
+              <td>${auditoriumCode}</td>
+              <td>${new Date(booking.date).toLocaleDateString()}</td>
+              <td>${booking.start}</td>
+              <td>${booking.end}</td>
+              <td>${booking.amenities.join(", ")}</td>
+              <td>${booking.status}</td>
+              <td>
+                <button class="approve-button" data-booking-id="${
+                  booking._id
+                }">Approve</button>
+                <button class="cancel-button" data-booking-id="${
+                  booking._id
+                }">Cancel</button>
+              </td>
+            `;
+              bookingsTable.appendChild(row);
+            } catch (error) {
+              console.error("Error creating booking row:", error);
+            }
+          });
+          attachEventListeners(); // Attach the event listeners after table is updated
+        }
+
+        // Show message in the message box
+        function showMessage(message, type) {
+          messageBox.textContent = message;
+          messageBox.className = `message-box ${type}`;
+          setTimeout(() => (messageBox.textContent = ""), 5000); // Clear message after 5 seconds
+        }
+
+        // Approve a booking
+        function approveBooking(bookingId) {
+          fetch("http://localhost:3000/admin/approve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bookingId: bookingId }),
+          })
+            .then((response) => {
+              if (response.ok) {
+                console.log("Booking approved successfully");
+                showMessage("Booking approved successfully", "success");
+                return fetchBookings().then(displayBookings);
+              } else {
+                console.error("Failed to approve booking");
+                showMessage("Failed to approve booking", "error");
+              }
+            })
+            .catch((error) => {
+              console.error("Error approving booking:", error);
+              showMessage("Error approving booking", "error");
+            });
+        }
+
+        // Cancel a booking
+        function cancelBooking(bookingId) {
+          fetch("http://localhost:3000/admin/cancel", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bookingId: bookingId }),
+          })
+            .then((response) => response.json())
+            .then((response) => {
+              console.log(response);
+              if (response.success) {
+                console.log("Booking canceled successfully");
+                showMessage("Booking canceled successfully", "success");
+              } else {
+                console.error("Failed to cancel booking");
+                showMessage("Failed to cancel booking", "error");
+              }
+              return fetchBookings().then(displayBookings);
+            })
+            .catch((error) => {
+              console.error("Error canceling booking:", error);
+              showMessage("Error canceling booking", "error");
+            });
+        }
+
+        // Attach event listeners to buttons after the bookings are displayed
+        function attachEventListeners() {
+          const approveButtons = document.querySelectorAll(".approve-button");
+          const cancelButtons = document.querySelectorAll(".cancel-button");
+
+          approveButtons.forEach((button) => {
+            const bookingId = button.getAttribute("data-booking-id");
+            button.addEventListener("click", () => approveBooking(bookingId));
+          });
+
+          cancelButtons.forEach((button) => {
+            const bookingId = button.getAttribute("data-booking-id");
+            button.addEventListener("click", () => cancelBooking(bookingId));
+          });
+
+          // CSV Export button
+          document.getElementById("print-csv").addEventListener("click", () => {
+            fetchBookings().then((bookings) => {
+              exportBookingsToCSV(bookings);
+            });
+          });
+        }
+
+        // Fetch and display bookings on page load
+        fetchBookings()
+          .then((bookings) => {
+            displayBookings(bookings); // Display bookings in the table
+            initializeCalendar(bookings); // Initialize calendar with bookings
+          })
+          .catch((error) => {
+            console.error("Error fetching bookings:", error);
+            showMessage("Error fetching bookings", "error");
+          });
+      });
+    </script>
+  </body>
+</html>

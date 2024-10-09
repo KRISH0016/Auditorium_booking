@@ -1,0 +1,138 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif; /* Modern font for a clean look */
+}
+
+body {
+  background: #faf6ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 105vh;
+  margin: -20px 0 50px;
+  font-size: 16px; /* Larger default font size for readability */
+}
+
+.container {
+  background: #ffc494;
+  border-radius: 15px; /* Softer, more rounded corners */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.15); /* Softer shadow for depth */
+  position: relative;
+  overflow: hidden;
+  width: 700px; /* Slightly narrower for a sleeker look */
+  max-width: 95%;
+  min-height: 520px;
+  padding: 20px; /* Added padding for better spacing */
+}
+.container1 {
+  background: #ffc494;
+  border-radius: 15px; /* Softer, more rounded corners */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.15); /* Softer shadow for depth */
+  position: relative;
+  overflow: hidden;
+  width: 700px; /* Slightly narrower for a sleeker look */
+  max-width: 95%;
+  min-height: 720px;
+  padding: 20px; /* Added padding for better spacing */
+}
+
+form {
+  background-color: #ffc494;
+  display: flex;
+  flex-direction: column;
+  padding: 0 40px;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+h1 {
+  color: #fff;
+  font-size: 24px; /* Larger, clearer heading */
+  margin-bottom: 15px;
+  font-weight: 600; /* Medium thickness for headings */
+  text-transform: uppercase;
+  letter-spacing: 2px; /* Spacing out letters for a modern feel */
+}
+h2 {
+  color: #fff;
+  font-size: 20px; /* Larger, clearer heading */
+  margin-bottom: 15px;
+  font-weight: 500; /* Medium thickness for headings */
+  text-transform: uppercase;
+  letter-spacing: 1.5px; /* Spacing out letters for a modern feel */
+}
+h3 {
+  color: #fff;
+  font-size: 18px; /* Larger, clearer heading */
+  margin-bottom: 15px;
+  font-weight: 400; /* Medium thickness for headings */
+  text-transform: uppercase;
+  letter-spacing: 1px; /* Spacing out letters for a modern feel */
+}
+input {
+  background-color: #f3f3f3;
+  border: 1px solid #ddd; /* Added a subtle border */
+  border-radius: 8px; /* Rounded corners for inputs */
+  padding: 12px 20px;
+  margin: 10px 0;
+  width: 100%;
+  font-size: 14px; /* Slightly larger for readability */
+  color: #333;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  border-color: #ff4b2b; /* Highlight input on focus */
+  outline: none; /* Remove default outline */
+}
+
+button {
+  border-radius: 25px; /* More rounded button for a modern look */
+  border: none; /* Removed border for cleaner button */
+  background-color: #ff4b2b;
+  color: #ffffff;
+  font-size: 14px; /* Increased font size for better visibility */
+  font-weight: bold;
+  padding: 12px 50px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, transform 80ms ease-in;
+  cursor: pointer; /* Added cursor pointer to indicate button */
+}
+
+button:hover {
+  background-color: #ff6347; /* Slight color change on hover */
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+a {
+  color: #333;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #ff4b2b; /* Hover color change for links */
+}
+
+p {
+  margin-top: 20px;
+  font-weight: 500;
+  color: #fff; /* Make paragraph text white for better contrast */
+}
+
+/* Added animation for smooth input focus */
+input:focus,
+button:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(255, 75, 43, 0.3); /* Soft glow on focus */
+}

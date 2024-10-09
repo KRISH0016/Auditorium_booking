@@ -1,0 +1,165 @@
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #faf6ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Set to 100vh to fit the viewport */
+  margin: 0;
+  flex-direction: column;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 95%;
+  max-width: 1200px;
+  min-height: 555px; /* Reduced min-height to fit within viewport */
+  padding: 15px; /* Maintain comfortable padding */
+  background: #ffdcc0;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.12);
+  margin-top: 10px; /* Reduced margin to fit better */
+}
+
+.left-panel,
+.right-panel {
+  width: 48%; /* Adjusted width for better fit */
+}
+
+.viewMyBookings {
+  background: #ffc494;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 15px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.viewMyBookings:hover {
+  transform: scale(1.02);
+}
+
+.amenities-container {
+  margin-top: 5px;
+}
+
+.amenities-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px; /* Adds space between items */
+}
+
+.amenity {
+  flex: 1 1 45%; /* Each amenity takes up about half the width */
+  display: flex;
+  align-items: center;
+}
+
+
+.auditorium-select,
+.booking-controls,
+.booking-status {
+  background: #ffc494;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  margin-bottom: 15px;
+}
+
+select,
+input[type="date"],
+button {
+  width: 100%;
+  padding: 10px; /* Adjusted padding */
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+select:focus,
+input[type="date"]:focus {
+  border-color: #871a07;
+  outline: none;
+}
+
+button:focus {
+  outline: none;
+  background-color: #9c240d;
+}
+
+#calendar {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+#message-box {
+  margin-top: 10px; /* Reduced margin */
+  padding: 12px;
+  background: #f7f7f7;
+  border-radius: 6px;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #871a07;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.booking-controls {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-slot-container,
+.auditorium-event-container {
+  display: flex; /* Use flexbox to align items side by side */
+  justify-content: space-between; /* Space between the items */
+  margin-bottom: 15px; /* Space below the container */
+}
+
+.date-slot-container > div,
+.auditorium-event-container > div {
+  width: 48%; /* Adjust width for side by side layout */
+}
+
+.booking-controls {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-container {
+  display: flex; /* Use flexbox to align buttons */
+  justify-content: space-between; /* Adjust space between buttons */
+  margin-top: 10px; /* Optional: Add some space above the buttons */
+}
+
+button {
+  margin: 0 5px; /* Optional: Add some space between buttons */
+  padding: 10px 15px; /* Adjust padding as needed */
+  border: none;
+  border-radius: 5px;
+  background-color: #871a07; /* Your button color */
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #9c240d; /* Hover effect for buttons */
+}

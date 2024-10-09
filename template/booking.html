@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Auditorium</title>
+    <link rel="stylesheet" href="../styles/styles-booking.css" />
+    <link rel="icon" type="image/png" href="../images/logo.png" />
+    <!-- For .png files -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-panel">
+        <div class="auditorium-select">
+          <h1>Hello, <span id="userName"></span></h1>
+          <h1>Auditorium Booking</h1>
+          <label for="auditorium">Choose Auditorium:</label>
+          <select id="auditorium">
+            <option value="auditorium1">KS</option>
+            <option value="auditorium2">KK</option>
+            <option value="auditorium3">Open Air Auditorium</option>
+          </select>
+          <label for="event-name">Event Name:</label>
+          <input type="text" id="event-name" placeholder="Enter event name" />
+        </div>
+
+        <div class="booking-controls">
+          <div class="date-slot-container">
+            <!-- New div for buttons -->
+            <label for="booking-date">Choose Date:</label>
+            <input type="date" id="booking-date" />
+
+            <div>
+              <label for="start-time">Start Time:</label>
+              <select id="start-time">
+                <option value="08:00">8:00 AM</option>
+                <option value="09:00">9:00 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="12:00">12:00 PM</option>
+                <option value="13:00">1:00 PM</option>
+                <option value="14:00">2:00 PM</option>
+                <option value="15:00">3:00 PM</option>
+                <option value="16:00">4:00 PM</option>
+                <option value="17:00">5:00 PM</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="end-time">End Time:</label>
+              <select id="end-time">
+                <option value="09:00">9:00 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="12:00">12:00 PM</option>
+                <option value="13:00">1:00 PM</option>
+                <option value="14:00">2:00 PM</option>
+                <option value="15:00">3:00 PM</option>
+                <option value="16:00">4:00 PM</option>
+                <option value="17:00">5:00 PM</option>
+                <option value="18:00">6:00 PM</option>
+              </select>
+            </div>
+          </div>
+          <div class="amenities-container">
+            <label>Amenities required:</label>
+            <div class="amenities-grid">
+              <div class="amenity">
+                <input type="checkbox" id="PAS" value="PAS" />
+                <label for="PAS">PAS</label>
+              </div>
+              <div class="amenity">
+                <input type="checkbox" id="cordless collar-mike" value="cordless collar-mike" />
+                <label for="cordless collar-mike">Cordless Collar-Mike</label>
+              </div>
+              <div class="amenity">
+                <input type="checkbox" id="projector" value="Projector" />
+                <label for="projector">Projector</label>
+              </div>
+              <div class="amenity">
+                <input type="checkbox" id="photography" value="photography" />
+                <label for="photography">Photography</label>
+              </div>
+              <div class="amenity">
+                <input type="checkbox" id="videography" value="videography" />
+                <label for="videography">Videography</label>
+              </div>
+              <div class="amenity">
+                <input type="checkbox" id="livestreaming" value="livestreaming" />
+                <label for="livestreaming">Live streaming</label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- <label>Amenities required:</label>
+          <div>
+            <input type="checkbox" id="collar-mike" value="Collar Mike" />
+            <label for="collar-mike">Collar Mike</label>
+          </div>
+          <div>
+            <input type="checkbox" id="hand-mikes" value="3 Mikes" />
+            <label for="hand-mikes">Hand Mikes</label>
+          </div>
+          <div>
+            <input type="checkbox" id="projector" value="Projector" />
+            <label for="projector">Projector</label>
+          </div> -->
+          <div class="button-container">
+            <!-- New div for buttons -->
+            <button id="book-button">Book</button>
+            <button id="cancel-button">Cancel</button>
+          </div>
+          <div id="message-box"></div>
+        </div>
+      </div>
+      <div class="right-panel">
+        <div id="calendar"></div>
+        <div class="viewMyBookings">
+          <button id="view-my-bookings-button">View My Bookings</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        //const calendarEl = document.getElementById("calendar");
+        const calendar = document.getElementById("calendar");
+        const auditoriumSelect = document.getElementById("auditorium");
+        const dateSelect = document.getElementById("booking-date");
+        //const slotSelect = document.getElementById("slot");
+        const eventNameInput = document.getElementById("event-name");
+        const viewMyBookingsButton = document.getElementById(
+          "view-my-bookings-button"
+        );
+        const amenitiesCheckboxes = document.querySelectorAll(
+          'input[type="checkbox"]'
+        );
+        const startTimeSelect = document.getElementById("start-time");
+        const start = startTimeSelect.value;
+        const endTimeSelect = document.getElementById("end-time");
+        const end = endTimeSelect.value;
+        const bookButton = document.getElementById("book-button");
+        const cancelButton = document.getElementById("cancel-button");
+        const messageBox = document.getElementById("message-box");
+        const userName = document.getElementById("userName");
+        const userId = localStorage.getItem("userID");
+        //const bookings = await fetchBookings();
+
+        console.log(localStorage.getItem("email"));
+        console.log(start + " " + end);
+        userName.innerHTML = localStorage.getItem("name");
+
+        let events = [];
+
+        async function fetchBookings() {
+          try {
+            const response = await fetch("http://localhost:3000/bookings");
+            if (!response.ok) {
+              throw new Error("Failed to fetch bookings");
+            }
+            const bookings = await response.json();
+            console.log("Fetched bookings:", bookings);
+
+            //FullCalendar expects an array of events, map bookings to event format
+            return bookings.map((booking) => ({
+              id: booking._id, // Use MongoDB ObjectId
+              title: booking.events_name,
+              start: booking.start,
+              end: booking.end,
+              date: booking.date,
+              events_name: booking.events_name,
+              auditorium: booking.auditorium,
+              backgroundColor:
+                  booking.status === "Approved" ? "green" : "grey",
+              borderColor: booking.status === "Approved" ? "green" : "grey",
+              // backgroundColor:
+              //   booking.status === "Approved"
+              //     ? "rgba(128, 128, 128, 0.5)"
+              //     : "rgba(255, 255, 0, 0.5)",
+              // borderColor:
+              //   booking.status === "Approved"
+              //     ? "rgba(255, 255, 0, 0.5)"
+              //     : "rgba(128, 128, 128, 0.5)",
+              userId: booking.user,
+            }));
+          } catch (error) {
+            console.error("Error fetching bookings:", error.message);
+            return [];
+          }
+        }
+        //     return bookings.map((booking) => ({
+        //       id: booking._id, // Use MongoDB ObjectId
+        //       title: booking.events_name,
+        //       start: `${booking.date}T${booking.start}:00`,
+        //       end: `${booking.date}T${booking.end}:00`,
+        //       backgroundColor:
+        //         booking.status === "Approved"
+        //           ? "rgba(255, 255, 0, 0.5)"
+        //           : "rgba(128, 128, 128, 0.5)",
+        //       borderColor:
+        //         booking.status === "Approved"
+        //           ? "rgba(255, 255, 0, 0.5)"
+        //           : "rgba(128, 128, 128, 0.5)",
+        //       userId: booking.user,
+        //     }));
+        //   } catch (error) {
+        //     console.error("Error fetching bookings:", error.message);
+        //     return [];
+        //   }
+        // }
+
+        // document.addEventListener("DOMContentLoaded", async () => {
+        //   // Fetch bookings and update the calendar on page load
+        //   const bookings = await fetchBookings();
+        //   updateCalendar(bookings);
+        // });
+
+        function fetchMyBookings() {
+          console.log("Calling");
+          return fetch(`http://localhost:3000/bookings/${userId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Fetched bookings:", data);
+              return data;
+            })
+            .catch((error) => {
+              console.error("Error fetching bookings:", error);
+            });
+        }
+
+        function updateMyCalendar(bookings) {
+          console.log("Update Calendar", bookings);
+          if (!bookings || bookings.length === 0) {
+            $("#calendar").fullCalendar("removeEvents"); // Clear events if no bookings
+            return;
+          }
+
+          // Remove any previously added events to avoid duplicates
+          $("#calendar").fullCalendar("removeEvents");
+
+          // Filter unique bookings based on _id
+          // const uniqueBookings = bookings.reduce((acc, current) => {
+          //   if (!acc.some((booking) => booking._id === current._id)) {
+          //     acc.push(current);
+          //   }
+          //   return acc;
+          // }, []);
+
+          const uniqueBookings = bookings;
+
+          console.log(uniqueBookings.length)
+
+          const events = uniqueBookings
+            .map((booking) => {
+              // Determine auditorium label based on the auditorium field
+              let auditoriumLabel;
+              if (booking.auditorium === "auditorium1") {
+                auditoriumLabel = "KS";
+              } else if (booking.auditorium === "auditorium2") {
+                auditoriumLabel = "KK";
+              } else {
+                auditoriumLabel = "Open Air Audi";
+              }
+
+              // Extract the booking date (if needed) and start/end times
+              let bookingDate;
+              try {
+                const dateParts = booking.date.split("T");
+                bookingDate = dateParts[0]; // Only extract the date part if necessary
+              } catch (error) {
+                console.error("Invalid booking date:", error);
+                return null; // Skip this booking if date is invalid
+              }
+
+              // Validate start and end times
+              const startTime = booking.start.includes(":")
+                ? booking.start
+                : `${booking.start}:00`;
+              const endTime = booking.end.includes(":")
+                ? booking.end
+                : `${booking.end}:00`;
+
+              // Combine booking date and time to create full ISO datetime strings
+              const start = `${bookingDate}T${startTime}`;
+              const end = `${bookingDate}T${endTime}`;
+
+              // Convert to ISO format (if needed)
+              let correctedStart, correctedEnd;
+              try {
+                correctedStart = new Date(start).toISOString();
+                correctedEnd = new Date(end).toISOString();
+              } catch (error) {
+                console.error("Invalid start or end time:", start, end);
+                return null; // Skip this booking if the time is invalid
+              }
+
+              // Create a time slot label for display
+              const slotLabel = `${startTime} - ${endTime}`;
+              const title = `${auditoriumLabel} ${slotLabel} - ${booking.events_name}`;
+
+              // Determine color based on booking status
+              const color =
+            
+                  booking.status === "Approved" ? "green" : "grey";
+                
+
+              // Return the event object to be added to the calendar
+              return {
+                title: title, // Title displayed in the calendar
+                start: correctedStart, // Correct ISO formatted start time
+                end: correctedEnd, // Correct ISO formatted end time
+                backgroundColor: color,
+                borderColor: color,
+                id: booking.id, // MongoDB ObjectId as event ID
+                userId: booking.userId, // User ID for reference
+                tooltip: title, // Tooltip for event hover
+              };
+            })
+            .filter((event) => event !== null); // Filter out any null events caused by invalid data
+
+          // Add the events to the calendar
+          console.log(events);
+          $("#calendar").fullCalendar("addEventSource", events);  
+          // return events;
+        }
+
+        function updateCalendar(bookings) {
+          console.log("Update Calendar", bookings);
+          if (!bookings || bookings.length === 0) {
+            $("#calendar").fullCalendar("removeEvents"); // Clear events if no bookings
+            return;
+          }
+
+          // Remove any previously added events to avoid duplicates
+          $("#calendar").fullCalendar("removeEvents");
+
+          // Filter unique bookings based on _id
+          // const uniqueBookings = bookings.reduce((acc, current) => {
+          //   if (!acc.some((booking) => booking._id === current._id)) {
+          //     acc.push(current);
+          //   }
+          //   return acc;
+          // }, []);
+
+          const uniqueBookings = bookings;
+
+          console.log(uniqueBookings.length)
+
+          const events = uniqueBookings
+            .map((booking) => {
+              // Determine auditorium label based on the auditorium field
+              let auditoriumLabel;
+              if (booking.auditorium === "auditorium1") {
+                auditoriumLabel = "KS";
+              } else if (booking.auditorium === "auditorium2") {
+                auditoriumLabel = "KK";
+              } else {
+                auditoriumLabel = "Open Air Audi";
+              }
+
+              // Extract the booking date (if needed) and start/end times
+              let bookingDate;
+              try {
+                const dateParts = booking.date.split("T");
+                bookingDate = dateParts[0]; // Only extract the date part if necessary
+              } catch (error) {
+                console.error("Invalid booking date:", error);
+                return null; // Skip this booking if date is invalid
+              }
+
+              // Validate start and end times
+              const startTime = booking.start.includes(":")
+                ? booking.start
+                : `${booking.start}:00`;
+              const endTime = booking.end.includes(":")
+                ? booking.end
+                : `${booking.end}:00`;
+
+              // Combine booking date and time to create full ISO datetime strings
+              const start = `${bookingDate}T${startTime}`;
+              const end = `${bookingDate}T${endTime}`;
+
+              // Convert to ISO format (if needed)
+              let correctedStart, correctedEnd;
+              try {
+                correctedStart = new Date(start).toISOString();
+                correctedEnd = new Date(end).toISOString();
+              } catch (error) {
+                console.error("Invalid start or end time:", start, end);
+                return null; // Skip this booking if the time is invalid
+              }
+
+              // Create a time slot label for display
+              const slotLabel = `${startTime} - ${endTime}`;
+              const title = `${auditoriumLabel} ${slotLabel} - ${booking.events_name}`;
+
+              // Determine color based on booking status
+              // const color =
+              //   booking.status === "Approved"
+              //     ? "green" // Yellow for approved
+              //     : "grey"; // Grey for pending
+
+              // Return the event object to be added to the calendar
+              return {
+                title: title, // Title displayed in the calendar
+                start: correctedStart, // Correct ISO formatted start time
+                end: correctedEnd, // Correct ISO formatted end time
+                backgroundColor: booking.backgroundColor,
+                borderColor: booking.borderColor,
+                id: booking.id, // MongoDB ObjectId as event ID
+                userId: booking.userId, // User ID for reference
+                tooltip: title, // Tooltip for event hover
+              };
+            })
+            .filter((event) => event !== null); // Filter out any null events caused by invalid data
+
+          // Add the events to the calendar
+          console.log(events);
+          // $("#calendar").fullCalendar("addEventSource", events);  
+          return events;
+        }
+
+        // $(document).addEventListener("DOMContentLoaded", () => {
+        //   fetchBookings()
+        //     .then((bookings) => {
+        //       updateCalendar(bookings);
+        //     })
+        //     .catch((error) => {
+        //       console.error("Error fetching bookings:", error);
+        //       messageBox.textContent = "Failed to fetch your bookings";
+        //     });
+        // });
+        $(document).ready(function () {
+          $("#calendar").fullCalendar({
+            header: {
+              left: "prev",
+              center: "title",
+              right: "next",
+            },
+            defaultView: "month",
+            displayEventTime: false, // Hide time next to title
+
+            events: async function (start, end, timezone, callback) {
+              try {
+                const bookings = await fetchBookings(); // Fetch booking data
+
+                console.log("Calendar bookings:", bookings); // Check the data being returned
+
+                const events = updateCalendar(bookings); // Update the calendar with fetched bookings
+                callback(events); // Pass the bookings to FullCalendar
+              } catch (error) {
+                console.error("Error fetching bookings:", error);
+                messageBox.textContent = "Failed to fetch your bookings";
+              }
+            },
+            eventRender: function (event, element) {
+              element.attr("title", event.tooltip); // Display full title on hover
+            },
+            eventClick: function (event) {
+              if (event.userId == userId) {
+                if (confirm("Do you want to cancel this booking?")) {
+                  cancelBooking(event.id);
+                }
+              } else {
+                alert("You can only cancel your own bookings.");
+              }
+            },
+          });
+        });
+
+        bookButton.addEventListener("click", async () => {
+          const auditorium = auditoriumSelect.value;
+          // const date = new Date(dateSelect.value); // Ensure this is a Date object
+          const date = dateSelect.value; // Ensure this is a Date object
+          console.log(dateSelect.value, date);
+          const startTimeSelect = document.getElementById("start-time");
+          const endTimeSelect = document.getElementById("end-time");
+
+          // Move these lines inside the click event listener
+          const startTime = startTimeSelect.value;
+          const endTime = endTimeSelect.value;
+
+          const amenities = Array.from(amenitiesCheckboxes)
+            .filter((checkbox) => checkbox.checked)
+            .map((checkbox) => checkbox.value);
+          const events_name = eventNameInput.value.trim();
+
+          console.log(startTime + " " + endTime);
+
+          if (auditorium && date && startTime && endTime && events_name) {
+            try {
+              // Send booking request with selected start and end time
+              await fetch("http://localhost:3000/book", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "auth": localStorage.getItem("token")
+                },
+                body: JSON.stringify({
+                  userId: localStorage.getItem("userID"),
+                  auditorium: auditorium,
+                  date: date,
+                  start: startTime,
+                  end: endTime,
+                  events_name: events_name,
+                  amenities: amenities,
+                  status: "pending",
+                }),
+              })
+                .then((response) => {
+                  if (!response.ok)
+                    throw new Error("Network response was not ok");
+                  return response.json();
+                })
+                .then((data) => {
+                  messageBox.textContent =
+                    "Booking request submitted for approval";
+                  fetchBookings().then((bookings) => updateCalendar(bookings));
+                });
+            } catch (error) {
+              messageBox.textContent = "Failed to submit booking request";
+            }
+          } else {
+            messageBox.textContent = "Please fill in all required fields.";
+          }
+        });
+
+        viewMyBookingsButton.addEventListener("click", () => {
+          fetchMyBookings()
+            .then((bookings) => {
+              updateMyCalendar(bookings);
+            })
+            .catch((error) => {
+              console.error("Error fetching bookings:", error);
+              messageBox.textContent = "Failed to fetch your bookings";
+            });
+        });
+
+        async function findBookingId(userId) {
+          const dateSelect = document.getElementById("booking-date");
+          const startTimeSelect = document.getElementById("start-time");
+          const endTimeSelect = document.getElementById("end-time");
+
+          const selectedDate = dateSelect.value; // e.g., "2024-09-23"
+          const startTime = startTimeSelect.value;
+          const endTime = endTimeSelect.value;
+
+          // Construct start and end datetime strings
+          const start = `${selectedDate}T${startTime}:00`;
+          const end = `${selectedDate}T${endTime}:00`;
+          console.log(start + " inview " + end);
+
+          try {
+            const response = await fetch("http://localhost:3000/slot", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                start: start,
+                end: end,
+                userId: userId,
+                date: selectedDate,
+              }),
+            });
+
+            const data = await response.json();
+
+            // Check if response is successful
+            if (response.ok) {
+              console.log(data._id);
+              messageBox.textContent = "Cancelling...";
+              currentBookingID = data._id;
+              // Optionally handle further updates here
+            } else {
+              messageBox.textContent =
+                data.message || "Failed to cancel the booking";
+            }
+          } catch (error) {
+            console.error(error);
+            messageBox.textContent = "Failed to cancel the booking";
+          }
+        }
+
+        async function cancelBooking(bookingId) {
+          await fetch("http://localhost:3000/cancel", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "auth": localStorage.getItem("token")
+            },
+            body: JSON.stringify({
+              userId: userId,
+              bookingId: bookingId,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              messageBox.textContent = data.message;
+              fetchBookings().then((bookings) => updateCalendar(bookings));
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              messageBox.textContent = "Failed to cancel the booking";
+            });
+        }
+
+        cancelButton.addEventListener("click", () => {
+          const dateSelect = document.getElementById("booking-date");
+          const startTimeSelect = document.getElementById("start-time");
+          const endTimeSelect = document.getElementById("end-time");
+
+          const selectedDate = dateSelect.value; // e.g., "2024-09-23"
+          const startTime = startTimeSelect.value;
+          const endTime = endTimeSelect.value;
+
+          const start = `${selectedDate}T${startTime}:00`;
+          const end = `${selectedDate}T${endTime}:00`;
+
+          console.log(start, end);
+
+          findBookingId(localStorage.getItem("userID"))
+            .then((bookingId) => {
+              if (bookingId) {
+                console.log("Booking ID", currentBookingID);
+                return cancelBooking(currentBookingID);
+              } else {
+                throw new Error("No booking found for the selected slot.");
+              }
+            })
+            .then((res) => {
+              console.log(res);
+            })
+            .catch((err) => {
+              console.error(err);
+              alert(err.message); // Show the error message
+            });
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auditorium Management System</title>
+    <link rel="stylesheet" type="text/css" href="../styles/styles.css" />
+    <link rel="icon" type="image/png" href="../images/logo.png" />
+    <!-- For .png files -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div id="auth">
+        <form id="registerForm" style="display: none">
+          <h1>Register</h1>
+          <label for="registerName">Name:</label>
+          <input type="text" id="registerName" required />
+          <label for="registerEmail">Email:</label>
+          <input type="email" id="registerEmail" required />
+          <label for="registerPassword">Password:</label>
+          <input type="password" id="registerPassword" required />
+          <label for="registerDepartment">Department:</label>
+          <input type="text" id="registerDepartment" required />
+          <label for="registerPhone">Phone Number:</label>
+          <input type="tel" id="registerPhone" required />
+          <!-- New field for phone number -->
+          <button type="submit">Register</button>
+          <p>Already have an account? <a href="#" id="toSignIn">Sign in</a></p>
+        </form>
+
+        <form id="signInForm">
+          <!-- <a href="https://www.tce.edu"> -->
+
+          <img src="../images/logo.png" style="width: 125px; height: 105px" />
+          <!-- </a> -->
+          <h1>Thiagarajar College of Engineering</h1>
+          <h2>Auditorium Management System</h2>
+          <h3>Sign In</h3>
+          <label for="signInEmail">Email:</label>
+          <input type="email" id="signInEmail" required />
+          <label for="signInPassword">Password:</label>
+          <input type="password" id="signInPassword" required />
+          <button type="submit">Sign In</button>
+          <p>Don't have an account? <a href="#" id="toRegister">Register</a></p>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const registerForm = document.getElementById("registerForm");
+        const signInForm = document.getElementById("signInForm");
+
+        // Toggle between Register and Sign In
+        document.getElementById("toRegister").addEventListener("click", (e) => {
+          e.preventDefault();
+          signInForm.style.display = "none";
+          registerForm.style.display = "block";
+        });
+
+        document.getElementById("toSignIn").addEventListener("click", (e) => {
+          e.preventDefault();
+          registerForm.style.display = "none";
+          signInForm.style.display = "block";
+        });
+        registerForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const name = document.getElementById("registerName").value;
+          const email = document.getElementById("registerEmail").value;
+          const password = document.getElementById("registerPassword").value;
+          const department =
+            document.getElementById("registerDepartment").value;
+          const phone = document.getElementById("registerPhone").value; // Get the phone number
+
+          if (!/^\d{10}$/.test(phone)) {
+            alert("Please enter a valid 10-digit phone number.");
+            return;
+          }
+          if (!email.endsWith("tce.edu")) {
+            alert("Please use a tce.edu email address.");
+            return;
+          }
+
+          try {
+            const response = await fetch("http://localhost:3000/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            });
+            const checkData = await response.json(); // Corrected to use response instead of checkResponse
+
+            if (checkData.exists) {
+              alert("Email is already registered. Please contact Admin.");
+              return;
+            }
+          } catch (error) {
+            console.log(error);
+          }
+
+          try {
+            const response = await fetch("http://localhost:3000/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name,
+                email,
+                password,
+                department,
+                phone,
+              }), // Include phone in registration
+            });
+
+            if (response.ok) {
+              // Open OTP page after successful registration
+              window.location.href = "http://localhost:3000/otp"; // Redirect to OTP page
+            } else {
+              const data = await response.json();
+              alert("Registration failed: " + data.message);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Failed to register");
+          }
+        });
+
+        // Sign In User
+        signInForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = document.getElementById("signInEmail").value;
+          const password = document.getElementById("signInPassword").value;
+          console.log(email);
+          // Find user by email
+          try {
+            const response = await fetch("http://localhost:3000/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
+
+            if (response.ok) {
+              const { success, message, token } = await response.json();
+              localStorage.setItem("token", token);
+              alert("Login Successful!");
+            } else {
+              const { success, message, token } = await response.json();
+              alert(message);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Failed to register");
+          }
+          if (!email.endsWith("tce.edu")) {
+            alert("Please use a tce.edu email address.");
+            return;
+          }
+
+          try {
+            const response = await fetch("http://localhost:3000/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
+
+            await response
+              .json()
+              .then((data) => {
+                console.log(data.data);
+                localStorage.setItem("email", data.data.email);
+                localStorage.setItem("name", data.data.name);
+                localStorage.setItem("dept", data.data.dept);
+                localStorage.setItem("userID", data.data._id);
+
+                console.log(localStorage.getItem("name"));
+
+                if (response.ok) {
+                  alert(`Welcome, ${data.data.name}`);
+                  window.location.href = "/booking"; // Redirect to booking page on successful login
+                } else {
+                  alert("Sign-in failed: " + data.message);
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+            // console.log(data.data.name);
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Failed to sign in");
+          }
+        });
+
+        // OTP Verification
+        const otpForm = document.getElementById("otpForm");
+        if (otpForm) {
+          otpForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const otpCode = document.getElementById("otpCode").value;
+            const email = document.getElementById("registerEmail").value; // Email should be stored from registration
+
+            try {
+              const response = await fetch("http://localhost:3000/verify-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, otp: otpCode }),
+              });
+
+              const result = await response.json();
+              if (response.ok) {
+                alert("OTP verified successfully");
+                //window.location.href = 'login.html'; // Redirect to booking page after OTP verification
+              } else {
+                alert("Invalid OTP");
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("Failed to verify OTP");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

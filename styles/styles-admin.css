@@ -1,0 +1,159 @@
+/* General styles */
+body {
+  font-family: "Poppins", sans-serif; /* Modern font */
+  margin: 0;
+  padding: 0;
+  background-color: #faf6ff; /* Light background for contrast */
+}
+
+header {
+  background-color: #333; /* Dark background for header */
+  color: white;
+  text-align: center;
+  padding: 15px 0; /* Reduced padding */
+}
+#print-csv {
+  background-color: #4caf50; /* Green background */
+  color: white; /* White text */
+  padding: 10px 15px; /* Padding */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-bottom: 20px; /* Space below the button */
+  font-size: 16px; /* Font size */
+}
+
+#print-csv:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+header h1 {
+  margin: 0;
+  font-size: 24px; /* Slightly smaller font size */
+}
+
+main {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 15px; /* Reduced margin */
+}
+
+section {
+  background-color: #ffdcc0; /* Section background color */
+  padding: 15px; /* Reduced padding */
+  margin-bottom: 15px; /* Reduced margin */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+  border-radius: 8px; /* Slightly smaller border radius */
+  width: calc(100% - 10px); /* Adjusted width for responsiveness */
+}
+
+/* Section heading styles */
+h2 {
+  color: #333;
+  margin: 0 0 10px; /* Reduced margins */
+}
+
+/* Bookings table styles */
+#bookings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px; /* Reduced spacing above the table */
+}
+
+#bookings-table th,
+#bookings-table td {
+  border: 1px solid #ddd;
+  padding: 6px; /* Reduced padding for a more compact look */
+  text-align: left;
+  white-space: nowrap; /* Prevent text from wrapping */
+}
+
+#bookings-table th {
+  background-color: #f2f2f2; /* Light header background */
+}
+
+#bookings-table td {
+  vertical-align: top;
+  font-size: 12px; /* Smaller font size */
+}
+
+/* Use media queries to adjust table styles for smaller screens */
+@media (max-width: 700px) {
+  #bookings-table {
+    display: block; /* Make the table block to allow scrolling */
+    overflow-x: auto; /* Allow horizontal scrolling */
+  }
+
+  #bookings-table th,
+  #bookings-table td {
+    white-space: normal; /* Allow text to wrap on smaller screens */
+  }
+}
+
+/* Specific adjustments for individual columns */
+#bookings-table td:nth-child(1), /* ID */
+#bookings-table td:nth-child(4), /* User ID */
+#bookings-table td:nth-child(6) {
+  /* Date */
+  width: 8%; /* Fixed width for certain columns */
+}
+
+#bookings-table td:nth-child(2), /* Name */
+#bookings-table td:nth-child(3), /* Dept */
+#bookings-table td:nth-child(5), /* Auditorium */
+#bookings-table td:nth-child(7), /* Slot */
+#bookings-table td:nth-child(8) {
+  /* Amenities */
+  width: 12%; /* Fixed width for other columns */
+}
+
+#bookings-table td:nth-child(9) {
+  /* Status */
+  width: 8%; /* Fixed width for status column */
+}
+
+#bookings-table td:nth-child(10) {
+  /* Action */
+  width: 12%; /* Fixed width for action buttons */
+}
+
+/* Calendar section styles */
+#calendar {
+  max-width: 700px; /* Adjusted max width */
+  margin: 15px auto; /* Center calendar with margin */
+}
+
+/* Message box styles */
+.message-box {
+  margin-top: 10px; /* Space above message box */
+  padding: 10px; /* Reduced padding for better look */
+  border: 1px solid #ccc;
+  border-radius: 6px; /* Rounded corners for message box */
+  background-color: #f0f0f0; /* Light background */
+  color: #333;
+}
+
+.message-box.success {
+  background-color: #d4edda; /* Success message background */
+  border-color: #c3e6cb; /* Success border color */
+  color: #155724; /* Success text color */
+}
+
+.message-box.error {
+  background-color: #f8d7da; /* Error message background */
+  border-color: #f5c6cb; /* Error border color */
+  color: #721c24; /* Error text color */
+}
+
+/* Responsive styles */
+@media (max-width: 700px) {
+  main {
+    flex-direction: column; /* Stack sections on small screens */
+  }
+
+  section {
+    margin: 5px; /* Margin for small screens */
+    width: 100%; /* Full width on small screens */
+  }
+}
