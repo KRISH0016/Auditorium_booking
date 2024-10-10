@@ -30,6 +30,14 @@
             <option value="auditorium1">KS</option>
             <option value="auditorium2">KK</option>
             <option value="auditorium3">Open Air Auditorium</option>
+            <option value="auditorium4">Main Ground</option>
+            <option value="auditorium5">Indoor Stadium</option>
+            <option value="auditorium6">CSE Seminar Hall</option>
+            <option value="auditorium7">IT Seminar Hall</option>
+            <option value="auditorium8">ECE Seminar Hall</option>
+            <option value="auditorium9">EEE Seminar Hall</option>
+            <option value="auditorium10">Mechanical Seminar Hall</option>
+            <option value="auditorium11">Mechatronics Seminar Hall</option>
           </select>
           <label for="event-name">Event Name:</label>
           <input type="text" id="event-name" placeholder="Enter event name" />
@@ -81,7 +89,11 @@
                 <label for="PAS">PAS</label>
               </div>
               <div class="amenity">
-                <input type="checkbox" id="cordless collar-mike" value="cordless collar-mike" />
+                <input
+                  type="checkbox"
+                  id="cordless collar-mike"
+                  value="cordless collar-mike"
+                />
                 <label for="cordless collar-mike">Cordless Collar-Mike</label>
               </div>
               <div class="amenity">
@@ -97,12 +109,16 @@
                 <label for="videography">Videography</label>
               </div>
               <div class="amenity">
-                <input type="checkbox" id="livestreaming" value="livestreaming" />
+                <input
+                  type="checkbox"
+                  id="livestreaming"
+                  value="livestreaming"
+                />
                 <label for="livestreaming">Live streaming</label>
               </div>
             </div>
           </div>
-          
+
           <!-- <label>Amenities required:</label>
           <div>
             <input type="checkbox" id="collar-mike" value="Collar Mike" />
@@ -165,7 +181,9 @@
 
         async function fetchBookings() {
           try {
-            const response = await fetch("https://auditorium-booking-i34f.onrender.com/bookings");
+            const response = await fetch(
+              "https://auditorium-booking-i34f.onrender.com/bookings"
+            );
             if (!response.ok) {
               throw new Error("Failed to fetch bookings");
             }
@@ -181,8 +199,7 @@
               date: booking.date,
               events_name: booking.events_name,
               auditorium: booking.auditorium,
-              backgroundColor:
-                  booking.status === "Approved" ? "green" : "grey",
+              backgroundColor: booking.status === "Approved" ? "green" : "grey",
               borderColor: booking.status === "Approved" ? "green" : "grey",
               // backgroundColor:
               //   booking.status === "Approved"
@@ -228,7 +245,9 @@
 
         function fetchMyBookings() {
           console.log("Calling");
-          return fetch(`https://auditorium-booking-i34f.onrender.com/bookings/${userId}`)
+          return fetch(
+            `https://auditorium-booking-i34f.onrender.com/bookings/${userId}`
+          )
             .then((response) => response.json())
             .then((data) => {
               console.log("Fetched bookings:", data);
@@ -259,7 +278,7 @@
 
           const uniqueBookings = bookings;
 
-          console.log(uniqueBookings.length)
+          console.log(uniqueBookings.length);
 
           const events = uniqueBookings
             .map((booking) => {
@@ -269,8 +288,26 @@
                 auditoriumLabel = "KS";
               } else if (booking.auditorium === "auditorium2") {
                 auditoriumLabel = "KK";
+              } else if (booking.auditorium === "auditorium3") {
+                auditoriumLabel = "Open Air Auditorium";
+              } else if (booking.auditorium === "auditorium4") {
+                auditoriumLabel = "Main Ground";
+              } else if (booking.auditorium === "auditorium5") {
+                auditoriumLabel = "Indoor Stadium";
+              } else if (booking.auditorium === "auditorium6") {
+                auditoriumLabel = "CSE Seminar Hall";
+              } else if (booking.auditorium === "auditorium7") {
+                auditoriumLabel = "IT Seminar Hall";
+              } else if (booking.auditorium === "auditorium8") {
+                auditoriumLabel = "ECE Seminar Hall";
+              } else if (booking.auditorium === "auditorium9") {
+                auditoriumLabel = "EEE Seminar Hall";
+              } else if (booking.auditorium === "auditorium10") {
+                auditoriumLabel = "Mechanical Seminar Hall";
+              } else if (booking.auditorium === "auditorium11") {
+                auditoriumLabel = "Mechatronics Seminar Hall";
               } else {
-                auditoriumLabel = "Open Air Audi";
+                auditoriumLabel = "Unknown Auditorium";
               }
 
               // Extract the booking date (if needed) and start/end times
@@ -310,10 +347,7 @@
               const title = `${auditoriumLabel} ${slotLabel} - ${booking.events_name}`;
 
               // Determine color based on booking status
-              const color =
-            
-                  booking.status === "Approved" ? "green" : "grey";
-                
+              const color = booking.status === "Approved" ? "green" : "grey";
 
               // Return the event object to be added to the calendar
               return {
@@ -331,7 +365,7 @@
 
           // Add the events to the calendar
           console.log(events);
-          $("#calendar").fullCalendar("addEventSource", events);  
+          $("#calendar").fullCalendar("addEventSource", events);
           // return events;
         }
 
@@ -355,7 +389,7 @@
 
           const uniqueBookings = bookings;
 
-          console.log(uniqueBookings.length)
+          console.log(uniqueBookings.length);
 
           const events = uniqueBookings
             .map((booking) => {
@@ -427,7 +461,7 @@
 
           // Add the events to the calendar
           console.log(events);
-          // $("#calendar").fullCalendar("addEventSource", events);  
+          // $("#calendar").fullCalendar("addEventSource", events);
           return events;
         }
 
@@ -505,7 +539,7 @@
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  "auth": localStorage.getItem("token")
+                  auth: localStorage.getItem("token"),
                 },
                 body: JSON.stringify({
                   userId: localStorage.getItem("userID"),
@@ -562,18 +596,21 @@
           console.log(start + " inview " + end);
 
           try {
-            const response = await fetch("https://auditorium-booking-i34f.onrender.com/slot", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                start: start,
-                end: end,
-                userId: userId,
-                date: selectedDate,
-              }),
-            });
+            const response = await fetch(
+              "https://auditorium-booking-i34f.onrender.com/slot",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  start: start,
+                  end: end,
+                  userId: userId,
+                  date: selectedDate,
+                }),
+              }
+            );
 
             const data = await response.json();
 
@@ -598,7 +635,7 @@
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "auth": localStorage.getItem("token")
+              auth: localStorage.getItem("token"),
             },
             body: JSON.stringify({
               userId: userId,

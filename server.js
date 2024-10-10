@@ -156,7 +156,7 @@ app.post("/register", async (req, res) => {
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname + "/template/login.html"));
-  //res.redirect('http://localhost:3000');
+  //res.redirect('https://auditorium-booking-i34f.onrender.com/');
 });
 
 // Login route
