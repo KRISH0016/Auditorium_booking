@@ -63,7 +63,9 @@
 
         // Fetch bookings from the server
         function fetchBookings() {
-          return fetch("https://auditorium-booking-i34f.onrender.com/admin/bookings")
+          return fetch(
+            "https://auditorium-booking-i34f.onrender.com/admin/bookings"
+          )
             .then((response) => response.json())
             .catch((error) => {
               console.error("Error fetching bookings:", error);
@@ -121,6 +123,14 @@
             auditorium1: "KS",
             auditorium2: "KK",
             auditorium3: "Open Air Auditorium",
+            auditorium4: "Main Ground",
+            auditorium5: "Indoor Stadium",
+            auditorium6: "CSE Seminar Hall",
+            auditorium7: "IT Seminar Hall",
+            auditorium8: "ECE Seminar Hall",
+            auditorium9: "EEE Seminar Hall",
+            auditorium10: "Mechanical Seminar Hall",
+            auditorium11: "Mechatronics Seminar Hall",
           };
 
           const newBookings = bookings
