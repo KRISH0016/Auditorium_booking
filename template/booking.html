@@ -555,7 +555,7 @@
 
           console.log(startTime + " " + endTime);
 
-          if (auditorium && date && startTime && endTime && events_name) {
+          if (auditorium && date && startTime && endTime && events_name && events_resourceperson) {
             try {
               // Send booking request with selected start and end time
               await fetch("https://auditorium-booking-i34f.onrender.com/book", {
