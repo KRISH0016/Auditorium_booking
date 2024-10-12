@@ -96,6 +96,7 @@
               booking.user.name,
               booking.user.dept,
               booking.events_name,
+              booking.events_resourceperson,
               auditoriumCode,
               new Date(booking.date).toLocaleDateString(),
               booking.start, // Start Time
@@ -242,6 +243,7 @@
               <td>${booking.user.name}</td>
               <td>${booking.user.dept}</td>
               <td>${booking.events_name}</td>
+              <td>${booking.events_resourceperson}</td>
               <td>${auditoriumCode}</td>
               <td>${new Date(booking.date).toLocaleDateString()}</td>
               <td>${booking.start}</td>

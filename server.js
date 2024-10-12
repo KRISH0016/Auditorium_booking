@@ -79,6 +79,7 @@ const bookingSchema = new mongoose.Schema({
   start: { type: String, required: true },
   end: { type: String, required: true },
   events_name: { type: String, required: true },
+  events_resourceperson: {type: String, required: true},
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   status: { type: String, default: "pending" },
   amenities: { type: [String], default: [] }, // Define amenities field
@@ -250,7 +251,7 @@ app.post("/verify-otp", async (req, res) => {
 app.post("/book", requireAuth, async (req, res) => {
   console.log("Request");
   console.log("Request Body:", req.body); // Log the request body
-  const { userId, auditorium, date, start, end, amenities, events_name } =
+  const { userId, auditorium, date, start, end, amenities, events_name,events_resourceperson } =
     req.body;
   console.log(userId);
   try {
@@ -269,6 +270,7 @@ app.post("/book", requireAuth, async (req, res) => {
       start: start,
       end: end,
       events_name: events_name,
+      events_resourceperson: events_resourceperson,
       user: user._id,
       amenities: amenities || [], // Include amenities
       status: "pending",
@@ -404,12 +406,31 @@ app.post("/admin/approve", async (req, res) => {
   Booking Details:
   Date: ${formattedDate}
   Auditorium: ${
-    booking.auditorium === "auditorium1"
-      ? "KS"
-      : booking.auditorium === "auditorium2"
-      ? "KK"
-      : "Open Air Audi"
-  }
+  booking.auditorium === "auditorium1"
+    ? "KS"
+    : booking.auditorium === "auditorium2"
+    ? "KK"
+    : booking.auditorium === "auditorium3"
+    ? "Open Air Auditorium"
+    : booking.auditorium === "auditorium4"
+    ? "Main Ground"
+    : booking.auditorium === "auditorium5"
+    ? "Indoor Stadium"
+    : booking.auditorium === "auditorium6"
+    ? "CSE Seminar Hall"
+    : booking.auditorium === "auditorium7"
+    ? "IT Seminar Hall"
+    : booking.auditorium === "auditorium8"
+    ? "ECE Seminar Hall"
+    : booking.auditorium === "auditorium9"
+    ? "EEE Seminar Hall"
+    : booking.auditorium === "auditorium10"
+    ? "Mechanical Seminar Hall"
+    : booking.auditorium === "auditorium11"
+    ? "Mechatronics Seminar Hall"
+    : "Unknown Auditorium"
+}
+
   Start Time: ${booking.start} 
   End Time: ${booking.end} 
   Event Name: ${booking.events_name}
