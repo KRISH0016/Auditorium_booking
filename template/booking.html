@@ -539,7 +539,7 @@
             },
           });
         });
-
+        
         bookButton.addEventListener("click", async () => {
           const auditorium = auditoriumSelect.value;
           // const date = new Date(dateSelect.value); // Ensure this is a Date object
@@ -611,7 +611,51 @@
               messageBox.textContent = "Failed to fetch your bookings";
             });
         });
+        async function slotchecking(userID){
+          const dateSelect = document.getElementById("booking-date");
+          const startTimeSelect = document.getElementById("start-time");
+          const endTimeSelect = document.getElementById("end-time");
 
+          const selectedDate = dateSelect.value; // e.g., "2024-09-23"
+          const startTime = startTimeSelect.value;
+          const endTime = endTimeSelect.value;
+          const slotdetails = `${selectedDate}%${startTime}%${endTime}`;
+          
+          try {
+            const response = await fetch(
+              "https://auditorium-booking-i34f.onrender.com/slotcheck",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  start: startTime,
+                  end: endTime,
+                  userId: userId,
+                  date: selectedDate,
+                  slotdetails: slotdetails,
+                }),
+              }
+            );
+
+            const data = await response.json();
+
+            // Check if response is successful
+            if (response.ok) {
+              
+              messageBox.textContent = "slot...";
+              
+              // Optionally handle further updates here
+            } else {
+              messageBox.textContent =
+                data.message || "Failed to slot check";
+            }
+          } catch (error) {
+            console.error(error);
+            messageBox.textContent = "Failed the slot booking";
+          }
+        }
         async function findBookingId(userId) {
           const dateSelect = document.getElementById("booking-date");
           const startTimeSelect = document.getElementById("start-time");

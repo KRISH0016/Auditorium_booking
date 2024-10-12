@@ -511,6 +511,7 @@ app.post("/admin/approve", async (req, res) => {
 // });
 
 const dotenv = require("dotenv");
+const { CallTracker } = require("assert");
 dotenv.config();
 
 app.post("/admin/login", async (req, res) => {
@@ -547,6 +548,52 @@ app.post("/admin/login", async (req, res) => {
 //     });
 // });
 // Backend logic (in your Node.js/Express app)
+app.post("/slotcheck", async (req, res) => {
+  const { start, end, userId, date, slotdetails } = req.body;
+  
+  try {
+    const existingBooking = await Booking.findOne({
+      date: date,
+      $or: [{ start: { $lte: end }, end: { $gte: start } }],
+    });
+
+    if (existingBooking) {
+      if (existingBooking.status === "approved") {
+        return res
+          .status(200)
+          .send({
+            message: "Slot is already booked and approved. Your booking is pending admin approval.",
+          });
+      } else {
+        return res
+          .status(200)
+          .send({
+            message: "Slot is already booked but waiting for admin approval.",
+          });
+      }
+    }
+
+    const newBooking = new Booking({
+      start,
+      end,
+      user: userId,
+      date,
+      status: "pending",
+    });
+
+    await newBooking.save();
+    res
+      .status(201)
+      .send({
+        message: "Booking created successfully. Waiting for admin approval.",
+        booking: newBooking,
+      });
+  } catch (err) {
+    res
+      .status(500)
+      .send({ error: "An error occurred while processing your request." });
+  }
+});
 app.post("/slot", async (req, res) => {
   const { start, end, userId, date } = req.body;
   const startTime = new Date(start);
@@ -707,6 +754,8 @@ app.get("/booking", async (req, res) => {
 app.get("/otp", (req, res) => {
   res.sendFile(path.join(__dirname, "template/otp.html"));
 });
+
+
 
 // Start server
 app.listen(3000, () => {
