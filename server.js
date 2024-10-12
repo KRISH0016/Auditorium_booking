@@ -76,6 +76,7 @@ const User = mongoose.model("User", userSchema);
 const bookingSchema = new mongoose.Schema({
   auditorium: { type: String, required: true },
   date: { type: Date, required: true },
+  slot: { type: String, required: true },
   start: { type: String, required: true },
   end: { type: String, required: true },
   events_name: { type: String, required: true },
@@ -251,7 +252,7 @@ app.post("/verify-otp", async (req, res) => {
 app.post("/book", requireAuth, async (req, res) => {
   console.log("Request");
   console.log("Request Body:", req.body); // Log the request body
-  const { userId, auditorium, date, start, end, amenities, events_name,events_resourceperson } =
+  const { userId, auditorium, date,slot, start, end, amenities, events_name,events_resourceperson } =
     req.body;
   console.log(userId);
   try {
@@ -267,6 +268,7 @@ app.post("/book", requireAuth, async (req, res) => {
     const booking = new Booking({
       auditorium: auditorium,
       date: date,
+      slot: slot,
       start: start,
       end: end,
       events_name: events_name,
@@ -430,7 +432,6 @@ app.post("/admin/approve", async (req, res) => {
     ? "Mechatronics Seminar Hall"
     : "Unknown Auditorium"
 }
-
   Start Time: ${booking.start} 
   End Time: ${booking.end} 
   Event Name: ${booking.events_name}

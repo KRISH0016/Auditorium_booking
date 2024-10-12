@@ -557,6 +557,7 @@
             .map((checkbox) => checkbox.value);
           const events_name = eventNameInput.value.trim();
           const events_resourceperson = eventResourcePerson.value.trim();
+          const slotdetails = `${date}%${startTime}%${endTime}`;
 
           console.log(startTime + " " + endTime);
 
@@ -573,6 +574,7 @@
                   userId: localStorage.getItem("userID"),
                   auditorium: auditorium,
                   date: date,
+                  slot: slotdetails,
                   start: startTime,
                   end: endTime,
                   events_name: events_name,
