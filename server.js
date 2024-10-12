@@ -36,7 +36,7 @@ const createToken = (id) => {
   return jwt.sign({ id }, process.env.SECRET_TOKEN, { expiresIn: maxAge });
 };
 
-const {requireAuth} = require('./middleware/check');
+const { requireAuth } = require("./middleware/check");
 
 // Mongoose User schema and model
 // const userSchema = new mongoose.Schema({
@@ -80,7 +80,7 @@ const bookingSchema = new mongoose.Schema({
   start: { type: String, required: true },
   end: { type: String, required: true },
   events_name: { type: String, required: true },
-  events_resourceperson: {type: String, required: true},
+  events_resourceperson: { type: String, required: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   status: { type: String, default: "pending" },
   amenities: { type: [String], default: [] }, // Define amenities field
@@ -185,14 +185,12 @@ app.post("/login", async (req, res) => {
   }
 
   // Successful login
-  res
-    .status(200)
-    .json({
-      success: true,
-      message: "Login successful",
-      data: user,
-      token: token,
-    });
+  res.status(200).json({
+    success: true,
+    message: "Login successful",
+    data: user,
+    token: token,
+  });
 });
 
 // OTP verification route
@@ -252,8 +250,17 @@ app.post("/verify-otp", async (req, res) => {
 app.post("/book", requireAuth, async (req, res) => {
   console.log("Request");
   console.log("Request Body:", req.body); // Log the request body
-  const { userId, auditorium, date,slot, start, end, amenities, events_name,events_resourceperson } =
-    req.body;
+  const {
+    userId,
+    auditorium,
+    date,
+    slot,
+    start,
+    end,
+    amenities,
+    events_name,
+    events_resourceperson,
+  } = req.body;
   console.log(userId);
   try {
     // Create new booking request
@@ -408,30 +415,30 @@ app.post("/admin/approve", async (req, res) => {
   Booking Details:
   Date: ${formattedDate}
   Auditorium: ${
-  booking.auditorium === "auditorium1"
-    ? "KS"
-    : booking.auditorium === "auditorium2"
-    ? "KK"
-    : booking.auditorium === "auditorium3"
-    ? "Open Air Auditorium"
-    : booking.auditorium === "auditorium4"
-    ? "Main Ground"
-    : booking.auditorium === "auditorium5"
-    ? "Indoor Stadium"
-    : booking.auditorium === "auditorium6"
-    ? "CSE Seminar Hall"
-    : booking.auditorium === "auditorium7"
-    ? "IT Seminar Hall"
-    : booking.auditorium === "auditorium8"
-    ? "ECE Seminar Hall"
-    : booking.auditorium === "auditorium9"
-    ? "EEE Seminar Hall"
-    : booking.auditorium === "auditorium10"
-    ? "Mechanical Seminar Hall"
-    : booking.auditorium === "auditorium11"
-    ? "Mechatronics Seminar Hall"
-    : "Unknown Auditorium"
-}
+    booking.auditorium === "auditorium1"
+      ? "KS"
+      : booking.auditorium === "auditorium2"
+      ? "KK"
+      : booking.auditorium === "auditorium3"
+      ? "Open Air Auditorium"
+      : booking.auditorium === "auditorium4"
+      ? "Main Ground"
+      : booking.auditorium === "auditorium5"
+      ? "Indoor Stadium"
+      : booking.auditorium === "auditorium6"
+      ? "CSE Seminar Hall"
+      : booking.auditorium === "auditorium7"
+      ? "IT Seminar Hall"
+      : booking.auditorium === "auditorium8"
+      ? "ECE Seminar Hall"
+      : booking.auditorium === "auditorium9"
+      ? "EEE Seminar Hall"
+      : booking.auditorium === "auditorium10"
+      ? "Mechanical Seminar Hall"
+      : booking.auditorium === "auditorium11"
+      ? "Mechatronics Seminar Hall"
+      : "Unknown Auditorium"
+  }
   Start Time: ${booking.start} 
   End Time: ${booking.end} 
   Event Name: ${booking.events_name}
@@ -550,50 +557,43 @@ app.post("/admin/login", async (req, res) => {
 // Backend logic (in your Node.js/Express app)
 app.post("/slotcheck", async (req, res) => {
   const { start, end, userId, date, slotdetails } = req.body;
-  
+
   try {
+    // Check if there is an existing booking that overlaps with the requested time on the same date
     const existingBooking = await Booking.findOne({
       date: date,
-      $or: [{ start: { $lte: end }, end: { $gte: start } }],
+      $or: [
+        { start: { $lte: end }, end: { $gte: start } }, // Find overlapping booking
+      ],
     });
 
     if (existingBooking) {
       if (existingBooking.status === "approved") {
-        return res
-          .status(200)
-          .send({
-            message: "Slot is already booked and approved. Your booking is pending admin approval.",
-          });
+        // Slot is already booked and approved
+        return res.status(200).send({
+          message:
+            "Slot is already booked and approved. Your booking is pending admin approval.",
+        });
       } else {
-        return res
-          .status(200)
-          .send({
-            message: "Slot is already booked but waiting for admin approval.",
-          });
+        // Slot is booked but waiting for admin approval
+        return res.status(200).send({
+          message: "Slot is already booked but waiting for admin approval.",
+        });
       }
     }
 
-    const newBooking = new Booking({
-      start,
-      end,
-      user: userId,
-      date,
-      status: "pending",
+    // Slot is available
+    res.status(200).send({
+      message: "Slot is available for booking.",
     });
-
-    await newBooking.save();
-    res
-      .status(201)
-      .send({
-        message: "Booking created successfully. Waiting for admin approval.",
-        booking: newBooking,
-      });
   } catch (err) {
-    res
-      .status(500)
-      .send({ error: "An error occurred while processing your request." });
+    // Error occurred while processing the request
+    res.status(500).send({
+      error: "An error occurred while checking the slot availability.",
+    });
   }
 });
+
 app.post("/slot", async (req, res) => {
   const { start, end, userId, date } = req.body;
   const startTime = new Date(start);
@@ -607,18 +607,14 @@ app.post("/slot", async (req, res) => {
 
     if (existingBooking) {
       if (existingBooking.status === "approved") {
-        return res
-          .status(200)
-          .send({
-            message:
-              "Slot is already booked and approved. Your booking is pending admin approval.",
-          });
+        return res.status(200).send({
+          message:
+            "Slot is already booked and approved. Your booking is pending admin approval.",
+        });
       } else {
-        return res
-          .status(200)
-          .send({
-            message: "Slot is already booked but waiting for admin approval.",
-          });
+        return res.status(200).send({
+          message: "Slot is already booked but waiting for admin approval.",
+        });
       }
     }
 
@@ -630,12 +626,10 @@ app.post("/slot", async (req, res) => {
       status: "pending",
     });
     await newBooking.save();
-    res
-      .status(201)
-      .send({
-        message: "Booking created successfully. Waiting for admin approval.",
-        booking: newBooking,
-      });
+    res.status(201).send({
+      message: "Booking created successfully. Waiting for admin approval.",
+      booking: newBooking,
+    });
   } catch (err) {
     res
       .status(500)
@@ -754,8 +748,6 @@ app.get("/booking", async (req, res) => {
 app.get("/otp", (req, res) => {
   res.sendFile(path.join(__dirname, "template/otp.html"));
 });
-
-
 
 // Start server
 app.listen(3000, () => {
