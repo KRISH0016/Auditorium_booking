@@ -624,6 +624,12 @@
           // Including auditorium in the slot details
           const slotdetails = `${auditorium}%${date}%${startTime}%${endTime}`;
 
+          // Check if start time is less than end time
+          if (startTime > endTime) {
+            messageBox.textContent = "Start time should be less than end time.";
+            return; // Stop further execution if invalid
+          }
+
           if (
             auditorium &&
             date &&
@@ -659,7 +665,7 @@
 
               // Step 2: Always allow booking, regardless of slot status
               let bookingMessage = "";
-              if (slotCheckData.message.includes("already booked")) {
+              if (slotCheckData.message.includes("already booked and approved")) {
                 // Slot is already booked, but allow booking with a "pending" status
                 bookingMessage =
                   slotCheckData.message +
