@@ -557,11 +557,15 @@ app.post("/admin/login", async (req, res) => {
 // Backend logic (in your Node.js/Express app)
 app.post("/slotcheck", async (req, res) => {
   const { start, end, userId, date, slotdetails } = req.body;
+  
+  // Extract auditorium from slotdetails
+  const auditorium = slotdetails.split('%')[0]; // Assuming auditorium is the first part of slotdetails
 
   try {
-    // Check if there is an existing booking that overlaps with the requested time on the same date
+    // Check if there is an existing booking that overlaps with the requested time on the same date and auditorium
     const existingBooking = await Booking.findOne({
       date: date,
+      auditorium: auditorium, // Include auditorium in the query
       $or: [
         { start: { $lte: end }, end: { $gte: start } }, // Find overlapping booking
       ],

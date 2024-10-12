@@ -608,7 +608,6 @@
         bookButton.addEventListener("click", async () => {
           const auditorium = auditoriumSelect.value;
           const date = dateSelect.value;
-          console.log(dateSelect.value, date);
           const startTimeSelect = document.getElementById("start-time");
           const endTimeSelect = document.getElementById("end-time");
 
@@ -621,9 +620,9 @@
 
           const events_name = eventNameInput.value.trim();
           const events_resourceperson = eventResourcePerson.value.trim();
-          const slotdetails = `${date}%${startTime}%${endTime}`;
 
-          console.log(startTime + " " + endTime);
+          // Including auditorium in the slot details
+          const slotdetails = `${auditorium}%${date}%${startTime}%${endTime}`;
 
           if (
             auditorium &&
@@ -658,43 +657,48 @@
 
               const slotCheckData = await slotCheckResponse.json();
 
-              // Step 2: Check the response from slot check
+              // Step 2: Always allow booking, regardless of slot status
+              let bookingMessage = "";
               if (slotCheckData.message.includes("already booked")) {
-                // Slot is already booked, display the message to the user
-                messageBox.textContent = slotCheckData.message;
+                // Slot is already booked, but allow booking with a "pending" status
+                bookingMessage =
+                  slotCheckData.message +
+                  ". Booking request submitted for approval.";
               } else {
                 // Slot is available, proceed with the booking
-                const bookingResponse = await fetch(
-                  "https://auditorium-booking-i34f.onrender.com/book",
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      auth: localStorage.getItem("token"),
-                    },
-                    body: JSON.stringify({
-                      userId: localStorage.getItem("userID"),
-                      auditorium: auditorium,
-                      date: date,
-                      slot: slotdetails,
-                      start: startTime,
-                      end: endTime,
-                      events_name: events_name,
-                      events_resourceperson: events_resourceperson,
-                      amenities: amenities,
-                      status: "pending",
-                    }),
-                  }
-                );
-
-                if (!bookingResponse.ok)
-                  throw new Error("Network response was not ok");
-
-                const bookingData = await bookingResponse.json();
-                messageBox.textContent =
-                  "Booking request submitted for approval";
-                fetchBookings().then((bookings) => updateCalendar(bookings));
+                bookingMessage = "Booking request submitted for approval.";
               }
+
+              // Step 3: Proceed with the booking
+              const bookingResponse = await fetch(
+                "https://auditorium-booking-i34f.onrender.com/book",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    auth: localStorage.getItem("token"),
+                  },
+                  body: JSON.stringify({
+                    userId: localStorage.getItem("userID"),
+                    auditorium: auditorium,
+                    date: date,
+                    slot: slotdetails,
+                    start: startTime,
+                    end: endTime,
+                    events_name: events_name,
+                    events_resourceperson: events_resourceperson,
+                    amenities: amenities,
+                    status: "pending", // All bookings start as pending
+                  }),
+                }
+              );
+
+              if (!bookingResponse.ok)
+                throw new Error("Network response was not ok");
+
+              const bookingData = await bookingResponse.json();
+              messageBox.textContent = bookingMessage;
+              fetchBookings().then((bookings) => updateCalendar(bookings));
             } catch (error) {
               messageBox.textContent = "Failed to submit booking request";
             }
