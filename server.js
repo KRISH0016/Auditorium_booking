@@ -572,17 +572,23 @@ app.post("/slotcheck", async (req, res) => {
     });
 
     if (existingBooking) {
-      if (existingBooking.status === "approved") {
+      if (existingBooking.status === "Approved") {
         // Slot is already booked and approved
         return res.status(200).send({
           message:
             "Slot is already booked and approved. Your booking is pending admin approval.",
         });
-        
-      } else {
+
+      } else if(existingBooking.status === "pending") {
         // Slot is booked but waiting for admin approval
         return res.status(200).send({
           message: "Slot is booked but waiting for admin approval.",
+        });
+      }
+      else {
+        // Slot is booked but waiting for admin approval
+        return res.status(200).send({
+          message: " waiting for admin approval.",
         });
       }
     }
