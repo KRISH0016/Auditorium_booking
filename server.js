@@ -54,6 +54,8 @@ const { requireAuth } = require("./middleware/check");
 //   twoFASecret: String,
 //   twoFAauthen: { type: Boolean, default: false }, // New field to track whether 2FA has been authenticated
 // });
+//QRHEQATHQR
+
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
