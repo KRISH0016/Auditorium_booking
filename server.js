@@ -604,44 +604,40 @@ app.post("/cancel", requireAuth, async (req, res) => {
   const { userId, bookingId } = req.body;
 
   console.log("Cancel Booking", bookingId, userId);
-  // try {
-  //   const booking = await Booking.findById(bookingId);
-  // } catch (error) {
-  //   return res
-  //     .status(403)
-  //     .json({ success: false, message: "Booking is not found." });
-  // }
-  const booking = await Booking.findById(bookingId);
 
-  if (!booking) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Booking not found." });
+  try {
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found." });
+    }
+
+    // Remove booking from database
+    await Booking.deleteOne({ _id: bookingId });
+
+    // Send cancellation email to user
+    const user = await User.findById(booking.user);
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Booking Cancelled",
+      text: `Your booking for the auditorium on ${booking.date} has been cancelled.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ success: true, message: "Booking cancelled." });
+  } catch (error) {
+    console.error("Error during cancellation:", error);
+    res.status(500).json({ success: false, message: "Failed to cancel booking." });
   }
-
-  // Remove booking from database
-  await Booking.deleteOne({ _id: bookingId });
-
-  // Send cancellation email to user
-  const user = await User.findById(booking.user);
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: user.email,
-    subject: "Booking Cancelled",
-    text: `Your booking for the auditorium on ${booking.date} has been cancelled.`,
-  };
-
-  await transporter.sendMail(mailOptions);
-
-  res.status(200).json({ success: true, message: "Booking cancelled." });
 });
 
 // Admin cancellation route

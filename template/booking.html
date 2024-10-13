@@ -889,7 +889,7 @@
           const startTimeSelect = document.getElementById("start-time");
           const endTimeSelect = document.getElementById("end-time");
 
-          const selectedDate = dateSelect.value; // e.g., "2024-09-23"
+          const selectedDate = dateSelect.value;
           const startTime = startTimeSelect.value;
           const endTime = endTimeSelect.value;
 
@@ -918,22 +918,72 @@
             const data = await response.json();
 
             // Check if response is successful
-            if (response.ok) {
-              console.log(data._id);
+            if (response.ok && data._id) {
+              console.log("Booking found with ID:", data._id);
               messageBox.textContent = "Cancelling...";
-              currentBookingID = data._id;
-              // Optionally handle further updates here
+              return data._id; // Return the booking ID for cancellation
             } else {
               messageBox.textContent =
-                data.message || "Failed to cancel the booking";
+                data.message || "No booking found for the selected slot.";
+              return null; // Return null if no booking found
             }
           } catch (error) {
             console.error(error);
             messageBox.textContent = "Failed to cancel the booking";
+            return null;
           }
         }
 
+        // async function findBookingId(userId) {
+        //   const dateSelect = document.getElementById("booking-date");
+        //   const startTimeSelect = document.getElementById("start-time");
+        //   const endTimeSelect = document.getElementById("end-time");
+
+        //   const selectedDate = dateSelect.value; // e.g., "2024-09-23"
+        //   const startTime = startTimeSelect.value;
+        //   const endTime = endTimeSelect.value;
+
+        //   // Construct start and end datetime strings
+        //   const start = `${selectedDate}T${startTime}:00`;
+        //   const end = `${selectedDate}T${endTime}:00`;
+        //   console.log(start + " inview " + end);
+
+        //   try {
+        //     const response = await fetch(
+        //       "https://auditorium-booking-i34f.onrender.com/slot",
+        //       {
+        //         method: "POST",
+        //         headers: {
+        //           "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify({
+        //           start: start,
+        //           end: end,
+        //           userId: userId,
+        //           date: selectedDate,
+        //         }),
+        //       }
+        //     );
+
+        //     const data = await response.json();
+
+        //     // Check if response is successful
+        //     if (response.ok) {
+        //       console.log(data._id);
+        //       messageBox.textContent = "Cancelling...";
+        //       currentBookingID = data._id;
+        //       // Optionally handle further updates here
+        //     } else {
+        //       messageBox.textContent =
+        //         data.message || "Failed to cancel the booking";
+        //     }
+        //   } catch (error) {
+        //     console.error(error);
+        //     messageBox.textContent = "Failed to cancel the booking";
+        //   }
+        // }
         async function cancelBooking(bookingId) {
+          const userId = localStorage.getItem("userID"); // Fetch the userId here
           await fetch("https://auditorium-booking-i34f.onrender.com/cancel", {
             method: "POST",
             headers: {
@@ -941,7 +991,7 @@
               auth: localStorage.getItem("token"),
             },
             body: JSON.stringify({
-              userId: userId,
+              userId: userId, // Use the userId here
               bookingId: bookingId,
             }),
           })
@@ -956,37 +1006,80 @@
             });
         }
 
+        // async function cancelBooking(bookingId) {
+        //   await fetch("https://auditorium-booking-i34f.onrender.com/cancel", {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       auth: localStorage.getItem("token"),
+        //     },
+        //     body: JSON.stringify({
+        //       userId: userId,
+        //       bookingId: bookingId,
+        //     }),
+        //   })
+        //     .then((response) => response.json())
+        //     .then((data) => {
+        //       messageBox.textContent = data.message;
+        //       fetchBookings().then((bookings) => updateCalendar(bookings));
+        //     })
+        //     .catch((error) => {
+        //       console.error("Error:", error);
+        //       messageBox.textContent = "Failed to cancel the booking";
+        //     });
+        // }
         cancelButton.addEventListener("click", () => {
-          const dateSelect = document.getElementById("booking-date");
-          const startTimeSelect = document.getElementById("start-time");
-          const endTimeSelect = document.getElementById("end-time");
+          const userId = localStorage.getItem("userID");
 
-          const selectedDate = dateSelect.value; // e.g., "2024-09-23"
-          const startTime = startTimeSelect.value;
-          const endTime = endTimeSelect.value;
-
-          const start = `${selectedDate}T${startTime}:00`;
-          const end = `${selectedDate}T${endTime}:00`;
-
-          console.log(start, end);
-
-          findBookingId(localStorage.getItem("userID"))
+          findBookingId(userId)
             .then((bookingId) => {
               if (bookingId) {
-                console.log("Booking ID", currentBookingID);
-                return cancelBooking(currentBookingID);
+                console.log("Booking ID", bookingId);
+                return cancelBooking(bookingId);
               } else {
                 throw new Error("No booking found for the selected slot.");
               }
             })
             .then((res) => {
-              console.log(res);
+              console.log("Booking cancellation result:", res);
             })
             .catch((err) => {
               console.error(err);
               alert(err.message); // Show the error message
             });
         });
+
+        //   cancelButton.addEventListener("click", () => {
+        //     const dateSelect = document.getElementById("booking-date");
+        //     const startTimeSelect = document.getElementById("start-time");
+        //     const endTimeSelect = document.getElementById("end-time");
+
+        //     const selectedDate = dateSelect.value; // e.g., "2024-09-23"
+        //     const startTime = startTimeSelect.value;
+        //     const endTime = endTimeSelect.value;
+
+        //     const start = `${selectedDate}T${startTime}:00`;
+        //     const end = `${selectedDate}T${endTime}:00`;
+
+        //     console.log(start, end);
+
+        //     findBookingId(localStorage.getItem("userID"))
+        //       .then((bookingId) => {
+        //         if (bookingId) {
+        //           console.log("Booking ID", currentBookingID);
+        //           return cancelBooking(currentBookingID);
+        //         } else {
+        //           throw new Error("No booking found for the selected slot.");
+        //         }
+        //       })
+        //       .then((res) => {
+        //         console.log(res);
+        //       })
+        //       .catch((err) => {
+        //         console.error(err);
+        //         alert(err.message); // Show the error message
+        //       });
+        //   });
       });
     </script>
   </body>
