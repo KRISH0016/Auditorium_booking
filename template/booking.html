@@ -625,7 +625,7 @@
           const slotdetails = `${auditorium}%${date}%${startTime}%${endTime}`;
 
           // Check if start time is less than end time
-          if (startTime > endTime) {
+          if (startTime < endTime) {
             messageBox.textContent = "Start time should be less than end time.";
             return; // Stop further execution if invalid
           }
@@ -662,6 +662,7 @@
                 throw new Error("Slot checking failed");
 
               const slotCheckData = await slotCheckResponse.json();
+              console.log(slotCheckData);
 
               // Step 2: Always allow booking, regardless of slot status
               let bookingMessage = "";
