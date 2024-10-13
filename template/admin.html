@@ -221,6 +221,53 @@
         }
 
         // Display bookings in the table
+        // function displayBookings(bookings) {
+        //   bookingsTable.innerHTML = ""; // Clear the table body
+        //   const auditoriumMapping = {
+        //     auditorium1: "KS",
+        //     auditorium2: "KK",
+        //     auditorium3: "Open Air Auditorium",
+        //     auditorium4: "Main Ground",
+        //     auditorium5: "Indoor Stadium",
+        //     auditorium6: "CSE Seminar Hall",
+        //     auditorium7: "IT Seminar Hall",
+        //     auditorium8: "ECE Seminar Hall",
+        //     auditorium9: "EEE Seminar Hall",
+        //     auditorium10: "Mechanical Seminar Hall",
+        //     auditorium11: "Mechatronics Seminar Hall",
+        //   };
+        //   bookings.forEach((booking) => {
+        //     const row = document.createElement("tr");
+        //     const auditoriumCode =
+        //       auditoriumMapping[booking.auditorium] || booking.auditorium;
+        //     try {
+        //       row.innerHTML = `
+        //       <td>${booking.user.name}</td>
+        //       <td>${booking.user.dept}</td>
+        //       <td>${booking.events_name}</td>
+        //       <td>${booking.events_resourceperson}</td>
+        //       <td>${auditoriumCode}</td>
+        //       <td>${new Date(booking.date).toLocaleDateString()}</td>
+        //       <td>${booking.start}</td>
+        //       <td>${booking.end}</td>
+        //       <td>${booking.amenities.join(", ")}</td>
+        //       <td>${booking.status}</td>
+        //       <td>
+        //         <button class="approve-button" data-booking-id="${
+        //           booking._id
+        //         }">Approve</button>
+        //         <button class="cancel-button" data-booking-id="${
+        //           booking._id
+        //         }">Cancel</button>
+        //       </td>
+        //     `;
+        //       bookingsTable.appendChild(row);
+        //     } catch (error) {
+        //       console.error("Error creating booking row:", error);
+        //     }
+        //   });
+        //   attachEventListeners(); // Attach the event listeners after table is updated
+        // }
         function displayBookings(bookings) {
           bookingsTable.innerHTML = ""; // Clear the table body
           const auditoriumMapping = {
@@ -236,36 +283,84 @@
             auditorium10: "Mechanical Seminar Hall",
             auditorium11: "Mechatronics Seminar Hall",
           };
-          bookings.forEach((booking) => {
+
+          bookings.forEach((booking, index) => {
             const row = document.createElement("tr");
             const auditoriumCode =
               auditoriumMapping[booking.auditorium] || booking.auditorium;
+
+            // Determine if this booking overlaps with any other booking
+            let isOverlapping = false;
+
+            for (let i = 0; i < bookings.length; i++) {
+              if (i !== index) {
+                // Skip the current booking itself
+                const otherBooking = bookings[i];
+
+                // Check if they are on the same date and in the same auditorium
+                if (
+                  booking.date === otherBooking.date &&
+                  booking.auditorium === otherBooking.auditorium
+                ) {
+                  // Check for time overlap
+                  const bookingStart = new Date(
+                    `${booking.date}T${booking.start}`
+                  );
+                  const bookingEnd = new Date(`${booking.date}T${booking.end}`);
+                  const otherStart = new Date(
+                    `${otherBooking.date}T${otherBooking.start}`
+                  );
+                  const otherEnd = new Date(
+                    `${otherBooking.date}T${otherBooking.end}`
+                  );
+
+                  if (
+                    bookingStart < otherEnd &&
+                    bookingEnd > otherStart // Time overlap condition
+                  ) {
+                    isOverlapping = true;
+                    break; // No need to check further once an overlap is found
+                  }
+                }
+              }
+            }
+
+            // Add highlighting class if there is an overlap
+            const rowClass = isOverlapping ? "overlapping-booking" : "";
+
             try {
               row.innerHTML = `
-              <td>${booking.user.name}</td>
-              <td>${booking.user.dept}</td>
-              <td>${booking.events_name}</td>
-              <td>${booking.events_resourceperson}</td>
-              <td>${auditoriumCode}</td>
-              <td>${new Date(booking.date).toLocaleDateString()}</td>
-              <td>${booking.start}</td>
-              <td>${booking.end}</td>
-              <td>${booking.amenities.join(", ")}</td>
-              <td>${booking.status}</td>
-              <td>
-                <button class="approve-button" data-booking-id="${
-                  booking._id
-                }">Approve</button>
-                <button class="cancel-button" data-booking-id="${
-                  booking._id
-                }">Cancel</button>
-              </td>
-            `;
+        <td>${booking.user.name}</td>
+        <td>${booking.user.dept}</td>
+        <td>${booking.events_name}</td>
+        <td>${booking.events_resourceperson}</td>
+        <td>${auditoriumCode}</td>
+        <td>${new Date(booking.date).toLocaleDateString()}</td>
+        <td>${booking.start}</td>
+        <td>${booking.end}</td>
+        <td>${booking.amenities.join(", ")}</td>
+        <td>${booking.status}</td>
+        <td>
+          <button class="approve-button" data-booking-id="${
+            booking._id
+          }">Approve</button>
+          <button class="cancel-button" data-booking-id="${
+            booking._id
+          }">Cancel</button>
+        </td>
+      `;
+
+              // Apply the class to highlight overlapping rows
+              if (isOverlapping) {
+                row.classList.add(rowClass);
+              }
+
               bookingsTable.appendChild(row);
             } catch (error) {
               console.error("Error creating booking row:", error);
             }
           });
+
           attachEventListeners(); // Attach the event listeners after table is updated
         }
 
