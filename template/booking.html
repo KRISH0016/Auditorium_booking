@@ -24,8 +24,8 @@
       <div class="left-panel">
         <div class="auditorium-select">
           <h1>Hello, <span id="userName"></span></h1>
-          <h1>Auditorium Booking</h1>
-          <label for="auditorium">Choose Auditorium:</label>
+          <h1>Facility Booking</h1>
+          <label for="auditorium">Choose Facility:</label>
           <select id="auditorium">
             <option value="auditorium1">KS</option>
             <option value="auditorium2">KK</option>
@@ -37,14 +37,15 @@
             <option value="auditorium8">ECE Seminar Hall</option>
             <option value="auditorium9">EEE Seminar Hall</option>
             <option value="auditorium10">Mechanical Seminar Hall</option>
-            <option value="auditorium11">Mechatronics Seminar Hall</option>
+            <option value="auditorium11">Civil Seminar Hall</option>
+            <option value="auditorium12">Architecture Seminar Hall</option>
           </select>
           <div>
-            <label for="event-name">Event Name:</label>
+            <label for="event-name">Event Name*:</label>
             <input type="text" id="event-name" placeholder="Enter event name" />
           </div>
           <div>
-            <label for="event-resourceperson">Resource Person:</label>
+            <label for="event-resourceperson">Resource Person*:</label>
             <input
               type="text"
               id="event-resourceperson"
@@ -319,7 +320,9 @@
               } else if (booking.auditorium === "auditorium10") {
                 auditoriumLabel = "Mechanical Seminar Hall";
               } else if (booking.auditorium === "auditorium11") {
-                auditoriumLabel = "Mechatronics Seminar Hall";
+                auditoriumLabel = "Civil Seminar Hall";
+              } else if (booking.auditorium === "auditorium12"){
+                auditoriumLabel = "Architecture Seminar Hall";
               } else {
                 auditoriumLabel = "Unknown Auditorium";
               }
@@ -430,8 +433,10 @@
               } else if (booking.auditorium === "auditorium10") {
                 auditoriumLabel = "Mechanical Seminar Hall";
               } else if (booking.auditorium === "auditorium11") {
-                auditoriumLabel = "Mechatronics Seminar Hall";
-              } else {
+                auditoriumLabel = "Civil Seminar Hall";
+              } else if (booking.auditorium === "auditorium12"){
+                auditoriumLabel = "Architecture Seminar Hall";
+              }else {
                 auditoriumLabel = "Unknown Auditorium";
               }
 

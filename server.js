@@ -436,7 +436,9 @@ app.post("/admin/approve", async (req, res) => {
       : booking.auditorium === "auditorium10"
       ? "Mechanical Seminar Hall"
       : booking.auditorium === "auditorium11"
-      ? "Mechatronics Seminar Hall"
+      ? "Civil Seminar Hall"
+      : booking.auditorium === "auditorium12"
+      ? "Architecture Seminar Hall"
       : "Unknown Auditorium"
   }
   Start Time: ${booking.start} 
@@ -477,45 +479,6 @@ app.post("/admin/approve", async (req, res) => {
     .json({ success: true, message: "Booking approved and emails sent." });
 });
 
-// // Admin approval route
-// app.post("/admin/approve", async (req, res) => {
-//   const { bookingId } = req.body;
-//   console.log("Booking id received :" + bookingId);
-//   const booking = await Booking.findById(bookingId);
-
-//   if (!booking) {
-//     return res
-//       .status(404)
-//       .json({ success: false, message: "Booking not found." });
-//   }
-
-//   // Update booking status to approved
-//   booking.status = "Approved";
-//   await booking.save();
-
-//   // Send approval email to user
-//   const user = await User.findById(booking.user);
-//   const transporter = nodemailer.createTransport({
-//     service: "gmail",
-//     auth: {
-//       user: process.env.EMAIL_USER,
-//       pass: process.env.EMAIL_PASS,
-//     },
-//   });
-
-//   const mailOptions = {
-//     from: process.env.EMAIL_USER,
-//     to: user.email,
-//     subject: "Booking Approved",
-//     text: `Your booking for the auditorium on ${booking.date} has been approved.`,
-//   };
-
-//   await transporter.sendMail(mailOptions);
-
-//   res
-//     .status(200)
-//     .json({ success: true, message: "Booking approved and email sent." });
-// });
 
 const dotenv = require("dotenv");
 const { CallTracker } = require("assert");
