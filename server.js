@@ -578,6 +578,7 @@ app.post("/slotcheck", async (req, res) => {
           message:
             "Slot is already booked and approved. Your booking is pending admin approval.",
         });
+        
       } else {
         // Slot is booked but waiting for admin approval
         return res.status(200).send({
