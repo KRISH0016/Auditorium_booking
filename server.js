@@ -565,9 +565,10 @@ app.post("/slotcheck", async (req, res) => {
       date: date,
       auditorium: auditorium,
       $or: [
-        { start: { $lte: end }, end: { $gte: start } }, // Overlapping booking
+        { start: { $lt: end }, end: { $gt: start } }, // Overlap condition
       ],
     });
+    
 
     if (existingBooking) {
       if (existingBooking.status === "Approved") {
