@@ -104,7 +104,7 @@
             auditorium10: "Mechanical Seminar Hall",
             auditorium11: "Mechatronics Seminar Hall",
           };
-          
+
           bookings.forEach((booking) => {
             const auditoriumCode =
               auditoriumMapping[booking.auditorium] || booking.auditorium;
@@ -305,10 +305,8 @@
 
             // Determine if this booking overlaps with any other booking
             let isOverlapping = false;
-
             for (let i = 0; i < bookings.length; i++) {
               if (i !== index) {
-                // Skip the current booking itself
                 const otherBooking = bookings[i];
 
                 // Check if they are on the same date and in the same auditorium
@@ -316,7 +314,6 @@
                   booking.date === otherBooking.date &&
                   booking.auditorium === otherBooking.auditorium
                 ) {
-                  // Check for time overlap
                   const bookingStart = new Date(
                     `${booking.date}T${booking.start}`
                   );
@@ -328,16 +325,47 @@
                     `${otherBooking.date}T${otherBooking.end}`
                   );
 
-                  if (
-                    bookingStart < otherEnd &&
-                    bookingEnd > otherStart // Time overlap condition
-                  ) {
+                  // Check for time overlap
+                  if (bookingStart < otherEnd && bookingEnd > otherStart) {
                     isOverlapping = true;
-                    break; // No need to check further once an overlap is found
+                    break; // Exit loop once overlap is found
                   }
                 }
               }
             }
+
+            // for (let i = 0; i < bookings.length; i++) {
+            //   if (i !== index) {
+            //     // Skip the current booking itself
+            //     const otherBooking = bookings[i];
+
+            //     // Check if they are on the same date and in the same auditorium
+            //     if (
+            //       booking.date === otherBooking.date &&
+            //       booking.auditorium === otherBooking.auditorium
+            //     ) {
+            //       // Check for time overlap
+            //       const bookingStart = new Date(
+            //         `${booking.date}T${booking.start}`
+            //       );
+            //       const bookingEnd = new Date(`${booking.date}T${booking.end}`);
+            //       const otherStart = new Date(
+            //         `${otherBooking.date}T${otherBooking.start}`
+            //       );
+            //       const otherEnd = new Date(
+            //         `${otherBooking.date}T${otherBooking.end}`
+            //       );
+
+            //       if (
+            //         bookingStart < otherEnd &&
+            //         bookingEnd > otherStart // Time overlap condition
+            //       ) {
+            //         isOverlapping = true;
+            //         break; // No need to check further once an overlap is found
+            //       }
+            //     }
+            //   }
+            // }
 
             // Add highlighting class if there is an overlap
             const rowClass = isOverlapping ? "overlapping-booking" : "";
