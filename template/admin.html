@@ -91,6 +91,20 @@
           ];
           csvRows.push(headers.join(","));
 
+          const auditoriumMapping = {
+            auditorium1: "KS",
+            auditorium2: "KK",
+            auditorium3: "Open Air Auditorium",
+            auditorium4: "Main Ground",
+            auditorium5: "Indoor Stadium",
+            auditorium6: "CSE Seminar Hall",
+            auditorium7: "IT Seminar Hall",
+            auditorium8: "ECE Seminar Hall",
+            auditorium9: "EEE Seminar Hall",
+            auditorium10: "Mechanical Seminar Hall",
+            auditorium11: "Mechatronics Seminar Hall",
+          };
+          
           bookings.forEach((booking) => {
             const auditoriumCode =
               auditoriumMapping[booking.auditorium] || booking.auditorium;

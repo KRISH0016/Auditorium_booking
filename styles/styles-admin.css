@@ -147,7 +147,7 @@ h2 {
   color: #721c24; /* Error text color */
 }
 .overlapping-booking {
-  background-color: rgba(255, 99, 71, 0.3); /* Light red background */
+  background-color: rgba(169, 153, 150, 0.3); /* Light red background */
   font-weight: bold; /* Makes the text bolder for emphasis */
 }
 
