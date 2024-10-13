@@ -508,12 +508,10 @@ app.post("/admin/approve", async (req, res) => {
     });
   }
 
-  res
-    .status(200)
-    .json({
-      success: true,
-      message: "Booking approved, emails, and SMS sent.",
-    });
+  res.status(200).json({
+    success: true,
+    message: "Booking approved, emails, and SMS sent.",
+  });
 });
 
 // // Admin approval route
@@ -729,13 +727,17 @@ app.post("/slotcheck", async (req, res) => {
 
 app.post("/slot", async (req, res) => {
   const { start, end, userId, date } = req.body;
-  const startTime = new Date(start);
-  const endTime = new Date(end);
 
   try {
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+
+    // Adjust the query to check for full or partial overlaps in time
     const existingBooking = await Booking.findOne({
       date: date,
-      $or: [{ start: { $lte: endTime }, end: { $gte: startTime } }],
+      $or: [
+        { start: { $lte: endTime }, end: { $gte: startTime } }, // Time overlap case
+      ],
     });
 
     if (existingBooking) {
@@ -751,6 +753,7 @@ app.post("/slot", async (req, res) => {
       }
     }
 
+    // Proceed to create a new booking if no overlap exists
     const newBooking = new Booking({
       start,
       end,
@@ -758,17 +761,63 @@ app.post("/slot", async (req, res) => {
       date,
       status: "pending",
     });
+
     await newBooking.save();
-    res.status(201).send({
+
+    return res.status(201).send({
       message: "Booking created successfully. Waiting for admin approval.",
       booking: newBooking,
     });
   } catch (err) {
-    res
-      .status(500)
-      .send({ error: "An error occurred while processing your request." });
+    console.error("Error during slot booking:", err);
+    return res.status(500).send({
+      error: "An error occurred while processing your request.",
+    });
   }
 });
+
+// app.post("/slot", async (req, res) => {
+//   const { start, end, userId, date } = req.body;
+//   const startTime = new Date(start);
+//   const endTime = new Date(end);
+
+//   try {
+//     const existingBooking = await Booking.findOne({
+//       date: date,
+//       $or: [{ start: { $lte: endTime }, end: { $gte: startTime } }],
+//     });
+
+//     if (existingBooking) {
+//       if (existingBooking.status === "approved") {
+//         return res.status(200).send({
+//           message:
+//             "Slot is already booked and approved. Your booking is pending admin approval.",
+//         });
+//       } else {
+//         return res.status(200).send({
+//           message: "Slot is already booked but waiting for admin approval.",
+//         });
+//       }
+//     }
+
+//     const newBooking = new Booking({
+//       start,
+//       end,
+//       user: userId,
+//       date,
+//       status: "pending",
+//     });
+//     await newBooking.save();
+//     res.status(201).send({
+//       message: "Booking created successfully. Waiting for admin approval.",
+//       booking: newBooking,
+//     });
+//   } catch (err) {
+//     res
+//       .status(500)
+//       .send({ error: "An error occurred while processing your request." });
+//   }
+// });
 
 app.post("/cancel", requireAuth, async (req, res) => {
   const { userId, bookingId } = req.body;
@@ -815,12 +864,10 @@ app.post("/cancel", requireAuth, async (req, res) => {
       });
     }
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Booking cancelled. Notification sent.",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Booking cancelled. Notification sent.",
+    });
   } catch (error) {
     console.error("Error during cancellation:", error);
     res
