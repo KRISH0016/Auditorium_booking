@@ -718,6 +718,14 @@
         //     messageBox.textContent = "Please fill in all required fields.";
         //   }
         // });
+
+        async function refreshCalendar() {
+          const bookings = await fetchBookings(); // Fetch the latest bookings
+          if (bookings) {
+            updateCalendar(bookings); // Update the calendar with new data
+          }
+        }
+
         bookButton.addEventListener("click", async () => {
           const auditorium = auditoriumSelect.value;
           const date = dateSelect.value;
@@ -829,6 +837,7 @@
           } catch (error) {
             messageBox.textContent = "Failed to submit booking request";
           }
+          refreshCalendar();
         });
 
         viewMyBookingsButton.addEventListener("click", () => {
@@ -883,6 +892,7 @@
             console.error(error);
             messageBox.textContent = "Failed the slot booking";
           }
+          refreshCalendar();
         }
         async function findBookingId(userId) {
           const dateSelect = document.getElementById("booking-date");
