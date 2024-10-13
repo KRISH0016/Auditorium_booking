@@ -558,37 +558,26 @@ app.post("/admin/login", async (req, res) => {
 app.post("/slotcheck", async (req, res) => {
   const { start, end, userId, date, slotdetails } = req.body;
   
-  // Extract auditorium from slotdetails
-  const auditorium = slotdetails.split('%')[0]; // Assuming auditorium is the first part of slotdetails
+  const auditorium = slotdetails.split('%')[0]; // Extracting auditorium
 
   try {
-    // Check if there is an existing booking that overlaps with the requested time on the same date and auditorium
     const existingBooking = await Booking.findOne({
       date: date,
-      auditorium: auditorium, // Include auditorium in the query
+      auditorium: auditorium,
       $or: [
-        { start: { $lte: end }, end: { $gte: start } }, // Find overlapping booking
+        { start: { $lte: end }, end: { $gte: start } }, // Overlapping booking
       ],
     });
 
     if (existingBooking) {
       if (existingBooking.status === "Approved") {
-        // Slot is already booked and approved
         return res.status(200).send({
           message:
-            "Slot is already booked and approved. Your booking is pending admin approval.",
+            "Slot is already booked and approved. Your booking will be marked as pending for admin approval.",
         });
-
-      } else if(existingBooking.status === "pending") {
-        // Slot is booked but waiting for admin approval
+      } else if (existingBooking.status === "pending") {
         return res.status(200).send({
-          message: "Slot is booked but waiting for admin approval.",
-        });
-      }
-      else {
-        // Slot is booked but waiting for admin approval
-        return res.status(200).send({
-          message: " waiting for admin approval.",
+          message: "Slot is already booked but pending admin approval. Your booking will be added to the queue.",
         });
       }
     }
@@ -598,7 +587,6 @@ app.post("/slotcheck", async (req, res) => {
       message: "Slot is available for booking.",
     });
   } catch (err) {
-    // Error occurred while processing the request
     res.status(500).send({
       error: "An error occurred while checking the slot availability.",
     });
