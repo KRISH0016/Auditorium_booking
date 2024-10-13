@@ -625,7 +625,7 @@
           const slotdetails = `${auditorium}%${date}%${startTime}%${endTime}`;
 
           // Check if start time is less than end time
-          if (startTime < endTime) {
+          if (startTime > endTime) {
             messageBox.textContent = "Start time should be less than end time.";
             return; // Stop further execution if invalid
           }
