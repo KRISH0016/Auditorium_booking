@@ -21,7 +21,7 @@ body {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.15); /* Softer shadow for depth */
   position: relative;
   overflow: hidden;
-  width: 700px; /* Slightly narrower for a sleeker look */
+  width: 800px; /* Slightly narrower for a sleeker look */
   max-width: 95%;
   min-height: 520px;
   padding: 20px; /* Added padding for better spacing */
@@ -32,7 +32,7 @@ body {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.15); /* Softer shadow for depth */
   position: relative;
   overflow: hidden;
-  width: 700px; /* Slightly narrower for a sleeker look */
+  width: 800px; /* Slightly narrower for a sleeker look */
   max-width: 95%;
   min-height: 720px;
   padding: 20px; /* Added padding for better spacing */
@@ -51,7 +51,7 @@ form {
 
 h1 {
   color: #6a0000;
-  font-size: 24px; /* Larger, clearer heading */
+  font-size: 26px; /* Larger, clearer heading */
   margin-bottom: 15px;
   font-weight: 600; /* Medium thickness for headings */
   text-transform: uppercase;
@@ -69,7 +69,7 @@ h3 {
   color: #6a0000;
   font-size: 18px; /* Larger, clearer heading */
   margin-bottom: 15px;
-  font-weight: 400; /* Medium thickness for headings */
+  font-weight: 500; /* Medium thickness for headings */
   text-transform: uppercase;
   letter-spacing: 1px; /* Spacing out letters for a modern feel */
 }
@@ -127,7 +127,7 @@ a:hover {
 p {
   margin-top: 20px;
   font-weight: 500;
-  color: #fff; /* Make paragraph text white for better contrast */
+  color: #6a0000; /* Make paragraph text white for better contrast */
 }
 
 /* Added animation for smooth input focus */
