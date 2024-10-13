@@ -665,7 +665,7 @@
 
               // Step 2: Always allow booking, regardless of slot status
               let bookingMessage = "";
-              if (slotCheckData.message.includes("already booked and approved")) {
+              if (slotCheckData.message.includes("already booked")) {
                 // Slot is already booked, but allow booking with a "pending" status
                 bookingMessage =
                   slotCheckData.message +
