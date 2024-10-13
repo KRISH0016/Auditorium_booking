@@ -321,7 +321,7 @@
                 auditoriumLabel = "Mechanical Seminar Hall";
               } else if (booking.auditorium === "auditorium11") {
                 auditoriumLabel = "Civil Seminar Hall";
-              } else if (booking.auditorium === "auditorium12"){
+              } else if (booking.auditorium === "auditorium12") {
                 auditoriumLabel = "Architecture Seminar Hall";
               } else {
                 auditoriumLabel = "Unknown Auditorium";
@@ -434,9 +434,9 @@
                 auditoriumLabel = "Mechanical Seminar Hall";
               } else if (booking.auditorium === "auditorium11") {
                 auditoriumLabel = "Civil Seminar Hall";
-              } else if (booking.auditorium === "auditorium12"){
+              } else if (booking.auditorium === "auditorium12") {
                 auditoriumLabel = "Architecture Seminar Hall";
-              }else {
+              } else {
                 auditoriumLabel = "Unknown Auditorium";
               }
 
@@ -610,6 +610,114 @@
         //     messageBox.textContent = "Please fill in all required fields.";
         //   }
         // });
+        // bookButton.addEventListener("click", async () => {
+        //   const auditorium = auditoriumSelect.value;
+        //   const date = dateSelect.value;
+        //   const startTimeSelect = document.getElementById("start-time");
+        //   const endTimeSelect = document.getElementById("end-time");
+
+        //   const startTime = startTimeSelect.value;
+        //   const endTime = endTimeSelect.value;
+
+        //   const amenities = Array.from(amenitiesCheckboxes)
+        //     .filter((checkbox) => checkbox.checked)
+        //     .map((checkbox) => checkbox.value);
+
+        //   const events_name = eventNameInput.value.trim();
+        //   const events_resourceperson = eventResourcePerson.value.trim();
+
+        //   // Including auditorium in the slot details
+        //   const slotdetails = `${auditorium}%${date}%${startTime}%${endTime}`;
+
+        //   // Check if start time is less than end time
+        //   if (startTime >= endTime) {
+        //     messageBox.textContent = "Start time should be less than end time.";
+        //     return; // Stop further execution if invalid
+        //   }
+
+        //   if (
+        //     auditorium &&
+        //     date &&
+        //     startTime &&
+        //     endTime &&
+        //     events_name &&
+        //     events_resourceperson
+        //   ) {
+        //     try {
+        //       // Step 1: Check if the slot is available
+        //       const slotCheckResponse = await fetch(
+        //         "https://auditorium-booking-i34f.onrender.com/slotcheck",
+        //         {
+        //           method: "POST",
+        //           headers: {
+        //             "Content-Type": "application/json",
+        //             auth: localStorage.getItem("token"),
+        //           },
+        //           body: JSON.stringify({
+        //             userId: localStorage.getItem("userID"),
+        //             date: date,
+        //             start: startTime,
+        //             end: endTime,
+        //             slotdetails: slotdetails,
+        //           }),
+        //         }
+        //       );
+
+        //       if (!slotCheckResponse.ok)
+        //         throw new Error("Slot checking failed");
+
+        //       const slotCheckData = await slotCheckResponse.json();
+        //       console.log(slotCheckData + " data");
+
+        //       // Step 2: Always allow booking, regardless of slot status
+        //       let bookingMessage = "";
+        //       if (slotCheckData.message.includes("already booked")) {
+        //         // Slot is already booked, but allow booking with a "pending" status
+        //         bookingMessage =
+        //           slotCheckData.message +
+        //           ". Booking request submitted for approval.";
+        //       } else {
+        //         // Slot is available, proceed with the booking
+        //         bookingMessage = "Booking request submitted for approval.";
+        //       }
+
+        //       // Step 3: Proceed with the booking
+        //       const bookingResponse = await fetch(
+        //         "https://auditorium-booking-i34f.onrender.com/book",
+        //         {
+        //           method: "POST",
+        //           headers: {
+        //             "Content-Type": "application/json",
+        //             auth: localStorage.getItem("token"),
+        //           },
+        //           body: JSON.stringify({
+        //             userId: localStorage.getItem("userID"),
+        //             auditorium: auditorium,
+        //             date: date,
+        //             slot: slotdetails,
+        //             start: startTime,
+        //             end: endTime,
+        //             events_name: events_name,
+        //             events_resourceperson: events_resourceperson,
+        //             amenities: amenities,
+        //             status: "pending", // All bookings start as pending
+        //           }),
+        //         }
+        //       );
+
+        //       if (!bookingResponse.ok)
+        //         throw new Error("Network response was not ok");
+
+        //       const bookingData = await bookingResponse.json();
+        //       messageBox.textContent = bookingMessage;
+        //       fetchBookings().then((bookings) => updateCalendar(bookings));
+        //     } catch (error) {
+        //       messageBox.textContent = "Failed to submit booking request";
+        //     }
+        //   } else {
+        //     messageBox.textContent = "Please fill in all required fields.";
+        //   }
+        // });
         bookButton.addEventListener("click", async () => {
           const auditorium = auditoriumSelect.value;
           const date = dateSelect.value;
@@ -635,87 +743,91 @@
             return; // Stop further execution if invalid
           }
 
-          if (
-            auditorium &&
-            date &&
-            startTime &&
-            endTime &&
-            events_name &&
-            events_resourceperson
-          ) {
-            try {
-              // Step 1: Check if the slot is available
-              const slotCheckResponse = await fetch(
-                "https://auditorium-booking-i34f.onrender.com/slotcheck",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    auth: localStorage.getItem("token"),
-                  },
-                  body: JSON.stringify({
-                    userId: localStorage.getItem("userID"),
-                    date: date,
-                    start: startTime,
-                    end: endTime,
-                    slotdetails: slotdetails,
-                  }),
-                }
-              );
+          // Check for missing fields and create an error message
+          let missingFields = [];
+          if (!auditorium) missingFields.push("auditorium");
+          if (!date) missingFields.push("date");
+          if (!startTime) missingFields.push("start time");
+          if (!endTime) missingFields.push("end time");
+          if (!events_name) missingFields.push("event name");
+          if (!events_resourceperson) missingFields.push("resource person");
 
-              if (!slotCheckResponse.ok)
-                throw new Error("Slot checking failed");
+          if (missingFields.length > 0) {
+            messageBox.textContent =
+              "Please fill in the following details: " +
+              missingFields.join(", ");
+            return; // Stop further execution if fields are missing
+          }
 
-              const slotCheckData = await slotCheckResponse.json();
-              console.log(slotCheckData + " data");
-
-              // Step 2: Always allow booking, regardless of slot status
-              let bookingMessage = "";
-              if (slotCheckData.message.includes("already booked")) {
-                // Slot is already booked, but allow booking with a "pending" status
-                bookingMessage =
-                  slotCheckData.message +
-                  ". Booking request submitted for approval.";
-              } else {
-                // Slot is available, proceed with the booking
-                bookingMessage = "Booking request submitted for approval.";
+          try {
+            // Step 1: Check if the slot is available
+            const slotCheckResponse = await fetch(
+              "https://auditorium-booking-i34f.onrender.com/slotcheck",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  auth: localStorage.getItem("token"),
+                },
+                body: JSON.stringify({
+                  userId: localStorage.getItem("userID"),
+                  date: date,
+                  start: startTime,
+                  end: endTime,
+                  slotdetails: slotdetails,
+                }),
               }
+            );
 
-              // Step 3: Proceed with the booking
-              const bookingResponse = await fetch(
-                "https://auditorium-booking-i34f.onrender.com/book",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    auth: localStorage.getItem("token"),
-                  },
-                  body: JSON.stringify({
-                    userId: localStorage.getItem("userID"),
-                    auditorium: auditorium,
-                    date: date,
-                    slot: slotdetails,
-                    start: startTime,
-                    end: endTime,
-                    events_name: events_name,
-                    events_resourceperson: events_resourceperson,
-                    amenities: amenities,
-                    status: "pending", // All bookings start as pending
-                  }),
-                }
-              );
+            if (!slotCheckResponse.ok) throw new Error("Slot checking failed");
 
-              if (!bookingResponse.ok)
-                throw new Error("Network response was not ok");
+            const slotCheckData = await slotCheckResponse.json();
+            console.log(slotCheckData + " data");
 
-              const bookingData = await bookingResponse.json();
-              messageBox.textContent = bookingMessage;
-              fetchBookings().then((bookings) => updateCalendar(bookings));
-            } catch (error) {
-              messageBox.textContent = "Failed to submit booking request";
+            // Step 2: Always allow booking, regardless of slot status
+            let bookingMessage = "";
+            if (slotCheckData.message.includes("already booked")) {
+              // Slot is already booked, but allow booking with a "pending" status
+              bookingMessage =
+                slotCheckData.message +
+                ". Booking request submitted for approval.";
+            } else {
+              // Slot is available, proceed with the booking
+              bookingMessage = "Booking request submitted for approval.";
             }
-          } else {
-            messageBox.textContent = "Please fill in all required fields.";
+
+            // Step 3: Proceed with the booking
+            const bookingResponse = await fetch(
+              "https://auditorium-booking-i34f.onrender.com/book",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  auth: localStorage.getItem("token"),
+                },
+                body: JSON.stringify({
+                  userId: localStorage.getItem("userID"),
+                  auditorium: auditorium,
+                  date: date,
+                  slot: slotdetails,
+                  start: startTime,
+                  end: endTime,
+                  events_name: events_name,
+                  events_resourceperson: events_resourceperson,
+                  amenities: amenities,
+                  status: "pending", // All bookings start as pending
+                }),
+              }
+            );
+
+            if (!bookingResponse.ok)
+              throw new Error("Network response was not ok");
+
+            const bookingData = await bookingResponse.json();
+            messageBox.textContent = bookingMessage;
+            fetchBookings().then((bookings) => updateCalendar(bookings));
+          } catch (error) {
+            messageBox.textContent = "Failed to submit booking request";
           }
         });
 
