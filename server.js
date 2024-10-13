@@ -19,6 +19,13 @@ app.use(express.static("./"));
 app.use(bodyParser.json());
 app.use(cors());
 
+const twilio = require("twilio");
+
+// Twilio credentials (make sure to secure these in environment variables)
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = new twilio(accountSid, authToken);
+
 // MongoDB connection
 const db = async () => {
   try {
@@ -344,8 +351,8 @@ app.get("/admin/bookings", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+// Import Twilio
 
-// Admin approval route
 app.post("/admin/approve", async (req, res) => {
   console.log("Approval request");
   const { bookingId } = req.body;
@@ -381,6 +388,16 @@ app.post("/admin/approve", async (req, res) => {
 
   await transporter.sendMail(mailOptionsUser);
 
+  // Prepare and send SMS to the user
+  const userPhoneNumber = user.phone; // Assuming user phone number is stored in the database
+  if (userPhoneNumber) {
+    await client.messages.create({
+      body: `Your booking for the auditorium on ${booking.date} has been approved. For more details, please check your email.`,
+      to: userPhoneNumber, // User's phone number
+      from: process.env.TWILIO_PHONE_NUMBER, // Your Twilio number
+    });
+  }
+
   // Prepare emails for cleaning team, powerhouse, and audio technician
   const cleaningTeamEmail = process.env.CLEANING_TEAM_EMAIL;
   const powerhouseEmail = process.env.POWERHOUSE_EMAIL;
@@ -390,27 +407,15 @@ app.post("/admin/approve", async (req, res) => {
     booking.amenities.length > 0
       ? `Amenities: ${booking.amenities.join(", ")}`
       : "No amenities selected.";
-  const userName = user.name; // Get user name
-  const userDept = user.dept; // Get user department
+  const userName = user.name;
+  const userDept = user.dept;
 
   const formattedDate = new Date(booking.date).toLocaleDateString("en-IN", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-  // const BookingDetailMessage = `
-  // Booking Details:
-  // Date: ${formattedDate}
-  // Auditorium: ${
-  //   booking.auditorium === "auditorium1" ? "KS" :
-  //   booking.auditorium === "auditorium2" ? "KK" :
-  //   "Open Air Audi"
-  // }
-  // Session: ${booking.slot === "morning" ? "FN" : "AN"}
-  // Event Name: ${booking.events_name}
-  // Name: ${user.name}
-  // Dept: ${user.dept}
-  // Phone No: ${user.phone}`;
+
   const BookingDetailMessage = `
   Booking Details:
   Date: ${formattedDate}
@@ -474,11 +479,176 @@ app.post("/admin/approve", async (req, res) => {
   await transporter.sendMail(mailOptionsPowerhouse);
   await transporter.sendMail(mailOptionsAudioTechnician);
 
+  // Send SMS notifications to cleaning team, powerhouse, and audio technician
+  const cleaningTeamPhoneNumber = process.env.CLEANING_TEAM_PHONE;
+  const powerhousePhoneNumber = process.env.POWERHOUSE_PHONE;
+  const audioTechnicianPhoneNumber = process.env.AUDIO_TECHNICIAN_PHONE;
+
+  if (cleaningTeamPhoneNumber) {
+    await client.messages.create({
+      body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Cleaning required. Contact: ${user.phone}.`,
+      to: cleaningTeamPhoneNumber,
+      from: process.env.TWILIO_PHONE_NUMBER,
+    });
+  }
+
+  if (powerhousePhoneNumber) {
+    await client.messages.create({
+      body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Power setup required. Contact: ${user.phone}.`,
+      to: powerhousePhoneNumber,
+      from: process.env.TWILIO_PHONE_NUMBER,
+    });
+  }
+
+  if (audioTechnicianPhoneNumber) {
+    await client.messages.create({
+      body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Audio setup required. Contact: ${user.phone}.`,
+      to: audioTechnicianPhoneNumber,
+      from: process.env.TWILIO_PHONE_NUMBER,
+    });
+  }
+
   res
     .status(200)
-    .json({ success: true, message: "Booking approved and emails sent." });
+    .json({
+      success: true,
+      message: "Booking approved, emails, and SMS sent.",
+    });
 });
 
+// // Admin approval route
+// app.post("/admin/approve", async (req, res) => {
+//   console.log("Approval request");
+//   const { bookingId } = req.body;
+//   console.log("Booking id received: " + bookingId);
+//   const booking = await Booking.findById(bookingId);
+
+//   if (!booking) {
+//     return res
+//       .status(404)
+//       .json({ success: false, message: "Booking not found." });
+//   }
+
+//   // Update booking status to approved
+//   booking.status = "Approved";
+//   await booking.save();
+
+//   // Send approval email to user
+//   const user = await User.findById(booking.user);
+//   const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//       user: process.env.EMAIL_USER,
+//       pass: process.env.EMAIL_PASS,
+//     },
+//   });
+
+//   const mailOptionsUser = {
+//     from: process.env.EMAIL_USER,
+//     to: user.email,
+//     subject: "Booking Approved",
+//     text: `Your booking for the auditorium on ${booking.date} has been approved.`,
+//   };
+
+//   await transporter.sendMail(mailOptionsUser);
+
+//   // Prepare emails for cleaning team, powerhouse, and audio technician
+//   const cleaningTeamEmail = process.env.CLEANING_TEAM_EMAIL;
+//   const powerhouseEmail = process.env.POWERHOUSE_EMAIL;
+//   const audioTechnicianEmail = process.env.AUDIO_TECHNICIAN_EMAIL;
+
+//   const amenitiesList =
+//     booking.amenities.length > 0
+//       ? `Amenities: ${booking.amenities.join(", ")}`
+//       : "No amenities selected.";
+//   const userName = user.name; // Get user name
+//   const userDept = user.dept; // Get user department
+
+//   const formattedDate = new Date(booking.date).toLocaleDateString("en-IN", {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//   });
+//   // const BookingDetailMessage = `
+//   // Booking Details:
+//   // Date: ${formattedDate}
+//   // Auditorium: ${
+//   //   booking.auditorium === "auditorium1" ? "KS" :
+//   //   booking.auditorium === "auditorium2" ? "KK" :
+//   //   "Open Air Audi"
+//   // }
+//   // Session: ${booking.slot === "morning" ? "FN" : "AN"}
+//   // Event Name: ${booking.events_name}
+//   // Name: ${user.name}
+//   // Dept: ${user.dept}
+//   // Phone No: ${user.phone}`;
+//   const BookingDetailMessage = `
+//   Booking Details:
+//   Date: ${formattedDate}
+//   Auditorium: ${
+//     booking.auditorium === "auditorium1"
+//       ? "KS"
+//       : booking.auditorium === "auditorium2"
+//       ? "KK"
+//       : booking.auditorium === "auditorium3"
+//       ? "Open Air Auditorium"
+//       : booking.auditorium === "auditorium4"
+//       ? "Main Ground"
+//       : booking.auditorium === "auditorium5"
+//       ? "Indoor Stadium"
+//       : booking.auditorium === "auditorium6"
+//       ? "CSE Seminar Hall"
+//       : booking.auditorium === "auditorium7"
+//       ? "IT Seminar Hall"
+//       : booking.auditorium === "auditorium8"
+//       ? "ECE Seminar Hall"
+//       : booking.auditorium === "auditorium9"
+//       ? "EEE Seminar Hall"
+//       : booking.auditorium === "auditorium10"
+//       ? "Mechanical Seminar Hall"
+//       : booking.auditorium === "auditorium11"
+//       ? "Civil Seminar Hall"
+//       : booking.auditorium === "auditorium12"
+//       ? "Architecture Seminar Hall"
+//       : "Unknown Auditorium"
+//   }
+//   Start Time: ${booking.start}
+//   End Time: ${booking.end}
+//   Event Name: ${booking.events_name}
+//   Name: ${user.name}
+//   Dept: ${user.dept}
+//   Phone No: ${user.phone}`;
+
+//   const mailOptionsCleaning = {
+//     from: process.env.EMAIL_USER,
+//     to: cleaningTeamEmail,
+//     subject: "New Booking Approved",
+//     text: `A new booking has been approved for ${booking.date} by ${userName} from the ${userDept} department. Please prepare the cleaning accordingly. For further info contact ${user.phone}.\n\n${BookingDetailMessage}`,
+//   };
+
+//   const mailOptionsPowerhouse = {
+//     from: process.env.EMAIL_USER,
+//     to: powerhouseEmail,
+//     subject: "New Booking Approved",
+//     text: `A new booking has been approved for ${booking.date} by ${userName} from the ${userDept} department. Please ensure power setup is ready. For further info contact ${user.phone}.\n\n${BookingDetailMessage}`,
+//   };
+
+//   const mailOptionsAudioTechnician = {
+//     from: process.env.EMAIL_USER,
+//     to: audioTechnicianEmail,
+//     subject: "New Booking Approved",
+//     text: `A new booking has been approved for ${booking.date} by ${userName} from the ${userDept} department. For further info contact ${user.phone}. ${amenitiesList}.\n\n${BookingDetailMessage}`,
+//   };
+
+//   // Send emails to the cleaning team, powerhouse, and audio technician
+//   await transporter.sendMail(mailOptionsCleaning);
+//   await transporter.sendMail(mailOptionsPowerhouse);
+//   await transporter.sendMail(mailOptionsAudioTechnician);
+
+//   res
+//     .status(200)
+//     .json({ success: true, message: "Booking approved and emails sent." });
+// });
 
 const dotenv = require("dotenv");
 const { CallTracker } = require("assert");
@@ -520,8 +690,8 @@ app.post("/admin/login", async (req, res) => {
 // Backend logic (in your Node.js/Express app)
 app.post("/slotcheck", async (req, res) => {
   const { start, end, userId, date, slotdetails } = req.body;
-  
-  const auditorium = slotdetails.split('%')[0]; // Extracting auditorium
+
+  const auditorium = slotdetails.split("%")[0]; // Extracting auditorium
 
   try {
     const existingBooking = await Booking.findOne({
@@ -531,7 +701,6 @@ app.post("/slotcheck", async (req, res) => {
         { start: { $lt: end }, end: { $gt: start } }, // Overlap condition
       ],
     });
-    
 
     if (existingBooking) {
       if (existingBooking.status === "Approved") {
@@ -541,7 +710,8 @@ app.post("/slotcheck", async (req, res) => {
         });
       } else if (existingBooking.status === "pending") {
         return res.status(200).send({
-          message: "Slot is already booked but pending admin approval. Your booking will be added to the queue.",
+          message:
+            "Slot is already booked but pending admin approval. Your booking will be added to the queue.",
         });
       }
     }
@@ -603,19 +773,21 @@ app.post("/slot", async (req, res) => {
 app.post("/cancel", requireAuth, async (req, res) => {
   const { userId, bookingId } = req.body;
 
-  console.log("Cancel Booking", bookingId, userId);
-
   try {
     const booking = await Booking.findById(bookingId);
     if (!booking) {
-      return res.status(404).json({ success: false, message: "Booking not found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Booking not found." });
     }
 
     // Remove booking from database
     await Booking.deleteOne({ _id: bookingId });
 
-    // Send cancellation email to user
+    // Find the user and send an email as before
     const user = await User.findById(booking.user);
+
+    // Send email notification (as before)
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -633,10 +805,27 @@ app.post("/cancel", requireAuth, async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({ success: true, message: "Booking cancelled." });
+    // Send SMS notification via Twilio
+    const userPhoneNumber = user.phone; // Assume `phone` is stored in the user schema
+    if (userPhoneNumber) {
+      await client.messages.create({
+        body: `Your booking for the auditorium on ${booking.date} has been cancelled.`,
+        to: userPhoneNumber, // User's phone number
+        from: process.env.TWILIO_PHONE_NUMBER, // Your Twilio number
+      });
+    }
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Booking cancelled. Notification sent.",
+      });
   } catch (error) {
     console.error("Error during cancellation:", error);
-    res.status(500).json({ success: false, message: "Failed to cancel booking." });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to cancel booking." });
   }
 });
 
