@@ -381,25 +381,7 @@ app.post("/admin/approve", async (req, res) => {
     },
   });
 
-  const mailOptionsUser = {
-    from: process.env.EMAIL_USER,
-    to: user.email,
-    subject: "Booking Approved",
-    text: `Your booking for the auditorium on ${booking.date} has been approved.`,
-  };
-
-  await transporter.sendMail(mailOptionsUser);
-
-  // Prepare and send SMS to the user
-  const userPhoneNumber = user.phone; // Assuming user phone number is stored in the database
-  if (userPhoneNumber) {
-    await client.messages.create({
-      body: `Your booking for the auditorium on ${booking.date} has been approved. For more details, please check your email.`,
-      to: userPhoneNumber, // User's phone number
-      from: process.env.TWILIO_PHONE_NUMBER, // Your Twilio number
-    });
-  }
-
+  
   // Prepare emails for cleaning team, powerhouse, and audio technician
   const cleaningTeamEmail = process.env.CLEANING_TEAM_EMAIL;
   const powerhouseEmail = process.env.POWERHOUSE_EMAIL;
@@ -454,6 +436,26 @@ app.post("/admin/approve", async (req, res) => {
   Name: ${user.name}
   Dept: ${user.dept}
   Phone No: ${user.phone}`;
+
+  const mailOptionsUser = {
+    from: process.env.EMAIL_USER,
+    to: user.email,
+    subject: "Booking Approved",
+    text: `Your booking has been approved. Booking details:\n\n${BookingDetailMessage}`,
+  };
+//for the auditorium on ${booking.date}
+  await transporter.sendMail(mailOptionsUser);
+
+  // Prepare and send SMS to the user
+  const userPhoneNumber = user.phone; // Assuming user phone number is stored in the database
+  if (userPhoneNumber) {
+    await client.messages.create({
+      body: `Your booking for the auditorium on ${booking.date} has been approved. For more details, please check your email.`,
+      to: userPhoneNumber, // User's phone number
+      from: process.env.TWILIO_PHONE_NUMBER, // Your Twilio number
+    });
+  }
+
 
   const mailOptionsCleaning = {
     from: process.env.EMAIL_USER,
