@@ -416,13 +416,127 @@
           messageBox.className = `message-box ${type}`;
           setTimeout(() => (messageBox.textContent = ""), 5000); // Clear message after 5 seconds
         }
+        function showDialog(bookingId) {
+          const dialogBox = document.getElementById("dialogBox");
+          dialogBox.classList.remove("hidden");
 
-        // Approve a booking
-        function approveBooking(bookingId) {
+          const sectionsContainer =
+            document.getElementById("sectionsContainer");
+          sectionsContainer.innerHTML = ""; // Clear previous content
+
+          // Predefined technician options
+          const techniciansList = [
+            "John Doe",
+            "Jane Smith",
+            "Alex Johnson",
+            "Emily Davis",
+            "Chris Brown",
+          ];
+
+          // Function to add a new section
+          function addSection(sectionName = "") {
+            const sectionDiv = document.createElement("div");
+            sectionDiv.classList.add("section");
+
+            const sectionHeader = document.createElement("h4");
+            sectionHeader.textContent = sectionName || "New Section";
+
+            const subsectionsContainer = document.createElement("div");
+            subsectionsContainer.classList.add("subsections-container");
+
+            // Function to add a subsection
+            function addSubsection(selectedTechnician = "") {
+              const subsectionDiv = document.createElement("div");
+              subsectionDiv.classList.add("subsection");
+
+              const select = document.createElement("select");
+              const defaultOption = document.createElement("option");
+              defaultOption.value = "";
+              defaultOption.textContent = "Choose Technician";
+              defaultOption.disabled = true;
+              defaultOption.selected = !selectedTechnician;
+
+              select.appendChild(defaultOption);
+
+              techniciansList.forEach((technician) => {
+                const option = document.createElement("option");
+                option.value = technician;
+                option.textContent = technician;
+                if (technician === selectedTechnician) {
+                  option.selected = true;
+                }
+                select.appendChild(option);
+              });
+
+              const removeSubsectionBtn = document.createElement("button");
+              removeSubsectionBtn.textContent = "Remove";
+              removeSubsectionBtn.classList.add("remove-subsection-btn");
+              removeSubsectionBtn.onclick = () => subsectionDiv.remove();
+
+              subsectionDiv.appendChild(select);
+              subsectionDiv.appendChild(removeSubsectionBtn);
+              subsectionsContainer.appendChild(subsectionDiv);
+            }
+
+            // Add a default subsection
+            addSubsection();
+
+            const addSubsectionBtn = document.createElement("button");
+            addSubsectionBtn.textContent = "Add Technician";
+            addSubsectionBtn.classList.add("add-subsection-btn");
+            addSubsectionBtn.onclick = () => addSubsection();
+
+            const removeSectionBtn = document.createElement("button");
+            removeSectionBtn.textContent = "Remove Section";
+            removeSectionBtn.classList.add("remove-section-btn");
+            removeSectionBtn.onclick = () => sectionDiv.remove();
+
+            sectionDiv.appendChild(sectionHeader);
+            sectionDiv.appendChild(subsectionsContainer);
+            sectionDiv.appendChild(addSubsectionBtn);
+            sectionDiv.appendChild(removeSectionBtn);
+
+            sectionsContainer.appendChild(sectionDiv);
+          }
+
+          // Add default sections
+          addSection("Camera");
+          addSection("Video");
+
+          // Add new section handler
+          document.getElementById("addSectionBtn").onclick = () => addSection();
+
+          // Save and Cancel handlers
+          document.getElementById("saveBtn").onclick = () => {
+            const sectionData = Array.from(
+              sectionsContainer.getElementsByClassName("section")
+            ).map((section) => {
+              const sectionName = section.querySelector("h4").textContent;
+              const technicians = Array.from(
+                section.getElementsByClassName("subsection")
+              ).map((subsection) => subsection.querySelector("select").value);
+
+              return { sectionName, technicians };
+            });
+
+            dialogBox.classList.add("hidden");
+            approveBooking(bookingId, sectionData); // Pass structured data to approveBooking
+          };
+
+          document.getElementById("cancelBtn").onclick = () => {
+            dialogBox.classList.add("hidden");
+          };
+        }
+
+        // Updated `approveBooking` Function
+        function approveBooking(bookingId, sectionData) {
           fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ bookingId: bookingId }),
+            body: JSON.stringify({
+              bookingId: bookingId,
+              sections: sectionData, // Store sections and subsections data
+            }),
           })
             .then((response) => {
               if (response.ok) {
@@ -439,6 +553,29 @@
               showMessage("Error approving booking", "error");
             });
         }
+
+        // // Approve a booking
+        // function approveBooking(bookingId) {
+        //   fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ bookingId: bookingId }),
+        //   })
+        //     .then((response) => {
+        //       if (response.ok) {
+        //         console.log("Booking approved successfully");
+        //         showMessage("Booking approved successfully", "success");
+        //         return fetchBookings().then(displayBookings);
+        //       } else {
+        //         console.error("Failed to approve booking");
+        //         showMessage("Failed to approve booking", "error");
+        //       }
+        //     })
+        //     .catch((error) => {
+        //       console.error("Error approving booking:", error);
+        //       showMessage("Error approving booking", "error");
+        //     });
+        // }
 
         // Cancel a booking
         function cancelBooking(bookingId) {

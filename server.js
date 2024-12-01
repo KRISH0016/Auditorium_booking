@@ -68,6 +68,41 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
+// SectionTechnician schema
+const sectionTechnicianSchema = new mongoose.Schema({
+  bookingId: { type: mongoose.Schema.Types.ObjectId, ref: "Booking", required: true },
+  sectionName: { type: String, required: true },
+  technicianName: { type: String, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+});
+
+const SectionTechnician = mongoose.model("SectionTechnician", sectionTechnicianSchema);
+
+
+const technicianSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: String, // Optional field for phone number
+  available: { type: Boolean, default: true }, // Track technician availability
+});
+
+const Technician = mongoose.model("Technician", technicianSchema);
+
+module.exports = Technician;
+
+
+const sectionSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: String, // Optional field for additional description
+  technicians: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Technician' }], // References the Technician model
+  isActive: { type: Boolean, default: true }, // Tracks if the section is active
+});
+
+const Section = mongoose.model("Section", sectionSchema);
+
+module.exports = Section;
+
+
 // // Mongoose Booking schema and model
 // const bookingSchema = new mongoose.Schema({
 //   auditorium: { type: String, required: true },
@@ -357,9 +392,13 @@ app.get("/admin/bookings", async (req, res) => {
 
 app.post("/admin/approve", async (req, res) => {
   console.log("Approval request");
-  const { bookingId } = req.body;
+  const { bookingId, sectionData } = req.body; // Accept sectionData from frontend
   console.log("Booking id received: " + bookingId);
   const booking = await Booking.findById(bookingId);
+
+  //const { bookingId } = req.body;
+  //console.log("Booking id received: " + bookingId);
+  //const booking = await Booking.findById(bookingId);
 
   if (!booking) {
     return res
@@ -370,6 +409,28 @@ app.post("/admin/approve", async (req, res) => {
   // Update booking status to approved
   booking.status = "Approved";
   await booking.save();
+
+// Save section technician data to SectionTechnician collection
+const sectionTechnicianPromises = sectionData.map(async (section) => {
+  const { sectionName, technicians } = section;
+
+  // For each technician in the section, create a new SectionTechnician entry
+  const sectionTechnicianEntries = technicians.map((technician) => {
+    return new SectionTechnician({
+      bookingId,
+      sectionName,
+      technicianName: technician,
+      userId: booking.user, // Assuming booking.user is the user object (user ID)
+    }).save();
+  });
+
+  // Wait for all entries in a section to be saved
+  await Promise.all(sectionTechnicianEntries);
+});
+
+// Wait for all sections and technicians to be saved
+await Promise.all(sectionTechnicianPromises);
+
 
   // Send approval email to user
   const user = await User.findById(booking.user);
@@ -822,6 +883,47 @@ app.post("/slot", async (req, res) => {
 //       .send({ error: "An error occurred while processing your request." });
 //   }
 // });
+// API for creating a technician
+
+// Fetch all technicians from the database
+app.get("/technicians", (req, res) => {
+  Technician.find()
+    .then((technicians) => res.json(technicians))
+    .catch((err) => res.status(400).json({ error: err.message }));
+});
+
+app.post("/technician", (req, res) => {
+  const { name, email, phone, available } = req.body;
+
+  const newTechnician = new Technician({
+    name,
+    email,
+    phone,
+    available,
+  });
+
+  newTechnician
+    .save()
+    .then((technician) => res.json(technician))
+    .catch((err) => res.status(400).json({ error: err.message }));
+});
+
+// API to create a section
+app.post("/section", (req, res) => {
+  const { name, description, technicianIds } = req.body;
+
+  const newSection = new Section({
+    name,
+    description,
+    technicians: technicianIds,
+  });
+
+  newSection
+    .save()
+    .then((section) => res.json(section))
+    .catch((err) => res.status(400).json({ error: err.message }));
+});
+
 
 app.post("/cancel", requireAuth, async (req, res) => {
   const { userId, bookingId } = req.body;

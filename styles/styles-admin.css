@@ -150,6 +150,46 @@ h2 {
   background-color: rgba(169, 153, 150, 0.3); /* Light red background */
   font-weight: bold; /* Makes the text bolder for emphasis */
 }
+/* Dialog Box Styles */
+.hidden {
+  display: none;
+}
+
+.dialog-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.section {
+  margin-bottom: 10px;
+}
+
+.section input {
+  margin-right: 5px;
+}
+
+.section .remove-section-btn {
+  margin-left: 5px;
+}
+
 
 /* Responsive styles */
 @media (max-width: 700px) {

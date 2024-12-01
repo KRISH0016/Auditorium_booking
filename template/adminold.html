@@ -32,10 +32,8 @@
         <table id="bookings-table">
           <thead>
             <tr>
-              
               <th>Name</th>
               <th>Dept</th>
-              
               <th>Event</th>
               <th>Auditorium</th>
               <th>Date</th>
@@ -49,6 +47,19 @@
           <tbody id="bookings-body">
             <!-- Bookings will be dynamically added here -->
           </tbody>
+          <div id="dialogBox" class="dialog-box hidden">
+            <div class="dialog-content">
+              <h3>Configure Booking Details</h3>
+              <div id="sectionsContainer">
+                <!-- Sections will be dynamically added here -->
+              </div>
+              <button id="addSectionBtn">Add Section</button>
+              <div class="dialog-actions">
+                <button id="cancelBtn">Cancel</button>
+                <button id="saveBtn">Save</button>
+              </div>
+            </div>
+          </div>
         </table>
         <div id="message-box" class="message-box"></div>
         <button id="print-csv">Print CSV</button>
@@ -65,7 +76,9 @@
 
         // Fetch bookings from the server
         function fetchBookings() {
-          return fetch("https://auditorium-booking-i34f.onrender.com/admin/bookings")
+          return fetch(
+            "https://auditorium-booking-i34f.onrender.com/admin/bookings"
+          )
             .then((response) => response.json())
             .catch((error) => {
               console.error("Error fetching bookings:", error);
@@ -73,7 +86,6 @@
             });
         }
 
-  
         // Function to export bookings to CSV
         function exportBookingsToCSV(bookings) {
           const csvRows = [];
@@ -96,7 +108,7 @@
             const auditoriumCode =
               auditoriumMapping[booking.auditorium] || booking.auditorium;
             const row = [
-             // booking._id,
+              // booking._id,
               booking.user.name,
               booking.user.dept,
               //booking.user._id,
@@ -123,7 +135,6 @@
           document.body.removeChild(a);
         }
 
-
         function initializeCalendar(bookings) {
           console.log("Bookings for calendar: ", bookings);
 
@@ -144,7 +155,7 @@
             events: bookings.map((booking) => {
               const auditoriumCode =
                 auditoriumMapping[booking.auditorium] || booking.auditorium; // Get auditorium code
-                
+
               // Extract the booking date (if needed) and start/end times
               let bookingDate;
               try {
@@ -181,13 +192,15 @@
               //   "YYYY-MM-DD HH:mm"
               // ); // Format start time
               // const endTime = moment(booking.end).format("YYYY-MM-DD HH:mm"); // Format end time
-              console.log(  booking._id,
+              console.log(
+                booking._id,
                 `${auditoriumCode} ${booking.events_name}`, // Combine auditorium and event name
-                 startTime, // Set start time
-                 endTime, // Set end time
-                
-                  booking.status === "Approved" ? "green" : "grey",
-                 booking.status === "Approved" ? "green" : "grey")
+                startTime, // Set start time
+                endTime, // Set end time
+
+                booking.status === "Approved" ? "green" : "grey",
+                booking.status === "Approved" ? "green" : "grey"
+              );
               return {
                 id: booking._id,
                 title: `${auditoriumCode} ${booking.events_name}`, // Combine auditorium and event name
@@ -217,37 +230,81 @@
           };
 
           bookings.forEach((booking) => {
-            const row = document.createElement("tr");
-            const auditoriumCode =
-              auditoriumMapping[booking.auditorium] || booking.auditorium; // Map to code
-            try {
-              const row = document.createElement("tr");
-              row.innerHTML = `
-            
-              <td>${booking.user.name}</td>
-              <td>${booking.user.dept}</td>
-              <td>${booking.events_name}</td>
-              <td>${auditoriumCode}</td>
-              <td>${new Date(booking.date).toLocaleDateString()}</td>
-              <td>${booking.start}</td>
-              <td>${booking.end}</td>
-              <td>${booking.amenities.join(", ")}</td>
-              <td>${booking.status}</td>
-              <td>
-                <button class="approve-button" data-booking-id="${
-                  booking._id
-                }">Approve</button>
-                <button class="cancel-button" data-booking-id="${
-                  booking._id
-                }">Cancel</button>
-              </td>
-            `;
-              bookingsTable.appendChild(row);
-            } catch (error) {
-              console.error("Error creating booking row:", error);
-            }
-          });
+  const row = document.createElement("tr");
+  const auditoriumCode =
+    auditoriumMapping[booking.auditorium] || booking.auditorium; // Map to code
+
+  try {
+    row.innerHTML = `
+      <td>${booking.user.name}</td>
+      <td>${booking.user.dept}</td>
+      <td>${booking.events_name}</td>
+      <td>${auditoriumCode}</td>
+      <td>${new Date(booking.date).toLocaleDateString()}</td>
+      <td>${booking.start}</td>
+      <td>${booking.end}</td>
+      <td>${booking.amenities.join(", ")}</td>
+      <td>${booking.status}</td>
+      <td>
+        <button class="approve-button" data-booking-id="${booking._id}">Approve</button>
+        <button class="cancel-button" data-booking-id="${booking._id}">Cancel</button>
+      </td>
+    `;
+
+    // Append the row to the table
+    bookingsTable.appendChild(row);
+
+    // Add event listener to the Approve button
+    const approveButton = row.querySelector(".approve-button");
+    approveButton.addEventListener("click", () => {
+      showDialog(booking._id); // Call the showDialog function with the booking ID
+    });
+
+    // Add event listener to the Cancel button (optional)
+    const cancelButton = row.querySelector(".cancel-button");
+    cancelButton.addEventListener("click", () => {
+      // Implement cancel functionality if required
+      console.log(`Cancel booking ID: ${booking._id}`);
+    });
+  } catch (error) {
+    console.error("Error creating booking row:", error);
+  }
+});
         }
+
+        //   bookings.forEach((booking) => {
+        //     const row = document.createElement("tr");
+        //     const auditoriumCode =
+        //       auditoriumMapping[booking.auditorium] || booking.auditorium; // Map to code
+        //     try {
+        //       const row = document.createElement("tr");
+        //       row.innerHTML = `
+            
+        //       <td>${booking.user.name}</td>
+        //       <td>${booking.user.dept}</td>
+        //       <td>${booking.events_name}</td>
+        //       <td>${auditoriumCode}</td>
+        //       <td>${new Date(booking.date).toLocaleDateString()}</td>
+        //       <td>${booking.start}</td>
+        //       <td>${booking.end}</td>
+        //       <td>${booking.amenities.join(", ")}</td>
+        //       <td>${booking.status}</td>
+        //       <td>
+                
+        //         <button class="approve-button" data-booking-id="${
+        //           booking._id
+        //         }">Approve</button>
+        //         <button class="cancel-button" data-booking-id="${
+        //           booking._id
+        //         }">Cancel</button>
+        //       </td>
+        //     `;
+        //       bookingsTable.appendChild(row);
+        //     } catch (error) {
+        //       console.error("Error creating booking row:", error);
+        //     }
+        //   });
+        // }
 
         // Show message in the message box
         function showMessage(message, type) {
@@ -256,29 +313,245 @@
           setTimeout(() => (messageBox.textContent = ""), 5000); // Clear message after 5 seconds
         }
 
-        // Approve a booking
-        function approveBooking(bookingId) {
-          fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ bookingId: bookingId }),
-          })
-            .then(console.log(bookingId))
-            .then((response) => {
-              if (response.ok) {
-                console.log("Booking approved successfully");
-                showMessage("Booking approved successfully", "success");
-                return fetchBookings().then(displayBookings);
-              } else {
-                console.error("Failed to approve booking");
-                showMessage("Failed to approve booking", "error");
-              }
-            })
-            .catch((error) => {
-              console.error("Error approving booking:", error);
-              showMessage("Error approving booking", "error");
-            });
+        // // Approve a booking
+        // function approveBooking(bookingId) {
+        //   fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ bookingId: bookingId }),
+        //   })
+        //     .then(console.log(bookingId))
+        //     .then((response) => {
+        //       if (response.ok) {
+        //         console.log("Booking approved successfully");
+        //         showMessage("Booking approved successfully", "success");
+        //         return fetchBookings().then(displayBookings);
+        //       } else {
+        //         console.error("Failed to approve booking");
+        //         showMessage("Failed to approve booking", "error");
+        //       }
+        //     })
+        //     .catch((error) => {
+        //       console.error("Error approving booking:", error);
+        //       showMessage("Error approving booking", "error");
+        //     });
+        // }
+        // Function to show the dialog box
+        // function showDialog(bookingId) {
+        //   const dialogBox = document.getElementById("dialogBox");
+        //   dialogBox.classList.remove("hidden");
+
+        //   const sectionsContainer =
+        //     document.getElementById("sectionsContainer");
+
+        //   // Function to add a new section
+        //   function addSection(name = "") {
+        //     const sectionDiv = document.createElement("div");
+        //     sectionDiv.classList.add("section");
+
+        //     const input = document.createElement("input");
+        //     input.type = "text";
+        //     input.placeholder = "Enter name";
+        //     input.value = name;
+
+        //     const removeBtn = document.createElement("button");
+        //     removeBtn.textContent = "Remove";
+        //     removeBtn.classList.add("remove-section-btn");
+        //     removeBtn.onclick = () => sectionDiv.remove();
+
+        //     sectionDiv.appendChild(input);
+        //     sectionDiv.appendChild(removeBtn);
+
+        //     sectionsContainer.appendChild(sectionDiv);
+        //   }
+
+        //   // Add default sections
+        //   addSection("Camera");
+        //   addSection("Video");
+
+        //   // Add new section handler
+        //   document.getElementById("addSectionBtn").onclick = () => addSection();
+
+        //   // Save and Cancel handlers
+        //   document.getElementById("saveBtn").onclick = () => {
+        //     const sectionData = Array.from(
+        //       sectionsContainer.getElementsByClassName("section")
+        //     ).map((section) => section.querySelector("input").value);
+
+        //     dialogBox.classList.add("hidden");
+        //     approveBooking(bookingId, sectionData); // Pass data to approveBooking
+        //   };
+
+        //   document.getElementById("cancelBtn").onclick = () => {
+        //     dialogBox.classList.add("hidden");
+        //   };
+        // }
+
+        // // Function to approve booking (with additional data)
+        // function approveBooking(bookingId, sectionData) {
+        //   fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({
+        //       bookingId: bookingId,
+        //       sections: sectionData,
+        //     }),
+        //   })
+        //     .then((response) => {
+        //       if (response.ok) {
+        //         console.log("Booking approved successfully");
+        //         showMessage("Booking approved successfully", "success");
+        //         return fetchBookings().then(displayBookings);
+        //       } else {
+        //         console.error("Failed to approve booking");
+        //         showMessage("Failed to approve booking", "error");
+        //       }
+        //     })
+        //     .catch((error) => {
+        //       console.error("Error approving booking:", error);
+        //       showMessage("Error approving booking", "error");
+        //     });
+        // }
+
+        function showDialog(bookingId) {
+  const dialogBox = document.getElementById("dialogBox");
+  dialogBox.classList.remove("hidden");
+
+  const sectionsContainer = document.getElementById("sectionsContainer");
+  sectionsContainer.innerHTML = ""; // Clear previous content
+
+  // Predefined technician options
+  const techniciansList = [
+    "John Doe",
+    "Jane Smith",
+    "Alex Johnson",
+    "Emily Davis",
+    "Chris Brown",
+  ];
+
+  // Function to add a new section
+  function addSection(sectionName = "") {
+    const sectionDiv = document.createElement("div");
+    sectionDiv.classList.add("section");
+
+    const sectionHeader = document.createElement("h4");
+    sectionHeader.textContent = sectionName || "New Section";
+
+    const subsectionsContainer = document.createElement("div");
+    subsectionsContainer.classList.add("subsections-container");
+
+    // Function to add a subsection
+    function addSubsection(selectedTechnician = "") {
+      const subsectionDiv = document.createElement("div");
+      subsectionDiv.classList.add("subsection");
+
+      const select = document.createElement("select");
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "Choose Technician";
+      defaultOption.disabled = true;
+      defaultOption.selected = !selectedTechnician;
+
+      select.appendChild(defaultOption);
+
+      techniciansList.forEach((technician) => {
+        const option = document.createElement("option");
+        option.value = technician;
+        option.textContent = technician;
+        if (technician === selectedTechnician) {
+          option.selected = true;
         }
+        select.appendChild(option);
+      });
+
+      const removeSubsectionBtn = document.createElement("button");
+      removeSubsectionBtn.textContent = "Remove";
+      removeSubsectionBtn.classList.add("remove-subsection-btn");
+      removeSubsectionBtn.onclick = () => subsectionDiv.remove();
+
+      subsectionDiv.appendChild(select);
+      subsectionDiv.appendChild(removeSubsectionBtn);
+      subsectionsContainer.appendChild(subsectionDiv);
+    }
+
+    // Add a default subsection
+    addSubsection();
+
+    const addSubsectionBtn = document.createElement("button");
+    addSubsectionBtn.textContent = "Add Technician";
+    addSubsectionBtn.classList.add("add-subsection-btn");
+    addSubsectionBtn.onclick = () => addSubsection();
+
+    const removeSectionBtn = document.createElement("button");
+    removeSectionBtn.textContent = "Remove Section";
+    removeSectionBtn.classList.add("remove-section-btn");
+    removeSectionBtn.onclick = () => sectionDiv.remove();
+
+    sectionDiv.appendChild(sectionHeader);
+    sectionDiv.appendChild(subsectionsContainer);
+    sectionDiv.appendChild(addSubsectionBtn);
+    sectionDiv.appendChild(removeSectionBtn);
+
+    sectionsContainer.appendChild(sectionDiv);
+  }
+
+  // Add default sections
+  addSection("Camera");
+  addSection("Video");
+
+  // Add new section handler
+  document.getElementById("addSectionBtn").onclick = () => addSection();
+
+  // Save and Cancel handlers
+  document.getElementById("saveBtn").onclick = () => {
+    const sectionData = Array.from(
+      sectionsContainer.getElementsByClassName("section")
+    ).map((section) => {
+      const sectionName = section.querySelector("h4").textContent;
+      const technicians = Array.from(
+        section.getElementsByClassName("subsection")
+      ).map(
+        (subsection) => subsection.querySelector("select").value
+      );
+
+      return { sectionName, technicians };
+    });
+
+    dialogBox.classList.add("hidden");
+    approveBooking(bookingId, sectionData); // Pass structured data to approveBooking
+  };
+
+  document.getElementById("cancelBtn").onclick = () => {
+    dialogBox.classList.add("hidden");
+  };
+}
+
+// Updated `approveBooking` Function
+function approveBooking(bookingId, sectionData) {
+  fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      bookingId: bookingId,
+      sections: sectionData, // Store sections and subsections data
+    }),
+  })
+    .then((response) => {
+      if (response.ok) {
+        console.log("Booking approved successfully");
+        showMessage("Booking approved successfully", "success");
+        return fetchBookings().then(displayBookings);
+      } else {
+        console.error("Failed to approve booking");
+        showMessage("Failed to approve booking", "error");
+      }
+    })
+    .catch((error) => {
+      console.error("Error approving booking:", error);
+      showMessage("Error approving booking", "error");
+    });
+}
+
 
         // Cancel a booking
         function cancelBooking(bookingId) {
@@ -309,7 +582,6 @@
         function attachEventListeners() {
           document.querySelectorAll(".approve-button").forEach((button) => {
             button.addEventListener("click", () => {
-              
               const bookingId = button.getAttribute("data-booking-id");
               console.log(bookingId);
               approveBooking(bookingId);
@@ -340,98 +612,98 @@
             showMessage("Error fetching bookings", "error");
           });
       });
-      
-        // function initializeCalendar(bookings) {
-        //   console.log("Bookings for calendar: ", bookings);
 
-        //   const auditoriumMapping = {
-        //     auditorium1: "KS",
-        //     auditorium2: "KK",
-        //     auditorium3: "Open Air Auditorium",
-        //     // Add more mappings if needed
-        //   };
+      // function initializeCalendar(bookings) {
+      //   console.log("Bookings for calendar: ", bookings);
 
-        //   $("#calendar").fullCalendar({
-        //     header: {
-        //       left: "prev,next today",
-        //       center: "title",
-        //       right: "month,agendaWeek,agendaDay",
-        //     },
-        //     editable: false, // Make false to prevent users from dragging events
-        //     events: bookings.map((booking) => {
-        //       const auditoriumCode =
-        //         auditoriumMapping[booking.auditorium] || booking.auditorium; // Get auditorium code
-        //       const timeSlot = booking.slot === "morning" ? "FN" : "AN"; // Map time slot to 'mrng' or 'aftn'
+      //   const auditoriumMapping = {
+      //     auditorium1: "KS",
+      //     auditorium2: "KK",
+      //     auditorium3: "Open Air Auditorium",
+      //     // Add more mappings if needed
+      //   };
 
-        //       return {
-        //         id: booking._id,
-        //         title: `${auditoriumCode} ${timeSlot} ${booking.events_name}`, // Combine auditorium, time slot, and event name
-        //         start: moment(booking.date).format("YYYY-MM-DD"), // Format date for FullCalendar
-        //         backgroundColor:
-        //           booking.status === "Approved" ? "green" : "grey",
-        //         borderColor: booking.status === "Approved" ? "green" : "grey",
-        //       };
-        //     }),
-        //     eventClick: function (calEvent) {
-        //       console.log("Event clicked:", calEvent);
-        //       // Add logic here for event click handling if necessary
-        //     },
-        //   });
-        // }
+      //   $("#calendar").fullCalendar({
+      //     header: {
+      //       left: "prev,next today",
+      //       center: "title",
+      //       right: "month,agendaWeek,agendaDay",
+      //     },
+      //     editable: false, // Make false to prevent users from dragging events
+      //     events: bookings.map((booking) => {
+      //       const auditoriumCode =
+      //         auditoriumMapping[booking.auditorium] || booking.auditorium; // Get auditorium code
+      //       const timeSlot = booking.slot === "morning" ? "FN" : "AN"; // Map time slot to 'mrng' or 'aftn'
 
-        // const auditoriumMapping = {
-        //   auditorium1: "KS",
-        //   auditorium2: "KK",
-        //   auditorium3: "Open Air Auditorium",
-        //   // Add more mappings if needed
-        // };
-        // // Display bookings in the table
-        // function displayBookings(bookings) {
-        //   bookingsTable.innerHTML = ""; // Clear the table body
-        //   console.log(bookings);
-        //   bookings.forEach((booking) => {
-        //     const row = document.createElement("tr");
-        //     const auditoriumCode =
-        //       auditoriumMapping[booking.auditorium] || booking.auditorium; // Map to code
+      //       return {
+      //         id: booking._id,
+      //         title: `${auditoriumCode} ${timeSlot} ${booking.events_name}`, // Combine auditorium, time slot, and event name
+      //         start: moment(booking.date).format("YYYY-MM-DD"), // Format date for FullCalendar
+      //         backgroundColor:
+      //           booking.status === "Approved" ? "green" : "grey",
+      //         borderColor: booking.status === "Approved" ? "green" : "grey",
+      //       };
+      //     }),
+      //     eventClick: function (calEvent) {
+      //       console.log("Event clicked:", calEvent);
+      //       // Add logic here for event click handling if necessary
+      //     },
+      //   });
+      // }
 
-        //     row.innerHTML = `
-        //     <td>${booking._id}</td>
-        //     <td>${booking.user.name}</td> <!-- Access user's name -->
-        //     <td>${booking.user.dept}</td> <!-- Access user's department -->
-        //     <td>${booking.user._id}</td>   <!-- Access user's ID -->
-        //     <td>${booking.events_name}</td>
-        //     <td>${auditoriumCode}</td>
-        //     <td>${new Date(
-        //       booking.date
-        //     ).toLocaleDateString()}</td> <!-- Format date -->
-        //     <td>${booking.slot}</td>
-        //     <td>${booking.amenities.join(", ")}</td>
-        //     <td>${booking.status}</td>
-        //     <td>
-        //         <button class="approve-button" data-booking-id="${
-        //           booking._id
-        //         }">Approve</button>
-        //         <button class="cancel-button" data-booking-id="${
-        //           booking._id
-        //         }">Cancel</button>
-        //     </td>
-        // `;
+      // const auditoriumMapping = {
+      //   auditorium1: "KS",
+      //   auditorium2: "KK",
+      //   auditorium3: "Open Air Auditorium",
+      //   // Add more mappings if needed
+      // };
+      // // Display bookings in the table
+      // function displayBookings(bookings) {
+      //   bookingsTable.innerHTML = ""; // Clear the table body
+      //   console.log(bookings);
+      //   bookings.forEach((booking) => {
+      //     const row = document.createElement("tr");
+      //     const auditoriumCode =
+      //       auditoriumMapping[booking.auditorium] || booking.auditorium; // Map to code
 
-        //     // Update row background color based on status
-        //     if (booking.status === "Approved") {
-        //       row.style.backgroundColor =
-        //         booking.slot === "morning"
-        //           ? "rgba(0, 255, 0, 0.5)"
-        //           : "rgba(0, 255, 0, 1)";
-        //     } else if (booking.status === "pending") {
-        //       row.style.backgroundColor = "grey";
-        //     }
+      //     row.innerHTML = `
+      //     <td>${booking._id}</td>
+      //     <td>${booking.user.name}</td> <!-- Access user's name -->
+      //     <td>${booking.user.dept}</td> <!-- Access user's department -->
+      //     <td>${booking.user._id}</td>   <!-- Access user's ID -->
+      //     <td>${booking.events_name}</td>
+      //     <td>${auditoriumCode}</td>
+      //     <td>${new Date(
+      //       booking.date
+      //     ).toLocaleDateString()}</td> <!-- Format date -->
+      //     <td>${booking.slot}</td>
+      //     <td>${booking.amenities.join(", ")}</td>
+      //     <td>${booking.status}</td>
+      //     <td>
+      //         <button class="approve-button" data-booking-id="${
+      //           booking._id
+      //         }">Approve</button>
+      //         <button class="cancel-button" data-booking-id="${
+      //           booking._id
+      //         }">Cancel</button>
+      //     </td>
+      // `;
 
-        //     bookingsTable.appendChild(row);
-        //   });
+      //     // Update row background color based on status
+      //     if (booking.status === "Approved") {
+      //       row.style.backgroundColor =
+      //         booking.slot === "morning"
+      //           ? "rgba(0, 255, 0, 0.5)"
+      //           : "rgba(0, 255, 0, 1)";
+      //     } else if (booking.status === "pending") {
+      //       row.style.backgroundColor = "grey";
+      //     }
 
-        //   attachEventListeners();
-        // }
+      //     bookingsTable.appendChild(row);
+      //   });
+
+      //   attachEventListeners();
+      // }
     </script>
   </body>
 </html>
