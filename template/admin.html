@@ -415,14 +415,22 @@
               }
 
               bookingsTable.appendChild(row);
+
+              const approveButton = row.querySelector(".approve-button");
+              approveButton.addEventListener("click", () => {
+                showDialog(booking._id); // Call the showDialog function with the booking ID
+              });
+
+              // Add event listener to the Cancel button (optional)
+              const cancelButton = row.querySelector(".cancel-button");
+              cancelButton.addEventListener("click", () => {
+                // Implement cancel functionality if required
+                console.log(`Cancel booking ID: ${booking._id}`);
+              });
             } catch (error) {
               console.error("Error creating booking row:", error);
             }
           });
-          const approveButton = row.querySelector(".approve-button");
-    approveButton.addEventListener("click", () => {
-      showDialog(booking._id); // Call the showDialog function with the booking ID
-    });
           attachEventListeners(); // Attach the event listeners after table is updated
         }
 
