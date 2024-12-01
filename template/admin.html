@@ -415,18 +415,6 @@
               }
 
               bookingsTable.appendChild(row);
-
-              const approveButton = row.querySelector(".approve-button");
-              approveButton.addEventListener("click", () => {
-                showDialog(booking._id); // Call the showDialog function with the booking ID
-              });
-
-              // Add event listener to the Cancel button (optional)
-              const cancelButton = row.querySelector(".cancel-button");
-              cancelButton.addEventListener("click", () => {
-                // Implement cancel functionality if required
-                console.log(`Cancel booking ID: ${booking._id}`);
-              });
             } catch (error) {
               console.error("Error creating booking row:", error);
             }
@@ -628,19 +616,29 @@
 
         // Attach event listeners to buttons after the bookings are displayed
         function attachEventListeners() {
-          const approveButtons = document.querySelectorAll(".approve-button");
-          const cancelButtons = document.querySelectorAll(".cancel-button");
+          // const approveButtons = document.querySelectorAll(".approve-button");
+          // const cancelButtons = document.querySelectorAll(".cancel-button");
 
-          approveButtons.forEach((button) => {
-            const bookingId = button.getAttribute("data-booking-id");
-            button.addEventListener("click", () => approveBooking(bookingId));
+          // approveButtons.forEach((button) => {
+          //   const bookingId = button.getAttribute("data-booking-id");
+          //   button.addEventListener("click", () => approveBooking(bookingId));
+          // });
+
+          // cancelButtons.forEach((button) => {
+          //   const bookingId = button.getAttribute("data-booking-id");
+          //   button.addEventListener("click", () => cancelBooking(bookingId));
+          // });
+          const approveButton = row.querySelector(".approve-button");
+          approveButton.addEventListener("click", () => {
+            showDialog(booking._id); // Call the showDialog function with the booking ID
           });
 
-          cancelButtons.forEach((button) => {
-            const bookingId = button.getAttribute("data-booking-id");
-            button.addEventListener("click", () => cancelBooking(bookingId));
+          // Add event listener to the Cancel button (optional)
+          const cancelButton = row.querySelector(".cancel-button");
+          cancelButton.addEventListener("click", () => {
+            // Implement cancel functionality if required
+            console.log(`Cancel booking ID: ${booking._id}`);
           });
-
           // CSV Export button
           document.getElementById("print-csv").addEventListener("click", () => {
             fetchBookings().then((bookings) => {
