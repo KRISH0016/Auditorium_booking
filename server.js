@@ -68,6 +68,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
+
 // SectionTechnician schema
 const sectionTechnicianSchema = new mongoose.Schema({
   bookingId: { type: mongoose.Schema.Types.ObjectId, ref: "Booking", required: true },
@@ -88,7 +89,8 @@ const technicianSchema = new mongoose.Schema({
 
 const Technician = mongoose.model("Technician", technicianSchema);
 
-module.exports = Technician;
+//module.exports = Technician;
+
 
 
 const sectionSchema = new mongoose.Schema({
@@ -100,7 +102,7 @@ const sectionSchema = new mongoose.Schema({
 
 const Section = mongoose.model("Section", sectionSchema);
 
-module.exports = Section;
+//module.exports = Section;
 
 
 // // Mongoose Booking schema and model
@@ -890,6 +892,89 @@ app.post("/slot", async (req, res) => {
 // const Section = require("./models/section");
 // const SectionTechnician = require("./models/sectionTechnician");
 
+// // Add a new technician
+// app.post("/addTechnician", async (req, res) => {
+//   try {
+//     const { name, email, phone } = req.body;
+
+//     if (!name || !email) {
+//       return res.status(400).json({ message: "Name and Email are required." });
+//     }
+
+//     const technician = new Technician({ name, email, phone });
+//     await technician.save();
+
+//     res.status(201).json({ message: "Technician added successfully.", technician });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
+
+// // Add a new section
+// app.post("/addSection", async (req, res) => {
+//   try {
+//     const { name, description, technicians } = req.body;
+
+//     if (!name) {
+//       return res.status(400).json({ message: "Section name is required." });
+//     }
+
+//     const section = new Section({ name, description, technicians });
+//     await section.save();
+
+//     res.status(201).json({ message: "Section added successfully.", section });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
+
+// // Add a new Section-Technician mapping for a booking
+// app.post("/addSectionTechnician", async (req, res) => {
+//   try {
+//     const { bookingId, sectionName, technicianName, userId } = req.body;
+
+//     if (!bookingId || !sectionName || !technicianName || !userId) {
+//       return res.status(400).json({ message: "All fields are required." });
+//     }
+
+//     const sectionTechnician = new SectionTechnician({
+//       bookingId,
+//       sectionName,
+//       technicianName,
+//       userId,
+//     });
+
+//     await sectionTechnician.save();
+
+//     res.status(201).json({ message: "Section-Technician mapping saved successfully." });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
+
+// //module.exports = router;
+
+// // API for creating a technician
+
+// // Fetch all technicians from the database
+// app.get("/technicians", (req, res) => {
+//   Technician.find()
+//     .then((technicians) => res.json(technicians))
+//     .catch((err) => res.status(400).json({ error: err.message }));
+// });
+// app.get("/addSectionTechnician", (req,res) =>{
+//   Section.find()
+//     .then((sections) => res.json(sections))
+//     .catch((err) => res.status(400).json({ error: err.message }));
+// });
+
+// Schema definitions
+
+// Endpoints
+
 // Add a new technician
 app.post("/addTechnician", async (req, res) => {
   try {
@@ -897,6 +982,11 @@ app.post("/addTechnician", async (req, res) => {
 
     if (!name || !email) {
       return res.status(400).json({ message: "Name and Email are required." });
+    }
+
+    const existingTechnician = await Technician.findOne({ email });
+    if (existingTechnician) {
+      return res.status(400).json({ message: "Technician with this email already exists." });
     }
 
     const technician = new Technician({ name, email, phone });
@@ -912,13 +1002,18 @@ app.post("/addTechnician", async (req, res) => {
 // Add a new section
 app.post("/addSection", async (req, res) => {
   try {
-    const { name, description, technicians } = req.body;
+    const { sectionName, technicians } = req.body;
 
-    if (!name) {
+    if (!sectionName) {
       return res.status(400).json({ message: "Section name is required." });
     }
 
-    const section = new Section({ name, description, technicians });
+    const existingSection = await Section.findOne({ sectionName });
+    if (existingSection) {
+      return res.status(400).json({ message: "Section with this name already exists." });
+    }
+
+    const section = new Section({ sectionName, technicians });
     await section.save();
 
     res.status(201).json({ message: "Section added successfully.", section });
@@ -931,19 +1026,13 @@ app.post("/addSection", async (req, res) => {
 // Add a new Section-Technician mapping for a booking
 app.post("/addSectionTechnician", async (req, res) => {
   try {
-    const { bookingId, sectionName, technicianName, userId } = req.body;
+    const { bookingId, sections } = req.body;
 
-    if (!bookingId || !sectionName || !technicianName || !userId) {
-      return res.status(400).json({ message: "All fields are required." });
+    if (!bookingId || !sections || sections.length === 0) {
+      return res.status(400).json({ message: "Booking ID and sections are required." });
     }
 
-    const sectionTechnician = new SectionTechnician({
-      bookingId,
-      sectionName,
-      technicianName,
-      userId,
-    });
-
+    const sectionTechnician = new SectionTechnician({ bookingId, sections });
     await sectionTechnician.save();
 
     res.status(201).json({ message: "Section-Technician mapping saved successfully." });
@@ -953,52 +1042,41 @@ app.post("/addSectionTechnician", async (req, res) => {
   }
 });
 
-//module.exports = router;
-
-// API for creating a technician
-
-// Fetch all technicians from the database
-app.get("/technicians", (req, res) => {
-  Technician.find()
-    .then((technicians) => res.json(technicians))
-    .catch((err) => res.status(400).json({ error: err.message }));
-});
-app.get("/addSectionTechnician", (req,res) =>{
-  Section.find()
-    .then((sections) => res.json(sections))
-    .catch((err) => res.status(400).json({ error: err.message }));
+// Fetch all technicians
+app.get("/technicians", async (req, res) => {
+  try {
+    const technicians = await Technician.find({}, "name email phone");
+    res.status(200).json({ technicians });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
-// app.post("/technician", (req, res) => {
-//   const { name, email, phone, available } = req.body;
-//   const newTechnician = new Technician({
-//     name,
-//     email,
-//     phone,
-//     available,
-//   });
+// Fetch all sections
+app.get("/sections", async (req, res) => {
+  try {
+    const sections = await Section.find();
+    res.status(200).json({ sections });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 
-//   newTechnician
-//     .save()
-//     .then((technician) => res.json(technician))
-//     .catch((err) => res.status(400).json({ error: err.message }));
-// });
+// Fetch sections and technicians for dialog initialization
+app.get("/initializeDialog", async (req, res) => {
+  try {
+    const technicians = await Technician.find({}, "name email phone");
+    const sections = await Section.find();
 
-// // API to create a section
-// app.post("/section", (req, res) => {
-//   const { name, description, technicianIds } = req.body;
+    res.status(200).json({ technicians, sections });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 
-//   const newSection = new Section({
-//     name,
-//     description,
-//     technicians: technicianIds,
-//   });
-
-//   newSection
-//     .save()
-//     .then((section) => res.json(section))
-//     .catch((err) => res.status(400).json({ error: err.message }));
-// });
 
 
 app.post("/cancel", requireAuth, async (req, res) => {
