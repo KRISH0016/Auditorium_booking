@@ -449,6 +449,7 @@
           messageBox.className = `message-box ${type}`;
           setTimeout(() => (messageBox.textContent = ""), 5000); // Clear message after 5 seconds
         }
+
         async function showDialog(bookingId, userId) {
           const dialogBox = document.getElementById("dialogBox");
           dialogBox.classList.remove("hidden");
@@ -515,6 +516,32 @@
             }
           }
 
+          // Show prompt for adding a new technician
+          async function promptAddTechnician() {
+            const name = prompt("Enter Technician Name:");
+            if (!name) {
+              alert("Technician name is required.");
+              return null;
+            }
+
+            const email = prompt("Enter Technician Email:");
+            if (!email) {
+              alert("Technician email is required.");
+              return null;
+            }
+
+            const phone = prompt("Enter Technician Phone (Optional):");
+
+            const technician = { name, email, phone };
+            const savedTechnician = await saveTechnician(technician);
+
+            if (savedTechnician) {
+              techniciansList.push(savedTechnician.name);
+              return savedTechnician.name;
+            }
+            return null;
+          }
+
           // Function to add a new section
           function addSection(sectionName = "") {
             const sectionDiv = document.createElement("div");
@@ -527,7 +554,7 @@
             subsectionsContainer.classList.add("subsections-container");
 
             // Function to add a subsection
-            function addSubsection(selectedTechnician = "") {
+            async function addSubsection(selectedTechnician = "") {
               const subsectionDiv = document.createElement("div");
               subsectionDiv.classList.add("subsection");
 
@@ -550,12 +577,26 @@
                 select.appendChild(option);
               });
 
+              const addTechnicianBtn = document.createElement("button");
+              addTechnicianBtn.textContent = "Add New Technician";
+              addTechnicianBtn.onclick = async () => {
+                const newTechnician = await promptAddTechnician();
+                if (newTechnician) {
+                  const option = document.createElement("option");
+                  option.value = newTechnician;
+                  option.textContent = newTechnician;
+                  option.selected = true;
+                  select.appendChild(option);
+                }
+              };
+
               const removeSubsectionBtn = document.createElement("button");
               removeSubsectionBtn.textContent = "Remove";
               removeSubsectionBtn.classList.add("remove-subsection-btn");
               removeSubsectionBtn.onclick = () => subsectionDiv.remove();
 
               subsectionDiv.appendChild(select);
+              subsectionDiv.appendChild(addTechnicianBtn);
               subsectionDiv.appendChild(removeSubsectionBtn);
               subsectionsContainer.appendChild(subsectionDiv);
             }
