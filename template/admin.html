@@ -516,25 +516,25 @@
             }
           }
           async function promptAddSection() {
-    const sectionName = prompt("Enter Section Name:");
-    if (!sectionName) {
-      alert("Section name is required.");
-      return null;
-    }
+            const sectionName = prompt("Enter Section Name:");
+            if (!sectionName) {
+              alert("Section name is required.");
+              return null;
+            }
 
-    const existingSection = sectionNames.includes(sectionName);
-    if (existingSection) {
-      alert("This section already exists.");
-      return null;
-    }
+            const existingSection = sectionNames.includes(sectionName);
+            if (existingSection) {
+              alert("This section already exists.");
+              return null;
+            }
 
-    const newSection = await saveSection({ name: sectionName });
-    if (newSection) {
-      sectionNames.push(newSection.name);
-      return newSection.name;
-    }
-    return null;
-  }
+            const newSection = await saveSection({ name: sectionName });
+            if (newSection) {
+              sectionNames.push(newSection.name);
+              return newSection.name;
+            }
+            return null;
+          }
           // Show prompt for adding a new technician
           async function promptAddTechnician() {
             const name = prompt("Enter Technician Name:");
@@ -562,7 +562,10 @@
           }
 
           // Function to add a new section
-          function addSection(sectionName = "") {
+          function addSection() {
+            const sectionName = promptAddSection();
+            if (!sectionName) return; // Exit if section name is invalid
+
             const sectionDiv = document.createElement("div");
             sectionDiv.classList.add("section");
 
@@ -645,8 +648,11 @@
           await fetchTechniciansAndSections();
 
           // Add default sections based on fetched data
-          sectionNames.forEach((sectionName) => addSection(sectionName));
-
+          sectionNames.forEach((sectionName) => {
+            const sectionDiv = document.createElement("div");
+            sectionDiv.classList.add("section");
+            addSection(sectionName);
+          });
           // Add new section handler
           document.getElementById("addSectionBtn").onclick = () => addSection();
 
