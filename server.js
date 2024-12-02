@@ -957,16 +957,20 @@ app.post("/addSectionTechnician", async (req, res) => {
 
 // API for creating a technician
 
-// // Fetch all technicians from the database
-// app.get("/technicians", (req, res) => {
-//   Technician.find()
-//     .then((technicians) => res.json(technicians))
-//     .catch((err) => res.status(400).json({ error: err.message }));
-// });
+// Fetch all technicians from the database
+app.get("/technicians", (req, res) => {
+  Technician.find()
+    .then((technicians) => res.json(technicians))
+    .catch((err) => res.status(400).json({ error: err.message }));
+});
+app.get("/addSectionTechnician", (req,res) =>{
+  Section.find()
+    .then((sections) => res.json(sections))
+    .catch((err) => res.status(400).json({ error: err.message }));
+});
 
 // app.post("/technician", (req, res) => {
 //   const { name, email, phone, available } = req.body;
-
 //   const newTechnician = new Technician({
 //     name,
 //     email,
