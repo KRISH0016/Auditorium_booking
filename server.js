@@ -953,7 +953,7 @@ app.post("/addSectionTechnician", async (req, res) => {
   }
 });
 
-module.exports = router;
+//module.exports = router;
 
 // API for creating a technician
 
