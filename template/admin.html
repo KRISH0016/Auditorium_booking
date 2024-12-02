@@ -418,8 +418,23 @@
             } catch (error) {
               console.error("Error creating booking row:", error);
             }
+
+            const approveButton = row.querySelector(".approve-button");
+            approveButton.addEventListener("click", () => {
+              showDialog(booking._id); // Call the showDialog function with the booking ID
+            });
+
+            // Add event listener to the Cancel button (optional)
+            const cancelButton = row.querySelector(".cancel-button");
+            const bookingId = button.getAttribute("data-booking-id");
+            cancelButton.addEventListener("click", () => {
+              // Implement cancel functionality if required
+              button.addEventListener("click", () => cancelBooking(bookingId));
+              console.log(`Cancel booking ID: ${booking._id},${bookingId}`);
+            });
           });
-          //attachEventListeners(); // Attach the event listeners after table is updated
+
+          attachEventListeners(); // Attach the event listeners after table is updated
         }
 
         // Show message in the message box
@@ -628,19 +643,6 @@
           //   const bookingId = button.getAttribute("data-booking-id");
           //   button.addEventListener("click", () => cancelBooking(bookingId));
           // });
-          const approveButton = row.querySelector(".approve-button");
-          approveButton.addEventListener("click", () => {
-            showDialog(booking._id); // Call the showDialog function with the booking ID
-          });
-
-          // Add event listener to the Cancel button (optional)
-          const cancelButton = row.querySelector(".cancel-button");
-          const bookingId = button.getAttribute("data-booking-id");
-          cancelButton.addEventListener("click", () => {
-            // Implement cancel functionality if required
-            button.addEventListener("click", () => cancelBooking(bookingId));
-            console.log(`Cancel booking ID: ${booking._id},${bookingId}`);
-          });
           // CSV Export button
           document.getElementById("print-csv").addEventListener("click", () => {
             fetchBookings().then((bookings) => {
