@@ -515,7 +515,26 @@
               return null;
             }
           }
+          async function promptAddSection() {
+    const sectionName = prompt("Enter Section Name:");
+    if (!sectionName) {
+      alert("Section name is required.");
+      return null;
+    }
 
+    const existingSection = sectionNames.includes(sectionName);
+    if (existingSection) {
+      alert("This section already exists.");
+      return null;
+    }
+
+    const newSection = await saveSection({ name: sectionName });
+    if (newSection) {
+      sectionNames.push(newSection.name);
+      return newSection.name;
+    }
+    return null;
+  }
           // Show prompt for adding a new technician
           async function promptAddTechnician() {
             const name = prompt("Enter Technician Name:");
