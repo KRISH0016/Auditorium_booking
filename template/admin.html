@@ -426,12 +426,16 @@
 
             // Add event listener to the Cancel button (optional)
             const cancelButton = row.querySelector(".cancel-button");
-            const bookingId = button.getAttribute("data-booking-id");
+            const bookingId = cancelButton.getAttribute("data-booking-id");
             cancelButton.addEventListener("click", () => {
               // Implement cancel functionality if required
-              button.addEventListener("click", () => cancelBooking(bookingId));
+              cancelButton.addEventListener("click", () => cancelBooking(bookingId));
               console.log(`Cancel booking ID: ${booking._id},${bookingId}`);
             });
+          //       cancelButton.forEach((button) => {
+          //   const bookingId = button.getAttribute("data-booking-id");
+          //   button.addEventListener("click", () => cancelBooking(bookingId));
+          // });
           });
 
           attachEventListeners(); // Attach the event listeners after table is updated
