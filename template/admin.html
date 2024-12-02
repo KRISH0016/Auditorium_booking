@@ -419,7 +419,7 @@
               console.error("Error creating booking row:", error);
             }
           });
-          attachEventListeners(); // Attach the event listeners after table is updated
+          //attachEventListeners(); // Attach the event listeners after table is updated
         }
 
         // Show message in the message box
@@ -635,9 +635,11 @@
 
           // Add event listener to the Cancel button (optional)
           const cancelButton = row.querySelector(".cancel-button");
+          const bookingId = button.getAttribute("data-booking-id");
           cancelButton.addEventListener("click", () => {
             // Implement cancel functionality if required
-            console.log(`Cancel booking ID: ${booking._id}`);
+            button.addEventListener("click", () => cancelBooking(bookingId));
+            console.log(`Cancel booking ID: ${booking._id},${bookingId}`);
           });
           // CSV Export button
           document.getElementById("print-csv").addEventListener("click", () => {
