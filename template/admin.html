@@ -562,8 +562,8 @@
           }
 
           // Function to add a new section
-          function addSection() {
-            const sectionName = promptAddSection();
+          async function addSection() {
+            const sectionName = await promptAddSection();
             if (!sectionName) return; // Exit if section name is invalid
 
             const sectionDiv = document.createElement("div");
