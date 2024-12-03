@@ -1408,6 +1408,7 @@ app.post("/admin/register", async (req, res) => {
     // Generate OTP
     const otp = crypto.randomInt(100000, 999999).toString();
     admin.twoFASecret = otp;
+    admin.twoFAauthen = false;
 
     // Save admin to database
     await admin.save();
