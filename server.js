@@ -97,7 +97,7 @@ const sectionSchema = new mongoose.Schema({
   name: { type: String, required: true },
   //description: String, // Optional field for additional description
   // technicians: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Technician' }], // References the Technician model
-  isActive: { type: Boolean, default: true }, // Tracks if the section is active
+  //isActive: { type: Boolean, default: true }, // Tracks if the section is active
 });
 
 const Section = mongoose.model("Section", sectionSchema);
@@ -1016,7 +1016,7 @@ app.post("/addSection", async (req, res) => {
         .json({ message: "Section with this name already exists." });
     }
 
-    const section = new Section({ sectionName: name });
+    const section = new Section({ name: name });
     await section.save();
 
     res.status(201).json({ message: "Section added successfully.", section });
