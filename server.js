@@ -1374,7 +1374,7 @@ const Admin = mongoose.model("Admin", adminSchema);
 
 // Admin Registration Route
 app.post("/admin/register", async (req, res) => {
-  const { email, password, name, department, phone } = req.body;
+  const {  name, email, password,department } = req.body;
 
   try {
     // Check if the email is from the allowed domain
