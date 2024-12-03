@@ -502,27 +502,25 @@
               return null;
             }
           }
-
-          // Render a section with technician dropdowns
           function renderSection(section) {
             const sectionDiv = document.createElement("div");
             sectionDiv.classList.add("section");
-            console.log(section+"+"+section.name);
+            console.log(section + "+" + section.sectionName); // Updated to section.sectionName
 
             const sectionHeader = document.createElement("h4");
-            sectionHeader.textContent = section.name;
+            sectionHeader.textContent = section.sectionName; // Accessing sectionName instead of name
 
             const subsectionsContainer = document.createElement("div");
             subsectionsContainer.classList.add("subsections-container");
 
             // Add technician dropdown
-            addTechnicianDropdown(subsectionsContainer, section.name);
+            addTechnicianDropdown(subsectionsContainer, section.sectionName);
 
             const addTechnicianBtn = document.createElement("button");
             addTechnicianBtn.textContent = "Add Technician";
             addTechnicianBtn.classList.add("add-technician-btn");
             addTechnicianBtn.onclick = () =>
-            addTechnicianDropdown(subsectionsContainer, section.name);
+              addTechnicianDropdown(subsectionsContainer, section.sectionName);
 
             const removeSectionBtn = document.createElement("button");
             removeSectionBtn.textContent = "Remove Section";
@@ -536,6 +534,40 @@
 
             sectionsContainer.appendChild(sectionDiv);
           }
+
+          // // Render a section with technician dropdowns
+          // function renderSection(section) {
+          //   const sectionDiv = document.createElement("div");
+          //   sectionDiv.classList.add("section");
+          //   console.log(section+"+"+section.name);
+
+          //   const sectionHeader = document.createElement("h4");
+          //   sectionHeader.textContent = section.name;
+
+          //   const subsectionsContainer = document.createElement("div");
+          //   subsectionsContainer.classList.add("subsections-container");
+
+          //   // Add technician dropdown
+          //   addTechnicianDropdown(subsectionsContainer, section.name);
+
+          //   const addTechnicianBtn = document.createElement("button");
+          //   addTechnicianBtn.textContent = "Add Technician";
+          //   addTechnicianBtn.classList.add("add-technician-btn");
+          //   addTechnicianBtn.onclick = () =>
+          //   addTechnicianDropdown(subsectionsContainer, section.name);
+
+          //   const removeSectionBtn = document.createElement("button");
+          //   removeSectionBtn.textContent = "Remove Section";
+          //   removeSectionBtn.classList.add("remove-section-btn");
+          //   removeSectionBtn.onclick = () => sectionDiv.remove();
+
+          //   sectionDiv.appendChild(sectionHeader);
+          //   sectionDiv.appendChild(subsectionsContainer);
+          //   sectionDiv.appendChild(addTechnicianBtn);
+          //   sectionDiv.appendChild(removeSectionBtn);
+
+          //   sectionsContainer.appendChild(sectionDiv);
+          // }
 
           // Add a dropdown for technician selection
           function addTechnicianDropdown(container, sectionName) {
