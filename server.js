@@ -1314,6 +1314,12 @@ app.get("/booking", async (req, res) => {
 app.get("/otp", (req, res) => {
   res.sendFile(path.join(__dirname, "template/otp.html"));
 });
+app.get("/adminlogin", (req, res) => {
+  res.sendFile(path.join(__dirname, "template/adminlogin.html"));
+});
+app.get("/adminotp", (req, res) => {
+  res.sendFile(path.join(__dirname, "template/adminotp.html"));
+});
 
 
 // MongoDB Schema for Admin
@@ -1468,7 +1474,7 @@ app.post("/admin/login", async (req, res) => {
 });
 
 // OTP verification route
-app.post("/verify-otp", async (req, res) => {
+app.post("/verify-otp-admin", async (req, res) => {
   const { email, otp } = req.body;
 
   // Find admin by email
@@ -1493,9 +1499,6 @@ app.post("/verify-otp", async (req, res) => {
     .status(200)
     .json({ success: true, message: "OTP verified successfully." });
 });
-
-// Generate JWT token (helper function)
-const jwt = require("jsonwebtoken");
 
 function createToken(adminId) {
   return jwt.sign({ id: adminId }, "your_jwt_secret", { expiresIn: "1h" });

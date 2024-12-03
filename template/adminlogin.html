@@ -183,7 +183,7 @@
               if (response.ok) {
                 messageDiv.style.color = "green";
                 messageDiv.textContent = result.message || "Login successful.";
-                window.location.href = "/admin/dashboard"; // Redirect to admin dashboard
+                window.location.href = "https://auditorium-booking-i34f.onrender.com/admin"; // Redirect to admin dashboard
               } else {
                 messageDiv.style.color = "red";
                 messageDiv.textContent = result.message || "Login failed.";
@@ -229,6 +229,7 @@
               if (response.ok) {
                 messageDiv.style.color = "green";
                 messageDiv.textContent = result.message || "Registration successful.";
+                window.location.href = "https://auditorium-booking-i34f.onrender.com/adminotp";
               } else {
                 messageDiv.style.color = "red";
                 messageDiv.textContent = result.message || "Registration failed.";
