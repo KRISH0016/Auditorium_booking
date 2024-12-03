@@ -718,8 +718,12 @@
               const data = await response.json();
 
               techniciansList = data.technicians || [];
-              sectionsData = data.sections || [];
-              console.log(data);
+              sectionsData = data.sections.map((section) => ({
+                name: section.name,
+                technicians: section.technicians || [],
+              }));
+
+              console.log("Fetched data:", data);
             } catch (error) {
               console.error("Error fetching data:", error);
             }
@@ -727,7 +731,7 @@
 
           // Save a new technician to the server
           async function saveTechnician(technician) {
-            console.log("Request Body Tech:", technician);
+            console.log("Request Body Technician:", technician);
             try {
               const response = await fetch("/addTechnician", {
                 method: "POST",
@@ -739,6 +743,7 @@
                 throw new Error("Failed to save technician.");
               }
               const data = await response.json();
+              console.log("Saved Technician:", data);
               return data.technician;
             } catch (error) {
               console.error(error);
@@ -749,7 +754,7 @@
 
           // Save a new section to the server
           async function saveSection(section) {
-            console.log("Request Body section:", section);
+            console.log("Request Body Section:", section);
             try {
               const response = await fetch("/addSection", {
                 method: "POST",
@@ -761,6 +766,7 @@
                 throw new Error("Failed to save section.");
               }
               const data = await response.json();
+              console.log("Saved Section:", data);
               return data.section;
             } catch (error) {
               console.error(error);
@@ -852,6 +858,14 @@
               return;
             }
 
+            const technicianName = prompt(
+              "Enter a Technician Name (required):"
+            );
+            if (!technicianName) {
+              alert("Technician name is required.");
+              return;
+            }
+
             const existingSection = sectionsData.find(
               (sec) => sec.name === sectionName
             );
@@ -860,7 +874,16 @@
               return;
             }
 
-            const newSection = await saveSection({ name: sectionName });
+            // Add the technician to the server first
+            const technician = await saveTechnician({ name: technicianName });
+            if (!technician) return;
+
+            // Add the section with the technician
+            const newSection = await saveSection({
+              name: sectionName,
+              technicians: [{ name: technician.name }],
+            });
+
             if (newSection) {
               sectionsData.push(newSection);
               renderSection(newSection);
@@ -880,9 +903,9 @@
               return { sectionName, technicians };
             });
 
-            // Save updated data to the server (you can implement this part)
             console.log("Saving sections and technicians:", sectionData);
 
+            // Hide dialog
             dialogBox.classList.add("hidden");
           };
 
@@ -890,6 +913,198 @@
             dialogBox.classList.add("hidden");
           };
         }
+
+        //// LATEST UPDATE IS BELOW
+        // async function showDialog(bookingId, userId) {
+        //   const dialogBox = document.getElementById("dialogBox");
+        //   dialogBox.classList.remove("hidden");
+
+        //   const sectionsContainer =
+        //     document.getElementById("sectionsContainer");
+        //   sectionsContainer.innerHTML = ""; // Clear previous content
+
+        //   let techniciansList = [];
+        //   let sectionsData = [];
+
+        //   // Fetch existing technicians and sections from the server
+        //   async function fetchTechniciansAndSections() {
+        //     try {
+        //       const response = await fetch("/getSectionTechnician"); // Replace with your actual API endpoint
+        //       const data = await response.json();
+
+        //       techniciansList = data.technicians || [];
+        //       sectionsData = data.sections || [];
+        //       console.log(data);
+        //     } catch (error) {
+        //       console.error("Error fetching data:", error);
+        //     }
+        //   }
+
+        //   // Save a new technician to the server
+        //   async function saveTechnician(technician) {
+        //     console.log("Request Body Tech:", technician);
+        //     try {
+        //       const response = await fetch("/addTechnician", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify(technician),
+        //       });
+
+        //       if (!response.ok) {
+        //         throw new Error("Failed to save technician.");
+        //       }
+        //       const data = await response.json();
+        //       return data.technician;
+        //     } catch (error) {
+        //       console.error(error);
+        //       alert("Error saving technician.");
+        //       return null;
+        //     }
+        //   }
+
+        //   // Save a new section to the server
+        //   async function saveSection(section) {
+        //     console.log("Request Body section:", section);
+        //     try {
+        //       const response = await fetch("/addSection", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify(section),
+        //       });
+
+        //       if (!response.ok) {
+        //         throw new Error("Failed to save section.");
+        //       }
+        //       const data = await response.json();
+        //       return data.section;
+        //     } catch (error) {
+        //       console.error(error);
+        //       alert("Error saving section.");
+        //       return null;
+        //     }
+        //   }
+
+        //   // Function to render a section with its associated technicians
+        //   async function renderSection(section) {
+        //     const sectionDiv = document.createElement("div");
+        //     sectionDiv.classList.add("section");
+
+        //     const sectionHeader = document.createElement("h4");
+        //     sectionHeader.textContent = section.name;
+
+        //     const subsectionsContainer = document.createElement("div");
+        //     subsectionsContainer.classList.add("subsections-container");
+
+        //     // Render existing technicians for this section
+        //     section.technicians.forEach((technician) => {
+        //       addSubsection(technician.name, subsectionsContainer);
+        //     });
+
+        //     const addSubsectionBtn = document.createElement("button");
+        //     addSubsectionBtn.textContent = "Add Technician";
+        //     addSubsectionBtn.classList.add("add-subsection-btn");
+        //     addSubsectionBtn.onclick = () =>
+        //       addSubsection("", subsectionsContainer);
+
+        //     const removeSectionBtn = document.createElement("button");
+        //     removeSectionBtn.textContent = "Remove Section";
+        //     removeSectionBtn.classList.add("remove-section-btn");
+        //     removeSectionBtn.onclick = () => sectionDiv.remove();
+
+        //     sectionDiv.appendChild(sectionHeader);
+        //     sectionDiv.appendChild(subsectionsContainer);
+        //     sectionDiv.appendChild(addSubsectionBtn);
+        //     sectionDiv.appendChild(removeSectionBtn);
+
+        //     sectionsContainer.appendChild(sectionDiv);
+        //   }
+
+        //   // Function to add a subsection
+        //   async function addSubsection(selectedTechnician, container) {
+        //     const subsectionDiv = document.createElement("div");
+        //     subsectionDiv.classList.add("subsection");
+
+        //     const select = document.createElement("select");
+        //     const defaultOption = document.createElement("option");
+        //     defaultOption.value = "";
+        //     defaultOption.textContent = "Choose Technician";
+        //     defaultOption.disabled = true;
+        //     defaultOption.selected = !selectedTechnician;
+
+        //     select.appendChild(defaultOption);
+
+        //     techniciansList.forEach((technician) => {
+        //       const option = document.createElement("option");
+        //       option.value = technician.name;
+        //       option.textContent = technician.name;
+        //       if (technician.name === selectedTechnician) {
+        //         option.selected = true;
+        //       }
+        //       select.appendChild(option);
+        //     });
+
+        //     const removeSubsectionBtn = document.createElement("button");
+        //     removeSubsectionBtn.textContent = "Remove";
+        //     removeSubsectionBtn.classList.add("remove-subsection-btn");
+        //     removeSubsectionBtn.onclick = () => subsectionDiv.remove();
+
+        //     subsectionDiv.appendChild(select);
+        //     subsectionDiv.appendChild(removeSubsectionBtn);
+        //     container.appendChild(subsectionDiv);
+        //   }
+
+        //   // Initialize dialog with fetched data
+        //   await fetchTechniciansAndSections();
+
+        //   // Render default sections with technicians
+        //   sectionsData.forEach((section) => renderSection(section));
+
+        //   // Add new section handler
+        //   document.getElementById("addSectionBtn").onclick = async () => {
+        //     const sectionName = prompt("Enter Section Name:");
+        //     if (!sectionName) {
+        //       alert("Section name is required.");
+        //       return;
+        //     }
+
+        //     const existingSection = sectionsData.find(
+        //       (sec) => sec.name === sectionName
+        //     );
+        //     if (existingSection) {
+        //       alert("This section already exists.");
+        //       return;
+        //     }
+
+        //     const newSection = await saveSection({ name: sectionName });
+        //     if (newSection) {
+        //       sectionsData.push(newSection);
+        //       renderSection(newSection);
+        //     }
+        //   };
+
+        //   // Save and Cancel handlers
+        //   document.getElementById("saveBtn").onclick = async () => {
+        //     const sectionData = Array.from(
+        //       sectionsContainer.getElementsByClassName("section")
+        //     ).map((section) => {
+        //       const sectionName = section.querySelector("h4").textContent;
+        //       const technicians = Array.from(
+        //         section.getElementsByClassName("subsection")
+        //       ).map((subsection) => subsection.querySelector("select").value);
+
+        //       return { sectionName, technicians };
+        //     });
+
+        //     // Save updated data to the server (you can implement this part)
+        //     console.log("Saving sections and technicians:", sectionData);
+
+        //     dialogBox.classList.add("hidden");
+        //   };
+
+        //   document.getElementById("cancelBtn").onclick = () => {
+        //     dialogBox.classList.add("hidden");
+        //   };
+        // }
 
         // function showDialog(bookingId) {
         //   const dialogBox = document.getElementById("dialogBox");
