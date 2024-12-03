@@ -1401,7 +1401,7 @@ app.post("/admin/register", async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      dept: department,
+      department: department,
       
     });
 
@@ -1433,7 +1433,7 @@ app.post("/admin/register", async (req, res) => {
     // Send OTP email
     await transporter.sendMail(mailOptions);
     console.log("Sent mail");
-    res.redirect("/otp");
+    res.redirect("/adminotp");
     console.log("Redirecting");
   } catch (error) {
     console.error("Error during registration: ", error);
