@@ -1372,12 +1372,10 @@ adminSchema.methods.comparePassword = async function (candidatePassword) {
 // Admin model
 const Admin = mongoose.model("Admin", adminSchema);
 
-// Admin Registration Route
 app.post("/admin/register", async (req, res) => {
-  const {  name, email, password ,department } = req.body;
+  const { name, email, password, department } = req.body;
 
   try {
-    // Check if the email is from the allowed domain
     if (!email.endsWith("tce.edu")) {
       return res.status(400).json({
         success: false,
@@ -1385,7 +1383,6 @@ app.post("/admin/register", async (req, res) => {
       });
     }
 
-    // Check if the admin already exists
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
       return res
@@ -1393,27 +1390,21 @@ app.post("/admin/register", async (req, res) => {
         .json({ success: false, message: "Email already exists." });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new admin object
     const admin = new Admin({
       name,
       email,
       password: hashedPassword,
       department: department,
-      
     });
 
-    // Generate OTP
     const otp = crypto.randomInt(100000, 999999).toString();
     admin.twoFASecret = otp;
     admin.twoFAauthen = false;
 
-    // Save admin to database
     await admin.save();
 
-    // Configure nodemailer transport using environment variables
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -1422,7 +1413,6 @@ app.post("/admin/register", async (req, res) => {
       },
     });
 
-    // Mail options for OTP
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
@@ -1430,17 +1420,90 @@ app.post("/admin/register", async (req, res) => {
       text: `Your OTP code is ${otp}. It is valid for 10 minutes.`,
     };
 
-    // Send OTP email
     await transporter.sendMail(mailOptions);
     console.log("Sent mail");
-    //res.redirect("https://auditorium-booking-i34f.onrender.com/adminotp");
-    res.ok;
-    console.log("Redirecting");
+
+    res.status(200).json({
+      success: true,
+      message: "Registration successful. Redirecting to OTP page.",
+      redirectUrl: "https://auditorium-booking-i34f.onrender.com/adminotp",
+    });
   } catch (error) {
     console.error("Error during registration: ", error);
     res.status(500).json({ message: "Server error during registration." });
   }
 });
+
+
+// // Admin Registration Route
+// app.post("/admin/register", async (req, res) => {
+//   const {  name, email, password ,department } = req.body;
+
+//   try {
+//     // Check if the email is from the allowed domain
+//     if (!email.endsWith("tce.edu")) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Registration only allowed for tce.edu emails.",
+//       });
+//     }
+
+//     // Check if the admin already exists
+//     const existingAdmin = await Admin.findOne({ email });
+//     if (existingAdmin) {
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "Email already exists." });
+//     }
+
+//     // Hash the password
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     // Create a new admin object
+//     const admin = new Admin({
+//       name,
+//       email,
+//       password: hashedPassword,
+//       department: department,
+      
+//     });
+
+//     // Generate OTP
+//     const otp = crypto.randomInt(100000, 999999).toString();
+//     admin.twoFASecret = otp;
+//     admin.twoFAauthen = false;
+
+//     // Save admin to database
+//     await admin.save();
+
+//     // Configure nodemailer transport using environment variables
+//     const transporter = nodemailer.createTransport({
+//       service: "gmail",
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS,
+//       },
+//     });
+
+//     // Mail options for OTP
+//     const mailOptions = {
+//       from: process.env.EMAIL_USER,
+//       to: email,
+//       subject: "Your OTP Code",
+//       text: `Your OTP code is ${otp}. It is valid for 10 minutes.`,
+//     };
+
+//     // Send OTP email
+//     await transporter.sendMail(mailOptions);
+//     console.log("Sent mail");
+//     //res.redirecturl("https://auditorium-booking-i34f.onrender.com/adminotp");
+//     res.ok;
+//     console.log("Redirecting");
+//   } catch (error) {
+//     console.error("Error during registration: ", error);
+//     res.status(500).json({ message: "Server error during registration." });
+//   }
+// });
 
 // Admin Login Route
 app.post("/admin/login", async (req, res) => {

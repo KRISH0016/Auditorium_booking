@@ -195,50 +195,97 @@
             }
           });
 
-        // Admin Register Form Submission
-        document
-          .getElementById("adminRegisterForm")
-          .addEventListener("submit", async function (event) {
-            event.preventDefault();
+    //     // Admin Register Form Submission
+    //     document
+    //       .getElementById("adminRegisterForm")
+    //       .addEventListener("submit", async function (event) {
+    //         event.preventDefault();
 
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("registerEmail").value;
-            const password = document.getElementById("registerPassword").value;
-            const confirmPassword = document.getElementById("confirmPassword").value;
-            const department = document.getElementById("department").value;
+    //         const name = document.getElementById("name").value;
+    //         const email = document.getElementById("registerEmail").value;
+    //         const password = document.getElementById("registerPassword").value;
+    //         const confirmPassword = document.getElementById("confirmPassword").value;
+    //         const department = document.getElementById("department").value;
 
-            if (password !== confirmPassword) {
-              document.getElementById("registerMessage").style.color = "red";
-              document.getElementById("registerMessage").textContent =
-                "Passwords do not match.";
-              return;
-            }
+    //         if (password !== confirmPassword) {
+    //           document.getElementById("registerMessage").style.color = "red";
+    //           document.getElementById("registerMessage").textContent =
+    //             "Passwords do not match.";
+    //           return;
+    //         }
 
-            try {
-              const response = await fetch("/admin/register", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ name, email, password, department }),
-              });
+    //         try {
+    //           const response = await fetch("/admin/register", {
+    //             method: "POST",
+    //             headers: {
+    //               "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify({ name, email, password, department }),
+    //           });
 
-              const result = await response.json();
-              const messageDiv = document.getElementById("registerMessage");
+    //           const result = await response.json();
+    //           const messageDiv = document.getElementById("registerMessage");
 
-              if (response.ok) {
-                messageDiv.style.color = "green";
-                messageDiv.textContent = result.message || "Registration successful.";
-                window.location.href = "https://auditorium-booking-i34f.onrender.com/adminotp";
-              } else {
-                messageDiv.style.color = "red";
-                messageDiv.textContent = result.message || "Registration failed.";
-              }
-            } catch (error) {
-              document.getElementById("registerMessage").style.color = "red";
-              document.getElementById("registerMessage").textContent ="An error occurred."+error;
-            }
-          });
+    //           if (response.ok) {
+    //             messageDiv.style.color = "green";
+    //             messageDiv.textContent = result.message || "Registration successful.";
+    //             window.location.href = "https://auditorium-booking-i34f.onrender.com/adminotp";
+    //           } else {
+    //             messageDiv.style.color = "red";
+    //             messageDiv.textContent = result.message || "Registration failed.";
+    //           }
+    //         } catch (error) {
+    //           document.getElementById("registerMessage").style.color = "red";
+    //           document.getElementById("registerMessage").textContent ="An error occurred."+error;
+    //         }
+    //       });
+    document
+  .getElementById("adminRegisterForm")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("registerEmail").value;
+    const password = document.getElementById("registerPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const department = document.getElementById("department").value;
+
+    if (password !== confirmPassword) {
+      document.getElementById("registerMessage").style.color = "red";
+      document.getElementById("registerMessage").textContent =
+        "Passwords do not match.";
+      return;
+    }
+
+    try {
+      const response = await fetch("/admin/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password, department }),
+      });
+
+      const result = await response.json();
+      const messageDiv = document.getElementById("registerMessage");
+
+      if (response.ok) {
+        messageDiv.style.color = "green";
+        messageDiv.textContent = result.message || "Registration successful.";
+        if (result.redirectUrl) {
+          window.location.href = result.redirectUrl;
+        }
+      } else {
+        messageDiv.style.color = "red";
+        messageDiv.textContent = result.message || "Registration failed.";
+      }
+    } catch (error) {
+      document.getElementById("registerMessage").style.color = "red";
+      document.getElementById("registerMessage").textContent =
+        "An error occurred: " + error.message;
+    }
+  });
+
       });
     </script>
   </body>
