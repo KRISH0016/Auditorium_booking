@@ -68,17 +68,22 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-
 // SectionTechnician schema
 const sectionTechnicianSchema = new mongoose.Schema({
-  bookingId: { type: mongoose.Schema.Types.ObjectId, ref: "Booking", required: true },
+  bookingId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Booking",
+    required: true,
+  },
   sectionName: { type: String, required: true },
   technicianName: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 });
 
-const SectionTechnician = mongoose.model("SectionTechnician", sectionTechnicianSchema);
-
+const SectionTechnician = mongoose.model(
+  "SectionTechnician",
+  sectionTechnicianSchema
+);
 
 const technicianSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -91,19 +96,16 @@ const Technician = mongoose.model("Technician", technicianSchema);
 
 //module.exports = Technician;
 
-
-
 const sectionSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String, // Optional field for additional description
- // technicians: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Technician' }], // References the Technician model
+  // technicians: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Technician' }], // References the Technician model
   //isActive: { type: Boolean, default: true }, // Tracks if the section is active
 });
 
 const Section = mongoose.model("Section", sectionSchema);
 
 //module.exports = Section;
-
 
 // // Mongoose Booking schema and model
 // const bookingSchema = new mongoose.Schema({
@@ -412,27 +414,26 @@ app.post("/admin/approve", async (req, res) => {
   booking.status = "Approved";
   await booking.save();
 
-// Save section technician data to SectionTechnician collection
-const sectionTechnicianPromises = sectionData.map(async (section) => {
-  const { sectionName, technicians } = section;
+  // Save section technician data to SectionTechnician collection
+  const sectionTechnicianPromises = sectionData.map(async (section) => {
+    const { sectionName, technicians } = section;
 
-  // For each technician in the section, create a new SectionTechnician entry
-  const sectionTechnicianEntries = technicians.map((technician) => {
-    return new SectionTechnician({
-      bookingId,
-      sectionName,
-      technicianName: technician,
-      userId: booking.user, // Assuming booking.user is the user object (user ID)
-    }).save();
+    // For each technician in the section, create a new SectionTechnician entry
+    const sectionTechnicianEntries = technicians.map((technician) => {
+      return new SectionTechnician({
+        bookingId,
+        sectionName,
+        technicianName: technician,
+        userId: booking.user, // Assuming booking.user is the user object (user ID)
+      }).save();
+    });
+
+    // Wait for all entries in a section to be saved
+    await Promise.all(sectionTechnicianEntries);
   });
 
-  // Wait for all entries in a section to be saved
-  await Promise.all(sectionTechnicianEntries);
-});
-
-// Wait for all sections and technicians to be saved
-await Promise.all(sectionTechnicianPromises);
-
+  // Wait for all sections and technicians to be saved
+  await Promise.all(sectionTechnicianPromises);
 
   // Send approval email to user
   const user = await User.findById(booking.user);
@@ -444,7 +445,6 @@ await Promise.all(sectionTechnicianPromises);
     },
   });
 
-  
   // Prepare emails for cleaning team, powerhouse, and audio technician
   const cleaningTeamEmail = process.env.CLEANING_TEAM_EMAIL;
   const powerhouseEmail = process.env.POWERHOUSE_EMAIL;
@@ -506,7 +506,7 @@ await Promise.all(sectionTechnicianPromises);
     subject: "Booking Approved",
     text: `Your booking has been approved. Booking details:\n\n${BookingDetailMessage}`,
   };
-//for the auditorium on ${booking.date}
+  //for the auditorium on ${booking.date}
   await transporter.sendMail(mailOptionsUser);
 
   // Prepare and send SMS to the user
@@ -518,7 +518,6 @@ await Promise.all(sectionTechnicianPromises);
       from: process.env.TWILIO_PHONE_NUMBER, // Your Twilio number
     });
   }
-
 
   const mailOptionsCleaning = {
     from: process.env.EMAIL_USER,
@@ -986,13 +985,17 @@ app.post("/addTechnician", async (req, res) => {
 
     const existingTechnician = await Technician.findOne({ email });
     if (existingTechnician) {
-      return res.status(400).json({ message: "Technician with this email already exists." });
+      return res
+        .status(400)
+        .json({ message: "Technician with this email already exists." });
     }
 
     const technician = new Technician({ name, email, phone });
     await technician.save();
 
-    res.status(201).json({ message: "Technician added successfully.", technician });
+    res
+      .status(201)
+      .json({ message: "Technician added successfully.", technician });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -1000,20 +1003,23 @@ app.post("/addTechnician", async (req, res) => {
 });
 
 // Add a new section
+
 app.post("/addSection", async (req, res) => {
   try {
-    const { sectionName } = req.body;
+    const { name } = req.body; // Extract 'name' from request body
 
-    if (!sectionName) {
+    if (!name) {
       return res.status(400).json({ message: "Section name is required." });
     }
 
-    const existingSection = await Section.findOne({ sectionName });
+    const existingSection = await Section.findOne({ sectionName: name });
     if (existingSection) {
-      return res.status(400).json({ message: "Section with this name already exists." });
+      return res
+        .status(400)
+        .json({ message: "Section with this name already exists." });
     }
 
-    const section = new Section({sectionName});
+    const section = new Section({ sectionName: name });
     await section.save();
 
     res.status(201).json({ message: "Section added successfully.", section });
@@ -1053,13 +1059,17 @@ app.post("/addSectionTechnician", async (req, res) => {
     const { bookingId, sections } = req.body;
 
     if (!bookingId || !sections || sections.length === 0) {
-      return res.status(400).json({ message: "Booking ID and sections are required." });
+      return res
+        .status(400)
+        .json({ message: "Booking ID and sections are required." });
     }
 
     const sectionTechnician = new SectionTechnician({ bookingId, sections });
     await sectionTechnician.save();
 
-    res.status(201).json({ message: "Section-Technician mapping saved successfully." });
+    res
+      .status(201)
+      .json({ message: "Section-Technician mapping saved successfully." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -1070,10 +1080,16 @@ app.post("/addSectionTechnician", async (req, res) => {
 app.get("/getSectionTechnician", async (req, res) => {
   try {
     // Fetch all technicians
-    const technicians = await Technician.find({}, { _id: 0, name: 1, email: 1, phone: 1 });
+    const technicians = await Technician.find(
+      {},
+      { _id: 0, name: 1, email: 1, phone: 1 }
+    );
 
     // Fetch all sections with associated technicians
-    const sections = await Section.find().populate("technicians", "name email phone");
+    const sections = await Section.find().populate(
+      "technicians",
+      "name email phone"
+    );
 
     // Format response data
     const formattedSections = sections.map((section) => ({
@@ -1094,7 +1110,6 @@ app.get("/getSectionTechnician", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
 
 // Fetch all technicians
 app.get("/technicians", async (req, res) => {
@@ -1130,8 +1145,6 @@ app.get("/initializeDialog", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
-
 
 app.post("/cancel", requireAuth, async (req, res) => {
   const { userId, bookingId } = req.body;
