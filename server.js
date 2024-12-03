@@ -718,40 +718,28 @@ const dotenv = require("dotenv");
 const { CallTracker } = require("assert");
 dotenv.config();
 
-app.post("/admin/login", async (req, res) => {
-  const { email, password } = req.body;
+// app.post("/admin/login", async (req, res) => {
+//   const { email, password } = req.body;
 
-  // Check credentials against environment variables
-  if (
-    email === process.env.ADMIN_EMAIL &&
-    password === process.env.ADMIN_PASSWORD
-  ) {
-    // If credentials match, send a success response
-    // const token = createToken(user._id);
-    return res
-      .status(200)
-      .json({ success: true, message: "Login successful." });
-  }
+//   // Check credentials against environment variables
+//   if (
+//     email === process.env.ADMIN_EMAIL &&
+//     password === process.env.ADMIN_PASSWORD
+//   ) {
+//     // If credentials match, send a success response
+//     // const token = createToken(user._id);
+//     return res
+//       .status(200)
+//       .json({ success: true, message: "Login successful." });
+//   }
 
-  // If credentials don't match, send an error response
-  return res
-    .status(401)
-    .json({ success: false, message: "Invalid credentials." });
-});
-
-// app.post("/slot", async (req, res) => {
-//   const { start, end, userId, date } = req.body;
-//   console.log(start, end, userId, date);
-//   await Booking.findOne({ start: start, end: end, user: userId, date: date })
-//     .then((booking) => {
-//       console.log(booking);
-//       return res.status(200).send(booking);
-//     })
-//     .catch((err) => {
-//       return err;
-//     });
+//   // If credentials don't match, send an error response
+//   return res
+//     .status(401)
+//     .json({ success: false, message: "Invalid credentials." });
 // });
-// Backend logic (in your Node.js/Express app)
+
+
 app.post("/slotcheck", async (req, res) => {
   const { start, end, userId, date, slotdetails } = req.body;
 
@@ -1326,6 +1314,195 @@ app.get("/booking", async (req, res) => {
 app.get("/otp", (req, res) => {
   res.sendFile(path.join(__dirname, "template/otp.html"));
 });
+
+
+// MongoDB Schema for Admin
+const adminSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "Name is required"],
+  },
+  email: {
+    type: String,
+    required: [true, "Email is required"],
+    unique: true,
+    lowercase: true,
+    match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"],
+  },
+  password: {
+    type: String,
+    required: [true, "Password is required"],
+    minlength: [6, "Password should be at least 6 characters"],
+  },
+  department: {
+    type: String,
+    required: [true, "Department is required"],
+  },
+  phone: {
+    type: String,
+    required: [true, "Phone number is required"],
+  },
+  twoFASecret: {
+    type: String,
+  },
+  twoFAauthen: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+// Hash the password before saving it
+adminSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// Method to compare the password during login
+adminSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
+
+// Admin model
+const Admin = mongoose.model("Admin", adminSchema);
+
+// Admin Registration Route
+app.post("/admin/register", async (req, res) => {
+  const { email, password, name, department, phone } = req.body;
+
+  try {
+    // Check if the email is from the allowed domain
+    if (!email.endsWith("tce.edu")) {
+      return res.status(400).json({
+        success: false,
+        message: "Registration only allowed for tce.edu emails.",
+      });
+    }
+
+    // Check if the admin already exists
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email already exists." });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new admin object
+    const admin = new Admin({
+      email,
+      password: hashedPassword,
+      dept: department,
+      name,
+      phone,
+    });
+
+    // Generate OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    admin.twoFASecret = otp;
+
+    // Save admin to database
+    await admin.save();
+
+    // Configure nodemailer transport using environment variables
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    // Mail options for OTP
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP code is ${otp}. It is valid for 10 minutes.`,
+    };
+
+    // Send OTP email
+    await transporter.sendMail(mailOptions);
+    console.log("Sent mail");
+    res.redirect("/otp");
+    console.log("Redirecting");
+  } catch (error) {
+    console.error("Error during registration: ", error);
+    res.status(500).json({ message: "Server error during registration." });
+  }
+});
+
+// Admin Login Route
+app.post("/admin/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  // Find admin by email
+  const admin = await Admin.findOne({ email });
+
+  // Check if admin exists and password matches
+  if (!admin || !(await bcrypt.compare(password, admin.password))) {
+    console.log("Invalid Credentials");
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid credentials" });
+  }
+  const token = createToken(admin._id);
+
+  if (!admin.twoFAauthen) {
+    console.log("Validate OTP");
+    return res.status(401).json({
+      success: false,
+      message: "OTP verification is pending. Please verify your OTP first.",
+    });
+  }
+
+  // Successful login
+  res.status(200).json({
+    success: true,
+    message: "Login successful",
+    data: admin,
+    token: token,
+  });
+});
+
+// OTP verification route
+app.post("/verify-otp", async (req, res) => {
+  const { email, otp } = req.body;
+
+  // Find admin by email
+  const admin = await Admin.findOne({ email });
+
+  if (!admin) {
+    return res.status(400).json({ message: "Admin not found." });
+  }
+
+  // Compare OTP
+  if (otp !== admin.twoFASecret) {
+    return res
+      .status(400)
+      .json({ message: "Invalid OTP. Registration failed." });
+  }
+
+  // OTP verified successfully
+  admin.twoFAauthen = true; // Update the 2FA authentication status to true
+  admin.twoFASecret = null; // Optionally clear the OTP secret after successful verification
+  await admin.save(); // Save the updated admin data
+  res
+    .status(200)
+    .json({ success: true, message: "OTP verified successfully." });
+});
+
+// Generate JWT token (helper function)
+const jwt = require("jsonwebtoken");
+
+function createToken(adminId) {
+  return jwt.sign({ id: adminId }, "your_jwt_secret", { expiresIn: "1h" });
+}
+
+
+
 
 // Start server
 app.listen(3000, () => {

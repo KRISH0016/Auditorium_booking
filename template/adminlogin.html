@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login & Register</title>
+    <link rel="icon" type="image/png" href="../images/logo.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #faf6ff;
+      }
+      .container {
+        background-color: #ffdcc0;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        width: 350px;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .container img {
+        width: 125px;
+        height: 105px;
+        margin-bottom: 20px;
+      }
+      .container h2 {
+        margin-bottom: 10px;
+        color: #871a07;
+      }
+      .container input {
+        width: calc(100% - 20px);
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+      .container button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        background-color: #871a07;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+      }
+      .container button:hover {
+        background-color: #9c240d;
+      }
+      .message {
+        margin-top: 10px;
+        color: red;
+        font-weight: bold;
+      }
+      #auth {
+        width: 100%;
+      }
+      .form-container {
+        display: none;
+      }
+      .form-container.active {
+        display: block;
+      }
+      .form-link {
+        margin-top: 15px;
+        font-size: 14px;
+      }
+      .form-link a {
+        color: #871a07;
+        text-decoration: none;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="auth">
+        <!-- Admin Login Form -->
+        <div id="loginForm" class="form-container active">
+          <img src="../images/logo.png" alt="Logo" />
+          <h2>Admin Login</h2>
+          <form id="adminLoginForm">
+            <input type="email" id="email" placeholder="Your Email" required />
+            <input
+              type="password"
+              id="password"
+              placeholder="Your Password"
+              required
+            />
+            <button type="submit">Login</button>
+          </form>
+          <div id="loginMessage" class="message"></div>
+          <div class="form-link">
+            Don't have an account? <a href="#" id="toRegister">Register</a>
+          </div>
+        </div>
+
+        <!-- Admin Register Form -->
+        <div id="registerForm" class="form-container">
+          <img src="../images/logo.png" alt="Logo" />
+          <h2>Admin Register</h2>
+          <form id="adminRegisterForm">
+            <input type="text" id="name" placeholder="Your Name" required />
+            <input type="email" id="registerEmail" placeholder="Your Email" required />
+            <input
+            type="text"
+            id="department"
+            placeholder="Your Department"
+            required
+          />
+            <input
+              type="password"
+              id="registerPassword"
+              placeholder="Your Password"
+              required
+            />
+            <input
+              type="password"
+              id="confirmPassword"
+              placeholder="Confirm Password"
+              required
+            />
+            <button type="submit">Register</button>
+          </form>
+          <div id="registerMessage" class="message"></div>
+          <div class="form-link">
+            Already have an account? <a href="#" id="toSignIn">Sign In</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const registerForm = document.getElementById("registerForm");
+        const loginForm = document.getElementById("loginForm");
+
+        // Toggle between Register and Login forms
+        document.getElementById("toRegister").addEventListener("click", (e) => {
+          e.preventDefault();
+          loginForm.classList.remove("active");
+          registerForm.classList.add("active");
+        });
+
+        document.getElementById("toSignIn").addEventListener("click", (e) => {
+          e.preventDefault();
+          registerForm.classList.remove("active");
+          loginForm.classList.add("active");
+        });
+
+        // Admin Login Form Submission
+        document
+          .getElementById("adminLoginForm")
+          .addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+              const response = await fetch("/admin/login", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+              });
+
+              const result = await response.json();
+              const messageDiv = document.getElementById("loginMessage");
+
+              if (response.ok) {
+                messageDiv.style.color = "green";
+                messageDiv.textContent = result.message || "Login successful.";
+                window.location.href = "/admin/dashboard"; // Redirect to admin dashboard
+              } else {
+                messageDiv.style.color = "red";
+                messageDiv.textContent = result.message || "Login failed.";
+              }
+            } catch (error) {
+              document.getElementById("loginMessage").style.color = "red";
+              document.getElementById("loginMessage").textContent =
+                "An error occurred.";
+            }
+          });
+
+        // Admin Register Form Submission
+        document
+          .getElementById("adminRegisterForm")
+          .addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("registerEmail").value;
+            const password = document.getElementById("registerPassword").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const department = document.getElementById("department").value;
+
+            if (password !== confirmPassword) {
+              document.getElementById("registerMessage").style.color = "red";
+              document.getElementById("registerMessage").textContent =
+                "Passwords do not match.";
+              return;
+            }
+
+            try {
+              const response = await fetch("/admin/register", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name, email, password, department }),
+              });
+
+              const result = await response.json();
+              const messageDiv = document.getElementById("registerMessage");
+
+              if (response.ok) {
+                messageDiv.style.color = "green";
+                messageDiv.textContent = result.message || "Registration successful.";
+              } else {
+                messageDiv.style.color = "red";
+                messageDiv.textContent = result.message || "Registration failed.";
+              }
+            } catch (error) {
+              document.getElementById("registerMessage").style.color = "red";
+              document.getElementById("registerMessage").textContent =
+                "An error occurred.";
+            }
+          });
+      });
+    </script>
+  </body>
+</html>
