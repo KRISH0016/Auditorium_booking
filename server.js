@@ -1042,6 +1042,36 @@ app.post("/addSectionTechnician", async (req, res) => {
   }
 });
 
+// Endpoint to fetch all sections and technicians
+app.get("/getSectionTechnician", async (req, res) => {
+  try {
+    // Fetch all technicians
+    const technicians = await Technician.find({}, { _id: 0, name: 1, email: 1, phone: 1 });
+
+    // Fetch all sections with associated technicians
+    const sections = await Section.find().populate("technicians", "name email phone");
+
+    // Format response data
+    const formattedSections = sections.map((section) => ({
+      sectionName: section.name,
+      technicians: section.technicians.map((tech) => ({
+        name: tech.name,
+        email: tech.email,
+        phone: tech.phone,
+      })),
+    }));
+
+    res.status(200).json({
+      technicians,
+      sections: formattedSections,
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
 // Fetch all technicians
 app.get("/technicians", async (req, res) => {
   try {

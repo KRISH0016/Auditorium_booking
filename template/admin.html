@@ -714,7 +714,7 @@
           // Fetch existing technicians and sections from the server
           async function fetchTechniciansAndSections() {
             try {
-              const response = await fetch("/getSectionsAndTechnicians"); // Replace with your actual API endpoint
+              const response = await fetch("/getSectionTechnician"); // Replace with your actual API endpoint
               const data = await response.json();
 
               techniciansList = data.technicians || [];
