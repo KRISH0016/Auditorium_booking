@@ -710,6 +710,7 @@
 
           let techniciansList = [];
           let sectionsData = [];
+          let sectionTechnicianMapping = [];
 
           // Fetch existing technicians and sections from the server
           async function fetchTechniciansAndSections() {
@@ -720,35 +721,12 @@
               techniciansList = data.technicians || [];
               sectionsData = data.sections.map((section) => ({
                 name: section.name,
-                technicians: section.technicians || [],
+                technicians: [],
               }));
 
               console.log("Fetched data:", data);
             } catch (error) {
               console.error("Error fetching data:", error);
-            }
-          }
-
-          // Save a new technician to the server
-          async function saveTechnician(technician) {
-            console.log("Request Body Technician:", technician);
-            try {
-              const response = await fetch("/addTechnician", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(technician),
-              });
-
-              if (!response.ok) {
-                throw new Error("Failed to save technician.");
-              }
-              const data = await response.json();
-              console.log("Saved Technician:", data);
-              return data.technician;
-            } catch (error) {
-              console.error(error);
-              alert("Error saving technician.");
-              return null;
             }
           }
 
@@ -775,8 +753,8 @@
             }
           }
 
-          // Function to render a section with its associated technicians
-          async function renderSection(section) {
+          // Render a section with technician dropdowns
+          function renderSection(section) {
             const sectionDiv = document.createElement("div");
             sectionDiv.classList.add("section");
 
@@ -786,16 +764,14 @@
             const subsectionsContainer = document.createElement("div");
             subsectionsContainer.classList.add("subsections-container");
 
-            // Render existing technicians for this section
-            section.technicians.forEach((technician) => {
-              addSubsection(technician.name, subsectionsContainer);
-            });
+            // Add technician dropdown
+            addTechnicianDropdown(subsectionsContainer, section.name);
 
-            const addSubsectionBtn = document.createElement("button");
-            addSubsectionBtn.textContent = "Add Technician";
-            addSubsectionBtn.classList.add("add-subsection-btn");
-            addSubsectionBtn.onclick = () =>
-              addSubsection("", subsectionsContainer);
+            const addTechnicianBtn = document.createElement("button");
+            addTechnicianBtn.textContent = "Add Technician";
+            addTechnicianBtn.classList.add("add-technician-btn");
+            addTechnicianBtn.onclick = () =>
+              addTechnicianDropdown(subsectionsContainer, section.name);
 
             const removeSectionBtn = document.createElement("button");
             removeSectionBtn.textContent = "Remove Section";
@@ -804,14 +780,14 @@
 
             sectionDiv.appendChild(sectionHeader);
             sectionDiv.appendChild(subsectionsContainer);
-            sectionDiv.appendChild(addSubsectionBtn);
+            sectionDiv.appendChild(addTechnicianBtn);
             sectionDiv.appendChild(removeSectionBtn);
 
             sectionsContainer.appendChild(sectionDiv);
           }
 
-          // Function to add a subsection
-          async function addSubsection(selectedTechnician, container) {
+          // Add a dropdown for technician selection
+          function addTechnicianDropdown(container, sectionName) {
             const subsectionDiv = document.createElement("div");
             subsectionDiv.classList.add("subsection");
 
@@ -820,7 +796,7 @@
             defaultOption.value = "";
             defaultOption.textContent = "Choose Technician";
             defaultOption.disabled = true;
-            defaultOption.selected = !selectedTechnician;
+            defaultOption.selected = true;
 
             select.appendChild(defaultOption);
 
@@ -828,9 +804,6 @@
               const option = document.createElement("option");
               option.value = technician.name;
               option.textContent = technician.name;
-              if (technician.name === selectedTechnician) {
-                option.selected = true;
-              }
               select.appendChild(option);
             });
 
@@ -847,7 +820,7 @@
           // Initialize dialog with fetched data
           await fetchTechniciansAndSections();
 
-          // Render default sections with technicians
+          // Render sections without technicians
           sectionsData.forEach((section) => renderSection(section));
 
           // Add new section handler
@@ -855,14 +828,6 @@
             const sectionName = prompt("Enter Section Name:");
             if (!sectionName) {
               alert("Section name is required.");
-              return;
-            }
-
-            const technicianName = prompt(
-              "Enter a Technician Name (required):"
-            );
-            if (!technicianName) {
-              alert("Technician name is required.");
               return;
             }
 
@@ -874,16 +839,7 @@
               return;
             }
 
-            // Add the technician to the server first
-            const technician = await saveTechnician({ name: technicianName });
-            if (!technician) return;
-
-            // Add the section with the technician
-            const newSection = await saveSection({
-              name: sectionName,
-              technicians: [{ name: technician.name }],
-            });
-
+            const newSection = await saveSection({ name: sectionName });
             if (newSection) {
               sectionsData.push(newSection);
               renderSection(newSection);
@@ -891,8 +847,8 @@
           };
 
           // Save and Cancel handlers
-          document.getElementById("saveBtn").onclick = async () => {
-            const sectionData = Array.from(
+          document.getElementById("saveBtn").onclick = () => {
+            sectionTechnicianMapping = Array.from(
               sectionsContainer.getElementsByClassName("section")
             ).map((section) => {
               const sectionName = section.querySelector("h4").textContent;
@@ -903,9 +859,13 @@
               return { sectionName, technicians };
             });
 
-            console.log("Saving sections and technicians:", sectionData);
+            console.log(
+              "Mapping for booking:",
+              bookingId,
+              sectionTechnicianMapping
+            );
 
-            // Hide dialog
+            // Save mapping to server (implement the API call)
             dialogBox.classList.add("hidden");
           };
 

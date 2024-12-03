@@ -96,8 +96,8 @@ const Technician = mongoose.model("Technician", technicianSchema);
 const sectionSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String, // Optional field for additional description
-  technicians: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Technician' }], // References the Technician model
-  isActive: { type: Boolean, default: true }, // Tracks if the section is active
+ // technicians: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Technician' }], // References the Technician model
+  //isActive: { type: Boolean, default: true }, // Tracks if the section is active
 });
 
 const Section = mongoose.model("Section", sectionSchema);
@@ -1002,7 +1002,7 @@ app.post("/addTechnician", async (req, res) => {
 // Add a new section
 app.post("/addSection", async (req, res) => {
   try {
-    const { sectionName, technicians } = req.body;
+    const { sectionName } = req.body;
 
     if (!sectionName) {
       return res.status(400).json({ message: "Section name is required." });
@@ -1013,7 +1013,7 @@ app.post("/addSection", async (req, res) => {
       return res.status(400).json({ message: "Section with this name already exists." });
     }
 
-    const section = new Section({ sectionName, technicians });
+    const section = new Section({sectionName});
     await section.save();
 
     res.status(201).json({ message: "Section added successfully.", section });
@@ -1022,6 +1022,30 @@ app.post("/addSection", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+// // Add a new section
+// app.post("/addSection", async (req, res) => {
+//   try {
+//     const { sectionName, technicians } = req.body;
+
+//     if (!sectionName) {
+//       return res.status(400).json({ message: "Section name is required." });
+//     }
+
+//     const existingSection = await Section.findOne({ sectionName });
+//     if (existingSection) {
+//       return res.status(400).json({ message: "Section with this name already exists." });
+//     }
+
+//     const section = new Section({ sectionName, technicians });
+//     await section.save();
+
+//     res.status(201).json({ message: "Section added successfully.", section });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
 
 // Add a new Section-Technician mapping for a booking
 app.post("/addSectionTechnician", async (req, res) => {
