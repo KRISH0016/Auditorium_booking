@@ -1433,7 +1433,8 @@ app.post("/admin/register", async (req, res) => {
     // Send OTP email
     await transporter.sendMail(mailOptions);
     console.log("Sent mail");
-    res.redirect("https://auditorium-booking-i34f.onrender.com/adminotp");
+    //res.redirect("https://auditorium-booking-i34f.onrender.com/adminotp");
+    res.ok;
     console.log("Redirecting");
   } catch (error) {
     console.error("Error during registration: ", error);
