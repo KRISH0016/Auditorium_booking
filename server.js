@@ -80,10 +80,7 @@ const sectionTechnicianSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 });
 
-const SectionTechnician = mongoose.model(
-  "SectionTechnician",
-  sectionTechnicianSchema
-);
+const SectionTechnician = mongoose.model("SectionTechnician", sectionTechnicianSchema);
 
 const technicianSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -98,9 +95,9 @@ const Technician = mongoose.model("Technician", technicianSchema);
 
 const sectionSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  description: String, // Optional field for additional description
+  //description: String, // Optional field for additional description
   // technicians: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Technician' }], // References the Technician model
-  //isActive: { type: Boolean, default: true }, // Tracks if the section is active
+  isActive: { type: Boolean, default: true }, // Tracks if the section is active
 });
 
 const Section = mongoose.model("Section", sectionSchema);
