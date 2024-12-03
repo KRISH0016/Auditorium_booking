@@ -847,7 +847,28 @@
           };
 
           // Save and Cancel handlers
-          document.getElementById("saveBtn").onclick = () => {
+          // document.getElementById("saveBtn").onclick = () => {
+          //   sectionTechnicianMapping = Array.from(
+          //     sectionsContainer.getElementsByClassName("section")
+          //   ).map((section) => {
+          //     const sectionName = section.querySelector("h4").textContent;
+          //     const technicians = Array.from(
+          //       section.getElementsByClassName("subsection")
+          //     ).map((subsection) => subsection.querySelector("select").value);
+
+          //     return { sectionName, technicians };
+          //   });
+
+          //   console.log(
+          //     "Mapping for booking:",
+          //     bookingId,
+          //     sectionTechnicianMapping
+          //   );
+
+          //   // Save mapping to server (implement the API call)
+          //   dialogBox.classList.add("hidden");
+          // };
+          document.getElementById("saveBtn").onclick = async () => {
             sectionTechnicianMapping = Array.from(
               sectionsContainer.getElementsByClassName("section")
             ).map((section) => {
@@ -856,7 +877,7 @@
                 section.getElementsByClassName("subsection")
               ).map((subsection) => subsection.querySelector("select").value);
 
-              return { sectionName, technicians };
+              return { sectionName, technicians: technicians.filter(Boolean) }; // Filter out empty selections
             });
 
             console.log(
@@ -865,8 +886,30 @@
               sectionTechnicianMapping
             );
 
-            // Save mapping to server (implement the API call)
-            dialogBox.classList.add("hidden");
+            try {
+              const response = await fetch("/saveSectionTechnicianMapping", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  bookingId,
+                  userId,
+                  mapping: sectionTechnicianMapping,
+                }),
+              });
+
+              if (!response.ok) {
+                throw new Error("Failed to save mapping.");
+              }
+
+              const data = await response.json();
+              console.log("Saved Mapping:", data);
+
+              alert("Mapping saved successfully.");
+              dialogBox.classList.add("hidden");
+            } catch (error) {
+              console.error("Error saving mapping:", error);
+              alert("Error saving mapping.");
+            }
           };
 
           document.getElementById("cancelBtn").onclick = () => {

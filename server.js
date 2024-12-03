@@ -80,7 +80,10 @@ const sectionTechnicianSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 });
 
-const SectionTechnician = mongoose.model("SectionTechnician", sectionTechnicianSchema);
+const SectionTechnician = mongoose.model(
+  "SectionTechnician",
+  sectionTechnicianSchema
+);
 
 const technicianSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -1051,6 +1054,36 @@ app.post("/addSection", async (req, res) => {
 // });
 
 // Add a new Section-Technician mapping for a booking
+
+
+
+app.post("/saveSectionTechnicianMapping", async (req, res) => {
+  try {
+    const { bookingId, userId, mapping } = req.body; // mapping is an array of {sectionName, technicians}
+
+    if (!bookingId || !userId || !Array.isArray(mapping)) {
+      return res.status(400).json({ message: "Invalid request data." });
+    }
+
+    // Save each mapping entry
+    const mappingEntries = mapping.flatMap(({ sectionName, technicians }) =>
+      technicians.map((technicianName) => ({
+        bookingId,
+        userId,
+        sectionName,
+        technicianName,
+      }))
+    );
+
+    await SectionTechnician.insertMany(mappingEntries);
+
+    res.status(201).json({ message: "Mapping saved successfully." });
+  } catch (error) {
+    console.error("Error saving mapping:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 app.post("/addSectionTechnician", async (req, res) => {
   try {
     const { bookingId, sections } = req.body;
@@ -1072,8 +1105,6 @@ app.post("/addSectionTechnician", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
-// Endpoint to fetch all sections and technicians
 app.get("/getSectionTechnician", async (req, res) => {
   try {
     // Fetch all technicians
@@ -1082,31 +1113,59 @@ app.get("/getSectionTechnician", async (req, res) => {
       { _id: 0, name: 1, email: 1, phone: 1 }
     );
 
-    // Fetch all sections with associated technicians
-    const sections = await Section.find().populate(
-      "technicians",
-      "name email phone"
-    );
+    // Fetch all sections
+    const sections = await Section.find({}, { _id: 0, name: 1 }); // Fetch only the section names
 
-    // Format response data
+    // Structure the response
     const formattedSections = sections.map((section) => ({
-      sectionName: section.name,
-      technicians: section.technicians.map((tech) => ({
-        name: tech.name,
-        email: tech.email,
-        phone: tech.phone,
-      })),
+      sectionName: section.name, // Assuming Section schema has a 'name' field
+      technicians: technicians, // Associate all technicians with each section
     }));
 
     res.status(200).json({
-      technicians,
-      sections: formattedSections,
+      technicians, // All available technicians
+      sections: formattedSections, // Sections with associated technician details
     });
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+// Endpoint to fetch all sections and technicians
+// app.get("/getSectionTechnician", async (req, res) => {
+//   try {
+//     // Fetch all technicians
+//     const technicians = await Technician.find(
+//       {},
+//       { _id: 0, name: 1, email: 1, phone: 1 }
+//     );
+
+//     // Fetch all sections with associated technicians
+//     const sections = await Section.find().populate(
+//       "technicians",
+//       "name email phone"
+//     );
+
+//     // Format response data
+//     const formattedSections = sections.map((section) => ({
+//       sectionName: section.name,
+//       technicians: section.technicians.map((tech) => ({
+//         name: tech.name,
+//         email: tech.email,
+//         phone: tech.phone,
+//       })),
+//     }));
+
+//     res.status(200).json({
+//       technicians,
+//       sections: formattedSections,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
 
 // Fetch all technicians
 app.get("/technicians", async (req, res) => {
