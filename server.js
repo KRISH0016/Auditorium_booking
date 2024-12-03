@@ -1344,10 +1344,10 @@ const adminSchema = new mongoose.Schema({
     type: String,
     required: [true, "Department is required"],
   },
-  phone: {
-    type: String,
-    required: [true, "Phone number is required"],
-  },
+  // phone: {
+  //   type: String,
+  //   required: [true, "Phone number is required"],
+  // },
   twoFASecret: {
     type: String,
   },
@@ -1374,7 +1374,7 @@ const Admin = mongoose.model("Admin", adminSchema);
 
 // Admin Registration Route
 app.post("/admin/register", async (req, res) => {
-  const {  name, email, password,department } = req.body;
+  const {  name, email, password ,department } = req.body;
 
   try {
     // Check if the email is from the allowed domain
@@ -1398,11 +1398,11 @@ app.post("/admin/register", async (req, res) => {
 
     // Create a new admin object
     const admin = new Admin({
+      name,
       email,
       password: hashedPassword,
       dept: department,
-      name,
-      phone,
+      
     });
 
     // Generate OTP
