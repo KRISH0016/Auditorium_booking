@@ -719,6 +719,7 @@
 
               techniciansList = data.technicians || [];
               sectionsData = data.sections || [];
+              console.log(data);
             } catch (error) {
               console.error("Error fetching data:", error);
             }
@@ -726,6 +727,7 @@
 
           // Save a new technician to the server
           async function saveTechnician(technician) {
+            console.log("Request Body Tech:", technician);
             try {
               const response = await fetch("/addTechnician", {
                 method: "POST",
@@ -747,6 +749,7 @@
 
           // Save a new section to the server
           async function saveSection(section) {
+            console.log("Request Body section:", section);
             try {
               const response = await fetch("/addSection", {
                 method: "POST",
