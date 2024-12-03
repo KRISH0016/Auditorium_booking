@@ -1500,13 +1500,6 @@ app.post("/verify-otp-admin", async (req, res) => {
     .json({ success: true, message: "OTP verified successfully." });
 });
 
-function createToken(adminId) {
-  return jwt.sign({ id: adminId }, "your_jwt_secret", { expiresIn: "1h" });
-}
-
-
-
-
 // Start server
 app.listen(3000, () => {
   db(); // Connect to MongoDB when server starts
