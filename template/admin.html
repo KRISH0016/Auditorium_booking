@@ -507,7 +507,10 @@
             const newSection = await saveSection({ name: sectionName });
             if (newSection) {
               sectionsData.push(newSection);
-              renderSection(sectionsData);
+              await fetchTechniciansAndSections();
+
+// Render sections without technicians
+              sectionsData.forEach((section) => renderSection(section));
             }
           };
           document.getElementById("saveBtn").onclick = async () => {
