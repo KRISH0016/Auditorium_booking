@@ -76,9 +76,11 @@ const sectionTechnicianSchema = new mongoose.Schema({
     required: true,
   },
   sectionName: { type: String, required: true },
-  technicianName: { type: String, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  technicianNames: { type: [String], required: true }, // Changed to an array of strings
+  userId:  { type: String, required: true },
+  //userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 });
+
 
 const SectionTechnician = mongoose.model(
   "SectionTechnician",
@@ -1044,27 +1046,25 @@ app.post("/addSection", async (req, res) => {
 // Add a new Section-Technician mapping for a booking
 
 
-
 app.post("/saveSectionTechnicianMapping", async (req, res) => {
   try {
-    //const { bookingId, mapping } = req.body; 
-    const { bookingId, userId, mapping } = req.body; // mapping is an array of {sectionName, technicians}
-    console.log("booking ID "+bookingId + mapping);
-     if (!bookingId || !userId || !Array.isArray(mapping)) {
-       return res.status(400).json({ message: "Invalid request data." });
-     }
+    const { bookingId, userId, mapping } = req.body;
 
-    // Save each mapping entry
-    const mappingEntries = mapping.flatMap(({ sectionName, technicians }) =>
-      technicians.map((technicianName) => ({
-        bookingId,
-        sectionName,
-        technicianName,
-        userId,
-      }))
-    );
+    if (!bookingId || !userId || !Array.isArray(mapping)) {
+      return res.status(400).json({ message: "Invalid request data." });
+    }
 
-    await SectionTechnician.insertMany(mappingEntries);
+    // Prepare grouped data for insertion
+    const groupedData = mapping.map(({ sectionName, technicians }) => ({
+      bookingId,
+      sectionName,
+      technicianNames: technicians,
+      userId,
+    }));
+
+    // Save or update data
+    await SectionTechnician.deleteMany({ bookingId }); // Optional: Clear previous entries for the booking
+    await SectionTechnician.insertMany(groupedData);
 
     res.status(201).json({ message: "Mapping saved successfully." });
   } catch (error) {
@@ -1072,6 +1072,7 @@ app.post("/saveSectionTechnicianMapping", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 
 app.post("/addSectionTechnician", async (req, res) => {
   try {
