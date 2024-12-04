@@ -64,6 +64,11 @@
         </table>
         <div id="message-box" class="message-box"></div>
         <button id="print-csv">Print CSV</button>
+        <button id="show-user">Show User</button>
+
+        <button id="show-admin">Show Admin</button>
+
+        <button id="show-technician">Show Technician</button>
       </section>
       <section class="calendar-section">
         <h2>Calendar View</h2>
@@ -337,7 +342,7 @@
 
             const approveButton = row.querySelector(".approve-button");
             approveButton.addEventListener("click", () => {
-              showDialog(booking._id,booking.user.name); // Call the showDialog function with the booking ID
+              showDialog(booking._id, booking.user.name); // Call the showDialog function with the booking ID
             });
 
             // Add event listener to the Cancel button (optional)
@@ -505,12 +510,12 @@
             }
 
             const newSection = await saveSection({ name: sectionName });
-           // const newSectionName=sectionName;
+            // const newSectionName=sectionName;
             if (newSection) {
               sectionsData.push(newSection);
               //await fetchTechniciansAndSections();
               console.log(sectionsData.name);
-              console.log("New Section "+ newSection.name);
+              console.log("New Section " + newSection.name);
               //console.log(newSectionName);
               renderSection(newSection.name);
               // Render sections without technicians
@@ -897,7 +902,6 @@
             });
         }
 
-
         // Cancel a booking
         function cancelBooking(bookingId) {
           fetch("https://auditorium-booking-i34f.onrender.com/admin/cancel", {
@@ -938,6 +942,59 @@
           //   button.addEventListener("click", () => cancelBooking(bookingId));
           // });
           // CSV Export button
+          document.getElementById("show-technician").onclick = async () => {
+            try {
+              const response = await fetch("/getTechnicianWorkDetails");
+              const data = await response.json();
+
+              if (data.success) {
+                const headers = [
+                  "Section Name",
+                  "Technician Names",
+                  "Booking Date",
+                  "Start Time",
+                  "End Time",
+                ];
+                displayTable("Technician Work Details", headers, data.data);
+              } else {
+                alert("Failed to fetch technician work details.");
+              }
+            } catch (error) {
+              console.error("Error fetching technician work details:", error);
+              alert("Error fetching details.");
+            }
+          };
+
+          document.getElementById("show-user").onclick = async () => {
+            try {
+              const response = await fetch("/getUsers");
+              const data = await response.json();
+
+              if (data.success) {
+                displayTable("Users", ["Name", "Email", "Role"], data.users);
+              } else {
+                alert("Failed to fetch user details.");
+              }
+            } catch (error) {
+              console.error("Error fetching users:", error);
+            }
+          };
+
+          document.getElementById("show-admin").onclick = async () => {
+            try {
+              const response = await fetch("/getAdmins");
+              const data = await response.json();
+
+              if (data.success) {
+                displayTable("Admins", ["Name", "Email", "Role"], data.admins);
+              } else {
+                alert("Failed to fetch admin details.");
+              }
+            } catch (error) {
+              console.error("Error fetching admins:", error);
+            }
+          };
+
           document.getElementById("print-csv").addEventListener("click", () => {
             fetchBookings().then((bookings) => {
               exportBookingsToCSV(bookings);

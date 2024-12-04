@@ -26,6 +26,32 @@ header {
 #print-csv:hover {
   background-color: #45a049; /* Darker green on hover */
 }
+#show-admin{
+  background-color: #4caf50; /* Green background */
+  color: white; /* White text */
+  padding: 30px 15px; /* Padding */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-bottom: 20px; /* Space below the button */
+  font-size: 16px; /* Font size */
+}
+#show-admin:hover{
+  background-color: #45a049; /* Darker green on hover */
+}
+#show-technician{
+  background-color: #4caf50; /* Green background */
+  color: white; /* White text */
+  padding: 50px 15px; /* Padding */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-bottom: 20px; /* Space below the button */
+  font-size: 16px; /* Font size */
+}
+#show-technician:hover{
+  background-color: #45a049; /* Darker green on hover */
+}
 
 header h1 {
   margin: 0;

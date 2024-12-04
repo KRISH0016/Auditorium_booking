@@ -1566,6 +1566,60 @@ app.post("/verify-otp-admin", async (req, res) => {
     .status(200)
     .json({ success: true, message: "OTP verified successfully." });
 });
+app.get("/getAdmins", async (req, res) => {
+  try {
+    const admins = await Admin.find({});
+    res.status(200).json({ success: true, admins });
+  } catch (error) {
+    console.error("Error fetching admins:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+app.get("/getUsers", async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.status(200).json({ success: true, users });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+app.get("/getTechnicianWorkDetails", async (req, res) => {
+  try {
+    // Fetch all technicians
+    const technicians = await Technician.find({}, "name"); // Fetch only the 'name' field
+    const technicianNames = technicians.map((tech) => tech.name);
+
+    // Fetch works for these technicians
+    const works = await SectionTechnician.find({
+      technicianNames: { $in: technicianNames },
+    });
+
+    // Create a map for fetching bookings
+    const bookingIds = works.map((work) => work.bookingId);
+    const bookings = await Booking.find({ _id: { $in: bookingIds } });
+
+    // Combine data
+    const technicianWorkDetails = works.map((work) => {
+      const booking = bookings.find(
+        (b) => b._id.toString() === work.bookingId.toString()
+      );
+      return {
+        sectionName: work.sectionName,
+        technicianNames: work.technicianNames,
+        bookingDate: booking ? booking.date : "N/A",
+        startTime: booking ? booking.startTime : "N/A",
+        endTime: booking ? booking.endTime : "N/A",
+      };
+    });
+
+    res.status(200).json({ success: true, data: technicianWorkDetails });
+  } catch (error) {
+    console.error("Error fetching technician work details:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
 
 // Start server
 app.listen(3000, () => {
