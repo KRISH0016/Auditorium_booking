@@ -66,6 +66,101 @@ header {
   background-color: #45a049; /* Darker green on hover */
 }
 
+/* Modal inside Section (Tabular-shown) */
+.Tabular-shown {
+  position: relative;
+  /* Add some space around the section */
+  padding: 20px;
+}
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 999; /* Ensure it is on top of other content */
+  padding-top: 60px; /* Position from top */
+}
+
+.modal-content {
+  background-color: #ffffff; /* White background */
+  margin: auto;
+  padding: 20px;
+  border-radius: 8px; /* Rounded corners */
+  width: 80%;
+  max-width: 900px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  overflow-x: auto; /* Allow horizontal scroll for wide content */
+}
+
+.modal-content h3 {
+  color: #333;
+  margin-bottom: 15px; /* Space below the title */
+}
+
+.modal-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px; /* Space above table */
+}
+
+.modal-content th, .modal-content td {
+  border: 1px solid #ddd;
+  padding: 8px; /* More padding for clarity */
+  text-align: left;
+}
+
+.modal-content th {
+  background-color: #f4f4f4; /* Lighter header */
+}
+
+.modal-content td {
+  font-size: 14px; /* Slightly larger font for readability */
+}
+
+.modal-content td:nth-child(1), /* Adjust first column (Name) */
+.modal-content td:nth-child(2), /* Adjust second column (Email) */
+.modal-content td:nth-child(3) { /* Adjust third column (Department) */
+  width: 30%; /* Adjust width of columns to ensure readability */
+}
+
+/* Close button (X) in top right corner */
+.close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Responsive modal content */
+@media (max-width: 700px) {
+  .modal-content {
+    width: 90%; /* Full width on small screens */
+    padding: 15px; /* Reduce padding on small screens */
+  }
+
+  .modal-content th, .modal-content td {
+    font-size: 12px; /* Smaller font size for mobile */
+  }
+
+  .modal-content td {
+    white-space: normal; /* Allow wrapping of content */
+  }
+}
+
 
 header h1 {
   margin: 0;
