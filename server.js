@@ -1048,7 +1048,7 @@ app.post("/addSection", async (req, res) => {
 app.post("/saveSectionTechnicianMapping", async (req, res) => {
   try {
     const { bookingId, userId, mapping } = req.body; // mapping is an array of {sectionName, technicians}
-
+    console.log("booking ID "+bookingId +" user ID "+ userId+" "+ sections);
     if (!bookingId || !userId || !Array.isArray(mapping)) {
       return res.status(400).json({ message: "Invalid request data." });
     }
