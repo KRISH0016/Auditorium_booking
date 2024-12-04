@@ -71,20 +71,22 @@
         <button id="print-admin">Print Admin CSV</button>
         <button id="print-technician">Print Technician CSV</button>
       </section>
+      <section class="Tabular-shown">
+        <div id="modal" class="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="modal-title">User Data</h3>
+            <table id="modal-table">
+              <!-- Table will be dynamically added here -->
+            </table>
+          </div>
+        </div>
+      </section>
       <section class="calendar-section">
         <h2>Calendar View</h2>
         <div id="calendar"></div>
       </section>
     </main>
-    <div id="modal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3 id="modal-title">User Data</h3>
-        <table id="modal-table">
-          <!-- Table will be dynamically added here -->
-        </table>
-      </div>
-    </div>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const bookingsTable = document.getElementById("bookings-body");
