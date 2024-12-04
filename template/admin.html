@@ -357,16 +357,103 @@
               showDialog(booking._id, booking.user.name); // Call the showDialog function with the booking ID
             });
 
-            // Add event listener to the Cancel button (optional)
+            // Sample cancelBooking function
+            function cancelBooking(bookingId, reason) {
+              // Implement the API call or server request here
+              console.log(`Booking ID: ${bookingId}, Reason: ${reason}`);
+            }
+
+            // Main functionality
             const cancelButton = row.querySelector(".cancel-button");
             const bookingId = cancelButton.getAttribute("data-booking-id");
+
             cancelButton.addEventListener("click", () => {
-              // Implement cancel functionality if required
-              cancelButton.addEventListener("click", () =>
-                cancelBooking(bookingId)
-              );
-              console.log(`Cancel booking ID: ${booking._id},${bookingId}`);
+              // Open the modal
+              openCancelModal(bookingId);
             });
+
+            function openCancelModal(bookingId) {
+              // Create modal dynamically
+              const modal = document.createElement("div");
+              modal.className = "modal";
+              modal.innerHTML = `
+    <div class="modal-content">
+      <h2>Cancel Booking</h2>
+      <p>Select a reason for cancellation:</p>
+      <form id="cancelForm">
+        <label>
+          <input type="radio" name="reason" value="Reason 1" required>
+          Reason 1
+        </label><br>
+        <label>
+          <input type="radio" name="reason" value="Reason 2">
+          Reason 2
+        </label><br>
+        <label>
+          <input type="radio" name="reason" value="Reason 3">
+          Reason 3
+        </label><br>
+        <label>
+          <input type="radio" name="reason" value="Reason 4">
+          Reason 4
+        </label><br>
+        <label>
+          <input type="radio" name="reason" value="Custom">
+          Other (Specify below)
+        </label><br>
+        <textarea id="customReason" placeholder="Write your reason here..." disabled></textarea>
+        <br>
+        <button type="submit" class="submit-button">Submit</button>
+        <button type="button" class="close-button">Close</button>
+      </form>
+    </div>
+  `;
+              document.body.appendChild(modal);
+
+              // Enable custom reason textarea if "Custom" is selected
+              const form = modal.querySelector("#cancelForm");
+              const customReasonTextarea = form.querySelector("#customReason");
+              form.addEventListener("change", (e) => {
+                if (e.target.name === "reason" && e.target.value === "Custom") {
+                  customReasonTextarea.disabled = false;
+                } else {
+                  customReasonTextarea.disabled = true;
+                }
+              });
+
+              // Handle form submission
+              form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const selectedReason = form.reason.value;
+                const customReason = customReasonTextarea.value.trim();
+                const reasonToSend =
+                  selectedReason === "Custom" ? customReason : selectedReason;
+
+                // Call cancelBooking with the booking ID and selected reason
+                cancelBooking(bookingId, reasonToSend);
+
+                // Close the modal
+                document.body.removeChild(modal);
+              });
+
+              // Handle modal close
+              modal
+                .querySelector(".close-button")
+                .addEventListener("click", () => {
+                  document.body.removeChild(modal);
+                });
+            }
+
+            // Add event listener to the Cancel button (optional)
+            // const cancelButton = row.querySelector(".cancel-button");
+            // const bookingId = cancelButton.getAttribute("data-booking-id");
+            // cancelButton.addEventListener("click", () => {
+            //   // Implement cancel functionality if required
+            //   cancelButton.addEventListener("click", () =>
+            //     cancelBooking(bookingId)
+            //   );
+            //   console.log(`Cancel booking ID: ${booking._id},${bookingId}`);
+            // });
             //       cancelButton.forEach((button) => {
             //   const bookingId = button.getAttribute("data-booking-id");
             //   button.addEventListener("click", () => cancelBooking(bookingId));
@@ -584,318 +671,13 @@
             dialogBox.classList.add("hidden");
           };
         }
-
-        //// LATEST UPDATE IS BELOW
-        // async function showDialog(bookingId, userId) {
-        //   const dialogBox = document.getElementById("dialogBox");
-        //   dialogBox.classList.remove("hidden");
-
-        //   const sectionsContainer =
-        //     document.getElementById("sectionsContainer");
-        //   sectionsContainer.innerHTML = ""; // Clear previous content
-
-        //   let techniciansList = [];
-        //   let sectionsData = [];
-
-        //   // Fetch existing technicians and sections from the server
-        //   async function fetchTechniciansAndSections() {
-        //     try {
-        //       const response = await fetch("/getSectionTechnician"); // Replace with your actual API endpoint
-        //       const data = await response.json();
-
-        //       techniciansList = data.technicians || [];
-        //       sectionsData = data.sections || [];
-        //       console.log(data);
-        //     } catch (error) {
-        //       console.error("Error fetching data:", error);
-        //     }
-        //   }
-
-        //   // Save a new technician to the server
-        //   async function saveTechnician(technician) {
-        //     console.log("Request Body Tech:", technician);
-        //     try {
-        //       const response = await fetch("/addTechnician", {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify(technician),
-        //       });
-
-        //       if (!response.ok) {
-        //         throw new Error("Failed to save technician.");
-        //       }
-        //       const data = await response.json();
-        //       return data.technician;
-        //     } catch (error) {
-        //       console.error(error);
-        //       alert("Error saving technician.");
-        //       return null;
-        //     }
-        //   }
-
-        //   // Save a new section to the server
-        //   async function saveSection(section) {
-        //     console.log("Request Body section:", section);
-        //     try {
-        //       const response = await fetch("/addSection", {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify(section),
-        //       });
-
-        //       if (!response.ok) {
-        //         throw new Error("Failed to save section.");
-        //       }
-        //       const data = await response.json();
-        //       return data.section;
-        //     } catch (error) {
-        //       console.error(error);
-        //       alert("Error saving section.");
-        //       return null;
-        //     }
-        //   }
-
-        //   // Function to render a section with its associated technicians
-        //   async function renderSection(section) {
-        //     const sectionDiv = document.createElement("div");
-        //     sectionDiv.classList.add("section");
-
-        //     const sectionHeader = document.createElement("h4");
-        //     sectionHeader.textContent = section.name;
-
-        //     const subsectionsContainer = document.createElement("div");
-        //     subsectionsContainer.classList.add("subsections-container");
-
-        //     // Render existing technicians for this section
-        //     section.technicians.forEach((technician) => {
-        //       addSubsection(technician.name, subsectionsContainer);
-        //     });
-
-        //     const addSubsectionBtn = document.createElement("button");
-        //     addSubsectionBtn.textContent = "Add Technician";
-        //     addSubsectionBtn.classList.add("add-subsection-btn");
-        //     addSubsectionBtn.onclick = () =>
-        //       addSubsection("", subsectionsContainer);
-
-        //     const removeSectionBtn = document.createElement("button");
-        //     removeSectionBtn.textContent = "Remove Section";
-        //     removeSectionBtn.classList.add("remove-section-btn");
-        //     removeSectionBtn.onclick = () => sectionDiv.remove();
-
-        //     sectionDiv.appendChild(sectionHeader);
-        //     sectionDiv.appendChild(subsectionsContainer);
-        //     sectionDiv.appendChild(addSubsectionBtn);
-        //     sectionDiv.appendChild(removeSectionBtn);
-
-        //     sectionsContainer.appendChild(sectionDiv);
-        //   }
-
-        //   // Function to add a subsection
-        //   async function addSubsection(selectedTechnician, container) {
-        //     const subsectionDiv = document.createElement("div");
-        //     subsectionDiv.classList.add("subsection");
-
-        //     const select = document.createElement("select");
-        //     const defaultOption = document.createElement("option");
-        //     defaultOption.value = "";
-        //     defaultOption.textContent = "Choose Technician";
-        //     defaultOption.disabled = true;
-        //     defaultOption.selected = !selectedTechnician;
-
-        //     select.appendChild(defaultOption);
-
-        //     techniciansList.forEach((technician) => {
-        //       const option = document.createElement("option");
-        //       option.value = technician.name;
-        //       option.textContent = technician.name;
-        //       if (technician.name === selectedTechnician) {
-        //         option.selected = true;
-        //       }
-        //       select.appendChild(option);
-        //     });
-
-        //     const removeSubsectionBtn = document.createElement("button");
-        //     removeSubsectionBtn.textContent = "Remove";
-        //     removeSubsectionBtn.classList.add("remove-subsection-btn");
-        //     removeSubsectionBtn.onclick = () => subsectionDiv.remove();
-
-        //     subsectionDiv.appendChild(select);
-        //     subsectionDiv.appendChild(removeSubsectionBtn);
-        //     container.appendChild(subsectionDiv);
-        //   }
-
-        //   // Initialize dialog with fetched data
-        //   await fetchTechniciansAndSections();
-
-        //   // Render default sections with technicians
-        //   sectionsData.forEach((section) => renderSection(section));
-
-        //   // Add new section handler
-        //   document.getElementById("addSectionBtn").onclick = async () => {
-        //     const sectionName = prompt("Enter Section Name:");
-        //     if (!sectionName) {
-        //       alert("Section name is required.");
-        //       return;
-        //     }
-
-        //     const existingSection = sectionsData.find(
-        //       (sec) => sec.name === sectionName
-        //     );
-        //     if (existingSection) {
-        //       alert("This section already exists.");
-        //       return;
-        //     }
-
-        //     const newSection = await saveSection({ name: sectionName });
-        //     if (newSection) {
-        //       sectionsData.push(newSection);
-        //       renderSection(newSection);
-        //     }
-        //   };
-
-        //   // Save and Cancel handlers
-        //   document.getElementById("saveBtn").onclick = async () => {
-        //     const sectionData = Array.from(
-        //       sectionsContainer.getElementsByClassName("section")
-        //     ).map((section) => {
-        //       const sectionName = section.querySelector("h4").textContent;
-        //       const technicians = Array.from(
-        //         section.getElementsByClassName("subsection")
-        //       ).map((subsection) => subsection.querySelector("select").value);
-
-        //       return { sectionName, technicians };
-        //     });
-
-        //     // Save updated data to the server (you can implement this part)
-        //     console.log("Saving sections and technicians:", sectionData);
-
-        //     dialogBox.classList.add("hidden");
-        //   };
-
-        //   document.getElementById("cancelBtn").onclick = () => {
-        //     dialogBox.classList.add("hidden");
-        //   };
-        // }
-
-        // function showDialog(bookingId) {
-        //   const dialogBox = document.getElementById("dialogBox");
-        //   dialogBox.classList.remove("hidden");
-
-        //   const sectionsContainer =
-        //     document.getElementById("sectionsContainer");
-        //   sectionsContainer.innerHTML = ""; // Clear previous content
-
-        //   // Predefined technician options
-        //   const techniciansList = [
-        //     "John Doe",
-        //     "Jane Smith",
-        //     "Alex Johnson",
-        //     "Emily Davis",
-        //     "Chris Brown",
-        //   ];
-
-        //   // Function to add a new section
-        //   function addSection(sectionName = "") {
-        //     const sectionDiv = document.createElement("div");
-        //     sectionDiv.classList.add("section");
-
-        //     const sectionHeader = document.createElement("h4");
-        //     sectionHeader.textContent = sectionName || "New Section";
-
-        //     const subsectionsContainer = document.createElement("div");
-        //     subsectionsContainer.classList.add("subsections-container");
-
-        //     // Function to add a subsection
-        //     function addSubsection(selectedTechnician = "") {
-        //       const subsectionDiv = document.createElement("div");
-        //       subsectionDiv.classList.add("subsection");
-
-        //       const select = document.createElement("select");
-        //       const defaultOption = document.createElement("option");
-        //       defaultOption.value = "";
-        //       defaultOption.textContent = "Choose Technician";
-        //       defaultOption.disabled = true;
-        //       defaultOption.selected = !selectedTechnician;
-
-        //       select.appendChild(defaultOption);
-
-        //       techniciansList.forEach((technician) => {
-        //         const option = document.createElement("option");
-        //         option.value = technician;
-        //         option.textContent = technician;
-        //         if (technician === selectedTechnician) {
-        //           option.selected = true;
-        //         }
-        //         select.appendChild(option);
-        //       });
-
-        //       const removeSubsectionBtn = document.createElement("button");
-        //       removeSubsectionBtn.textContent = "Remove";
-        //       removeSubsectionBtn.classList.add("remove-subsection-btn");
-        //       removeSubsectionBtn.onclick = () => subsectionDiv.remove();
-
-        //       subsectionDiv.appendChild(select);
-        //       subsectionDiv.appendChild(removeSubsectionBtn);
-        //       subsectionsContainer.appendChild(subsectionDiv);
-        //     }
-
-        //     // Add a default subsection
-        //     addSubsection();
-
-        //     const addSubsectionBtn = document.createElement("button");
-        //     addSubsectionBtn.textContent = "Add Technician";
-        //     addSubsectionBtn.classList.add("add-subsection-btn");
-        //     addSubsectionBtn.onclick = () => addSubsection();
-
-        //     const removeSectionBtn = document.createElement("button");
-        //     removeSectionBtn.textContent = "Remove Section";
-        //     removeSectionBtn.classList.add("remove-section-btn");
-        //     removeSectionBtn.onclick = () => sectionDiv.remove();
-
-        //     sectionDiv.appendChild(sectionHeader);
-        //     sectionDiv.appendChild(subsectionsContainer);
-        //     sectionDiv.appendChild(addSubsectionBtn);
-        //     sectionDiv.appendChild(removeSectionBtn);
-
-        //     sectionsContainer.appendChild(sectionDiv);
-        //   }
-
-        //   // Add default sections
-        //   addSection("Camera");
-        //   addSection("Video");
-
-        //   // Add new section handler
-        //   document.getElementById("addSectionBtn").onclick = () => addSection();
-
-        //   // Save and Cancel handlers
-        //   document.getElementById("saveBtn").onclick = () => {
-        //     const sectionData = Array.from(
-        //       sectionsContainer.getElementsByClassName("section")
-        //     ).map((section) => {
-        //       const sectionName = section.querySelector("h4").textContent;
-        //       const technicians = Array.from(
-        //         section.getElementsByClassName("subsection")
-        //       ).map((subsection) => subsection.querySelector("select").value);
-
-        //       return { sectionName, technicians };
-        //     });
-
-        //     dialogBox.classList.add("hidden");
-        //     approveBooking(bookingId, sectionData); // Pass structured data to approveBooking
-        //   };
-
-        //   document.getElementById("cancelBtn").onclick = () => {
-        //     dialogBox.classList.add("hidden");
-        //   };
-        // }
-
         // Updated `approveBooking` Function
         function approveBooking(bookingId) {
           fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              bookingId: bookingId, 
+              bookingId: bookingId,
             }),
           })
             .then((response) => {
@@ -914,12 +696,39 @@
             });
         }
 
+        // // Cancel a booking
+        // function cancelBooking(bookingId, reasonToSend) {
+        //   fetch("https://auditorium-booking-i34f.onrender.com/admin/cancel", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ bookingId: bookingId }),
+        //   })
+        //     .then((response) => response.json())
+        //     .then((response) => {
+        //       console.log(response);
+        //       if (response.success) {
+        //         console.log("Booking canceled successfully");
+        //         showMessage("Booking canceled successfully", "success");
+        //       } else {
+        //         console.error("Failed to cancel booking");
+        //         showMessage("Failed to cancel booking", "error");
+        //       }
+        //       return fetchBookings().then(displayBookings);
+        //     })
+        //     .catch((error) => {
+        //       console.error("Error canceling booking:", error);
+        //       showMessage("Error canceling booking", "error");
+        //     });
+        // }
         // Cancel a booking
-        function cancelBooking(bookingId) {
+        function cancelBooking(bookingId, reasonToSend) {
           fetch("https://auditorium-booking-i34f.onrender.com/admin/cancel", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ bookingId: bookingId }),
+            body: JSON.stringify({
+              bookingId: bookingId,
+              reason: reasonToSend,
+            }), // Pass reason as well
           })
             .then((response) => response.json())
             .then((response) => {

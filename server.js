@@ -77,10 +77,9 @@ const sectionTechnicianSchema = new mongoose.Schema({
   },
   sectionName: { type: String, required: true },
   technicianNames: { type: [String], required: true }, // Changed to an array of strings
-  userId:  { type: String, required: true },
+  userId: { type: String, required: true },
   //userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 });
-
 
 const SectionTechnician = mongoose.model(
   "SectionTechnician",
@@ -561,165 +560,9 @@ app.post("/admin/approve", async (req, res) => {
   });
 });
 
-// // Admin approval route
-// app.post("/admin/approve", async (req, res) => {
-//   console.log("Approval request");
-//   const { bookingId } = req.body;
-//   console.log("Booking id received: " + bookingId);
-//   const booking = await Booking.findById(bookingId);
-
-//   if (!booking) {
-//     return res
-//       .status(404)
-//       .json({ success: false, message: "Booking not found." });
-//   }
-
-//   // Update booking status to approved
-//   booking.status = "Approved";
-//   await booking.save();
-
-//   // Send approval email to user
-//   const user = await User.findById(booking.user);
-//   const transporter = nodemailer.createTransport({
-//     service: "gmail",
-//     auth: {
-//       user: process.env.EMAIL_USER,
-//       pass: process.env.EMAIL_PASS,
-//     },
-//   });
-
-//   const mailOptionsUser = {
-//     from: process.env.EMAIL_USER,
-//     to: user.email,
-//     subject: "Booking Approved",
-//     text: `Your booking for the auditorium on ${booking.date} has been approved.`,
-//   };
-
-//   await transporter.sendMail(mailOptionsUser);
-
-//   // Prepare emails for cleaning team, powerhouse, and audio technician
-//   const cleaningTeamEmail = process.env.CLEANING_TEAM_EMAIL;
-//   const powerhouseEmail = process.env.POWERHOUSE_EMAIL;
-//   const audioTechnicianEmail = process.env.AUDIO_TECHNICIAN_EMAIL;
-
-//   const amenitiesList =
-//     booking.amenities.length > 0
-//       ? `Amenities: ${booking.amenities.join(", ")}`
-//       : "No amenities selected.";
-//   const userName = user.name; // Get user name
-//   const userDept = user.dept; // Get user department
-
-//   const formattedDate = new Date(booking.date).toLocaleDateString("en-IN", {
-//     year: "numeric",
-//     month: "long",
-//     day: "numeric",
-//   });
-//   // const BookingDetailMessage = `
-//   // Booking Details:
-//   // Date: ${formattedDate}
-//   // Auditorium: ${
-//   //   booking.auditorium === "auditorium1" ? "KS" :
-//   //   booking.auditorium === "auditorium2" ? "KK" :
-//   //   "Open Air Audi"
-//   // }
-//   // Session: ${booking.slot === "morning" ? "FN" : "AN"}
-//   // Event Name: ${booking.events_name}
-//   // Name: ${user.name}
-//   // Dept: ${user.dept}
-//   // Phone No: ${user.phone}`;
-//   const BookingDetailMessage = `
-//   Booking Details:
-//   Date: ${formattedDate}
-//   Auditorium: ${
-//     booking.auditorium === "auditorium1"
-//       ? "KS"
-//       : booking.auditorium === "auditorium2"
-//       ? "KK"
-//       : booking.auditorium === "auditorium3"
-//       ? "Open Air Auditorium"
-//       : booking.auditorium === "auditorium4"
-//       ? "Main Ground"
-//       : booking.auditorium === "auditorium5"
-//       ? "Indoor Stadium"
-//       : booking.auditorium === "auditorium6"
-//       ? "CSE Seminar Hall"
-//       : booking.auditorium === "auditorium7"
-//       ? "IT Seminar Hall"
-//       : booking.auditorium === "auditorium8"
-//       ? "ECE Seminar Hall"
-//       : booking.auditorium === "auditorium9"
-//       ? "EEE Seminar Hall"
-//       : booking.auditorium === "auditorium10"
-//       ? "Mechanical Seminar Hall"
-//       : booking.auditorium === "auditorium11"
-//       ? "Civil Seminar Hall"
-//       : booking.auditorium === "auditorium12"
-//       ? "Architecture Seminar Hall"
-//       : "Unknown Auditorium"
-//   }
-//   Start Time: ${booking.start}
-//   End Time: ${booking.end}
-//   Event Name: ${booking.events_name}
-//   Name: ${user.name}
-//   Dept: ${user.dept}
-//   Phone No: ${user.phone}`;
-
-//   const mailOptionsCleaning = {
-//     from: process.env.EMAIL_USER,
-//     to: cleaningTeamEmail,
-//     subject: "New Booking Approved",
-//     text: `A new booking has been approved for ${booking.date} by ${userName} from the ${userDept} department. Please prepare the cleaning accordingly. For further info contact ${user.phone}.\n\n${BookingDetailMessage}`,
-//   };
-
-//   const mailOptionsPowerhouse = {
-//     from: process.env.EMAIL_USER,
-//     to: powerhouseEmail,
-//     subject: "New Booking Approved",
-//     text: `A new booking has been approved for ${booking.date} by ${userName} from the ${userDept} department. Please ensure power setup is ready. For further info contact ${user.phone}.\n\n${BookingDetailMessage}`,
-//   };
-
-//   const mailOptionsAudioTechnician = {
-//     from: process.env.EMAIL_USER,
-//     to: audioTechnicianEmail,
-//     subject: "New Booking Approved",
-//     text: `A new booking has been approved for ${booking.date} by ${userName} from the ${userDept} department. For further info contact ${user.phone}. ${amenitiesList}.\n\n${BookingDetailMessage}`,
-//   };
-
-//   // Send emails to the cleaning team, powerhouse, and audio technician
-//   await transporter.sendMail(mailOptionsCleaning);
-//   await transporter.sendMail(mailOptionsPowerhouse);
-//   await transporter.sendMail(mailOptionsAudioTechnician);
-
-//   res
-//     .status(200)
-//     .json({ success: true, message: "Booking approved and emails sent." });
-// });
-
 const dotenv = require("dotenv");
 const { CallTracker } = require("assert");
 dotenv.config();
-
-// app.post("/admin/login", async (req, res) => {
-//   const { email, password } = req.body;
-
-//   // Check credentials against environment variables
-//   if (
-//     email === process.env.ADMIN_EMAIL &&
-//     password === process.env.ADMIN_PASSWORD
-//   ) {
-//     // If credentials match, send a success response
-//     // const token = createToken(user._id);
-//     return res
-//       .status(200)
-//       .json({ success: true, message: "Login successful." });
-//   }
-
-//   // If credentials don't match, send an error response
-//   return res
-//     .status(401)
-//     .json({ success: false, message: "Invalid credentials." });
-// });
-
 
 app.post("/slotcheck", async (req, res) => {
   const { start, end, userId, date, slotdetails } = req.body;
@@ -811,138 +654,6 @@ app.post("/slot", async (req, res) => {
   }
 });
 
-// app.post("/slot", async (req, res) => {
-//   const { start, end, userId, date } = req.body;
-//   const startTime = new Date(start);
-//   const endTime = new Date(end);
-
-//   try {
-//     const existingBooking = await Booking.findOne({
-//       date: date,
-//       $or: [{ start: { $lte: endTime }, end: { $gte: startTime } }],
-//     });
-
-//     if (existingBooking) {
-//       if (existingBooking.status === "approved") {
-//         return res.status(200).send({
-//           message:
-//             "Slot is already booked and approved. Your booking is pending admin approval.",
-//         });
-//       } else {
-//         return res.status(200).send({
-//           message: "Slot is already booked but waiting for admin approval.",
-//         });
-//       }
-//     }
-
-//     const newBooking = new Booking({
-//       start,
-//       end,
-//       user: userId,
-//       date,
-//       status: "pending",
-//     });
-//     await newBooking.save();
-//     res.status(201).send({
-//       message: "Booking created successfully. Waiting for admin approval.",
-//       booking: newBooking,
-//     });
-//   } catch (err) {
-//     res
-//       .status(500)
-//       .send({ error: "An error occurred while processing your request." });
-//   }
-// });
-
-// const express = require("express");
-// const router = express.Router();
-// const Technician = require("./models/technician");
-// const Section = require("./models/section");
-// const SectionTechnician = require("./models/sectionTechnician");
-
-// // Add a new technician
-// app.post("/addTechnician", async (req, res) => {
-//   try {
-//     const { name, email, phone } = req.body;
-
-//     if (!name || !email) {
-//       return res.status(400).json({ message: "Name and Email are required." });
-//     }
-
-//     const technician = new Technician({ name, email, phone });
-//     await technician.save();
-
-//     res.status(201).json({ message: "Technician added successfully.", technician });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
-
-// // Add a new section
-// app.post("/addSection", async (req, res) => {
-//   try {
-//     const { name, description, technicians } = req.body;
-
-//     if (!name) {
-//       return res.status(400).json({ message: "Section name is required." });
-//     }
-
-//     const section = new Section({ name, description, technicians });
-//     await section.save();
-
-//     res.status(201).json({ message: "Section added successfully.", section });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
-
-// // Add a new Section-Technician mapping for a booking
-// app.post("/addSectionTechnician", async (req, res) => {
-//   try {
-//     const { bookingId, sectionName, technicianName, userId } = req.body;
-
-//     if (!bookingId || !sectionName || !technicianName || !userId) {
-//       return res.status(400).json({ message: "All fields are required." });
-//     }
-
-//     const sectionTechnician = new SectionTechnician({
-//       bookingId,
-//       sectionName,
-//       technicianName,
-//       userId,
-//     });
-
-//     await sectionTechnician.save();
-
-//     res.status(201).json({ message: "Section-Technician mapping saved successfully." });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
-
-// //module.exports = router;
-
-// // API for creating a technician
-
-// // Fetch all technicians from the database
-// app.get("/technicians", (req, res) => {
-//   Technician.find()
-//     .then((technicians) => res.json(technicians))
-//     .catch((err) => res.status(400).json({ error: err.message }));
-// });
-// app.get("/addSectionTechnician", (req,res) =>{
-//   Section.find()
-//     .then((sections) => res.json(sections))
-//     .catch((err) => res.status(400).json({ error: err.message }));
-// });
-
-// Schema definitions
-
-// Endpoints
-
 // Add a new technician
 app.post("/addTechnician", async (req, res) => {
   try {
@@ -1024,7 +735,6 @@ app.post("/addSection", async (req, res) => {
 
 // Add a new Section-Technician mapping for a booking
 
-
 app.post("/saveSectionTechnicianMapping", async (req, res) => {
   try {
     const { bookingId, userId, mapping } = req.body;
@@ -1051,7 +761,6 @@ app.post("/saveSectionTechnicianMapping", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
 
 app.post("/addSectionTechnician", async (req, res) => {
   try {
@@ -1229,60 +938,117 @@ app.post("/cancel", requireAuth, async (req, res) => {
 });
 
 // Admin cancellation route
+// app.post("/admin/cancel", async (req, res) => {
+//   const { bookingId } = req.body;
+
+//   const booking = await Booking.findById(bookingId);
+
+//   if (!booking) {
+//     return res
+//       .status(404)
+//       .json({ success: false, message: "Booking not found." });
+//   }
+
+//   // Remove booking from database
+//   await Booking.deleteOne({ _id: bookingId })
+//     .then(async (output) => {
+//       await User.findById(booking.user)
+//         .then(async (user) => {
+//           const transporter = nodemailer.createTransport({
+//             service: "gmail",
+//             auth: {
+//               user: process.env.EMAIL_USER,
+//               pass: process.env.EMAIL_PASS,
+//             },
+//           });
+
+//           console.log(user.email, process.env.EMAIL_USER);
+
+//           const mailOptions = {
+//             from: process.env.EMAIL_USER,
+//             to: user.email,
+//             subject: "Booking Cancelled",
+//             text: `Your booking for the auditorium on ${booking.date} has been cancelled.`,
+//           };
+
+//           await transporter.sendMail(mailOptions);
+
+//           res.status(200).json({
+//             success: true,
+//             message: "Booking cancelled and email sent.",
+//           });
+//         })
+//         .catch((err) => {
+//           console.log("Inner error", err);
+//           res
+//             .status(500)
+//             .json({ success: false, message: "Internal server error" });
+//         });
+//     })
+//     .catch((err) => {
+//       console.log("Outer error", err);
+//       res
+//         .status(500)
+//         .json({ success: false, message: "Internal server error" });
+//     });
+// });
 app.post("/admin/cancel", async (req, res) => {
-  const { bookingId } = req.body;
+  const { bookingId, reason } = req.body;
 
-  const booking = await Booking.findById(bookingId);
+  try {
+    const booking = await Booking.findById(bookingId);
 
-  if (!booking) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Booking not found." });
-  }
+    if (!booking) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Booking not found." });
+    }
 
-  // Remove booking from database
-  await Booking.deleteOne({ _id: bookingId })
-    .then(async (output) => {
-      await User.findById(booking.user)
-        .then(async (user) => {
-          const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS,
-            },
-          });
+    // Log or save the cancellation reason (optional)
+    console.log(`Cancellation Reason: ${reason}`);
 
-          console.log(user.email, process.env.EMAIL_USER);
+    // Remove booking from the database
+    await Booking.deleteOne({ _id: bookingId });
 
-          const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: user.email,
-            subject: "Booking Cancelled",
-            text: `Your booking for the auditorium on ${booking.date} has been cancelled.`,
-          };
+    // Find the user associated with the booking
+    const user = await User.findById(booking.user);
 
-          await transporter.sendMail(mailOptions);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
+    }
 
-          res.status(200).json({
-            success: true,
-            message: "Booking cancelled and email sent.",
-          });
-        })
-        .catch((err) => {
-          console.log("Inner error", err);
-          res
-            .status(500)
-            .json({ success: false, message: "Internal server error" });
-        });
-    })
-    .catch((err) => {
-      console.log("Outer error", err);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+    // Set up email transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
     });
+
+    // Send email notification
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Booking Cancelled",
+      text: `Your booking for the auditorium on ${booking.date} has been cancelled.\nReason: ${reason}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    // Send success response
+    res.status(200).json({
+      success: true,
+      message: "Booking cancelled and email sent.",
+    });
+  } catch (err) {
+    console.error("Error processing cancellation:", err);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
 });
+
 app.get("/admin-login", async (req, res) => {
   res.sendFile(path.join(__dirname, "template/admin-login.html"));
 });
@@ -1301,7 +1067,6 @@ app.get("/adminlogin", (req, res) => {
 app.get("/adminotp", (req, res) => {
   res.sendFile(path.join(__dirname, "template/adminotp.html"));
 });
-
 
 // MongoDB Schema for Admin
 const adminSchema = new mongoose.Schema({
@@ -1415,8 +1180,6 @@ app.post("/admin/register", async (req, res) => {
   }
 });
 
-
-
 // Admin Login Route
 app.post("/admin/login", async (req, res) => {
   const { email, password } = req.body;
@@ -1506,14 +1269,12 @@ app.get("/getTechnicianWorkDetails", async (req, res) => {
     const works = await SectionTechnician.find({
       technicianNames: { $in: technicianNames },
     });
-    console.log(works);  // This should show the section and technician works
-
+    console.log(works); // This should show the section and technician works
 
     // Create a map for fetching bookings
     const bookingIds = works.map((work) => work.bookingId);
     const bookings = await Booking.find({ _id: { $in: bookingIds } });
-    console.log(bookings);  // This should show the bookings related to the technicians
-
+    console.log(bookings); // This should show the bookings related to the technicians
 
     // Combine data
     const technicianWorkDetails = works.map((work) => {
@@ -1528,8 +1289,7 @@ app.get("/getTechnicianWorkDetails", async (req, res) => {
         EndTime: booking ? booking.end : "N/A",
       };
     });
-    console.log(technicianWorkDetails);  // This should display the final array of technician work details
-
+    console.log(technicianWorkDetails); // This should display the final array of technician work details
 
     res.status(200).json({ success: true, data: technicianWorkDetails });
   } catch (error) {
@@ -1537,7 +1297,6 @@ app.get("/getTechnicianWorkDetails", async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
-
 
 // Start server
 app.listen(3000, () => {
