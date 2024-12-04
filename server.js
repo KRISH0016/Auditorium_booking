@@ -1614,8 +1614,8 @@ app.get("/getTechnicianWorkDetails", async (req, res) => {
         sectionName: work.sectionName,
         technicianNames: work.technicianNames,
         bookingDate: booking ? booking.date : "N/A",
-        startTime: booking ? booking.startTime : "N/A",
-        endTime: booking ? booking.endTime : "N/A",
+        startTime: booking ? booking.start : "N/A",
+        endTime: booking ? booking.end : "N/A",
       };
     });
     console.log(technicianWorkDetails);  // This should display the final array of technician work details
