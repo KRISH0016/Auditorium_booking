@@ -105,6 +105,29 @@ header {
 #print-user:hover{
   background-color: #45a049; /* Darker green on hover */
 }
+
+dialog {
+  display: none;
+  width: 400px;
+  max-width: 90%;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: white;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+}
+
+button.close-button {
+  background-color: #ff6347;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
 /* Modal inside Section (Tabular-shown) */
 .Tabular-shown {
   position: relative;
