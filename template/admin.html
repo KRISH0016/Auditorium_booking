@@ -1223,7 +1223,7 @@
         const data = await response.json();
         console.log(data.users);
         if (data.success) {
-          showModal("User Data", ["Name", "Email", "Department", "Phone"], data.users);
+          showModal("User Data", ["Name", "Email", "Dept", "Phone"], data.users);
         } else {
           alert("Failed to fetch user details.");
         }
@@ -1239,7 +1239,7 @@
         const data = await response.json();
         console.log(data);
         if (data.success) {
-          showModal("Admin Data", ["Name", "Email", "department"], data.admins);
+          showModal("Admin Data", ["Name", "Email", "Department"], data.admins);
         } else {
           alert("Failed to fetch admin details.");
         }
