@@ -1221,6 +1221,7 @@
       try {
         const response = await fetch("/getUsers");
         const data = await response.json();
+        console.log(data);
         if (data.success) {
           showModal("User Data", ["Name", "Email", "Department", "Phone"], data.users);
         } else {
@@ -1236,8 +1237,9 @@
       try {
         const response = await fetch("/getAdmins");
         const data = await response.json();
+        console.log(data);
         if (data.success) {
-          showModal("Admin Data", ["Name", "Email", "Role"], data.admins);
+          showModal("Admin Data", ["Name", "Email", "Phone No"], data.admins);
         } else {
           alert("Failed to fetch admin details.");
         }
@@ -1251,6 +1253,7 @@
       try {
         const response = await fetch("/getTechnicianWorkDetails");
         const data = await response.json();
+        console.log(data);
         if (data.success) {
           showModal("Technician Data", ["Name", "Email"], data.technicians);
         } else {
