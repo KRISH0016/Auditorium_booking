@@ -1169,100 +1169,119 @@
           }
 
           function showModal(title, columns, data) {
-      const modal = document.getElementById("modal");
-      const modalTitle = document.getElementById("modal-title");
-      const modalTable = document.getElementById("modal-table");
+            const modal = document.getElementById("modal");
+            const modalTitle = document.getElementById("modal-title");
+            const modalTable = document.getElementById("modal-table");
 
-      // Set modal title
-      modalTitle.textContent = title;
+            // Set modal title
+            modalTitle.textContent = title;
 
-      // Clear existing table content
-      modalTable.innerHTML = "";
+            // Clear existing table content
+            modalTable.innerHTML = "";
 
-      // Create table headers
-      const headerRow = document.createElement("tr");
-      columns.forEach((col) => {
-        const th = document.createElement("th");
-        th.textContent = col;
-        headerRow.appendChild(th);
-      });
-      modalTable.appendChild(headerRow);
+            // Create table headers
+            const headerRow = document.createElement("tr");
+            columns.forEach((col) => {
+              const th = document.createElement("th");
+              th.textContent = col;
+              headerRow.appendChild(th);
+            });
+            modalTable.appendChild(headerRow);
 
-      // Create table rows for data
-      data.forEach((item) => {
-        const row = document.createElement("tr");
-        columns.forEach((col) => {
-          const td = document.createElement("td");
-          td.textContent = item[col.toLowerCase()];
-          row.appendChild(td);
-        });
-        modalTable.appendChild(row);
-      });
+            // Create table rows for data
+            data.forEach((item) => {
+              const row = document.createElement("tr");
+              columns.forEach((col) => {
+                const td = document.createElement("td");
+                td.textContent = item[col.toLowerCase()];
+                row.appendChild(td);
+              });
+              modalTable.appendChild(row);
+            });
 
-      // Display the modal
-      modal.style.display = "block";
-    }
+            // Display the modal
+            modal.style.display = "block";
+          }
 
-    // Close modal when the "x" button is clicked
-    document.querySelector(".close").onclick = function() {
-      document.getElementById("modal").style.display = "none";
-    }
+          // Close modal when the "x" button is clicked
+          document.querySelector(".close").onclick = function () {
+            document.getElementById("modal").style.display = "none";
+          };
 
-    // Close modal if the user clicks outside the modal content
-    window.onclick = function(event) {
-      const modal = document.getElementById("modal");
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    }
+          // Close modal if the user clicks outside the modal content
+          window.onclick = function (event) {
+            const modal = document.getElementById("modal");
+            if (event.target == modal) {
+              modal.style.display = "none";
+            }
+          };
 
-    // Show User Data
-    document.getElementById("show-user").onclick = async () => {
-      try {
-        const response = await fetch("/getUsers");
-        const data = await response.json();
-        console.log(data.users);
-        if (data.success) {
-          showModal("User Data", ["Name", "Email", "Dept", "Phone"], data.users);
-        } else {
-          alert("Failed to fetch user details.");
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
+          // Show User Data
+          document.getElementById("show-user").onclick = async () => {
+            try {
+              const response = await fetch("/getUsers");
+              const data = await response.json();
+              console.log(data.users);
+              if (data.success) {
+                showModal(
+                  "User Data",
+                  ["Name", "Email", "Dept", "Phone"],
+                  data.users
+                );
+              } else {
+                alert("Failed to fetch user details.");
+              }
+            } catch (error) {
+              console.error("Error fetching users:", error);
+            }
+          };
 
-    // Show Admin Data
-    document.getElementById("show-admin").onclick = async () => {
-      try {
-        const response = await fetch("/getAdmins");
-        const data = await response.json();
-        console.log(data);
-        if (data.success) {
-          showModal("Admin Data", ["Name", "Email", "Department"], data.admins);
-        } else {
-          alert("Failed to fetch admin details.");
-        }
-      } catch (error) {
-        console.error("Error fetching admins:", error);
-      }
-    };
+          // Show Admin Data
+          document.getElementById("show-admin").onclick = async () => {
+            try {
+              const response = await fetch("/getAdmins");
+              const data = await response.json();
+              console.log(data);
+              if (data.success) {
+                showModal(
+                  "Admin Data",
+                  ["Name", "Email", "Department"],
+                  data.admins
+                );
+              } else {
+                alert("Failed to fetch admin details.");
+              }
+            } catch (error) {
+              console.error("Error fetching admins:", error);
+            }
+          };
 
-    // Show Technician Data
-    document.getElementById("show-technician").onclick = async () => {
-      try {
-        const response = await fetch("/getTechnicianWorkDetails");
-        const data = await response.json();
-        console.log(data);
-        if (data.success) {
-          showModal("Technician Data", ["Name", "Email"], data.technicians);
-        } else {
-          alert("Failed to fetch technician details.");
-        }
-      } catch (error) {
-        console.error("Error fetching technicians:", error);
-      }
-    };
+          // Show Technician Data
+          document.getElementById("show-technician").onclick = async () => {
+            try {
+              const response = await fetch("/getTechnicianWorkDetails");
+              const data = await response.json();
+              console.log(data);
+
+              if (data.success) {
+                showModal(
+                  "Technician Data",
+                  [
+                    "Section Name",
+                    "Technician Names",
+                    "Booking Date",
+                    "Start Time",
+                    "End Time",
+                  ],
+                  data.data
+                ); // Use data.data instead of data.technicians
+              } else {
+                alert("Failed to fetch technician details.");
+              }
+            } catch (error) {
+              console.error("Error fetching technicians:", error);
+            }
+          };
 
           // Print User CSV
           document.getElementById("print-user").onclick = async () => {
