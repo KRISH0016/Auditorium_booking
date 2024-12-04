@@ -497,7 +497,7 @@
             }
 
             const existingSection = sectionsData.find(
-              (sec) => sec.name === sectionName
+              (sec) => sec.sectionName === sectionName
             );
             if (existingSection) {
               alert("This section already exists.");
@@ -507,7 +507,7 @@
             const newSection = await saveSection({ name: sectionName });
             if (newSection) {
               sectionsData.push(newSection);
-              renderSection(newSection);
+              renderSection(sectionsData);
             }
           };
           document.getElementById("saveBtn").onclick = async () => {
