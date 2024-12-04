@@ -337,7 +337,7 @@
 
             const approveButton = row.querySelector(".approve-button");
             approveButton.addEventListener("click", () => {
-              showDialog(booking._id); // Call the showDialog function with the booking ID
+              showDialog(booking._id,booking.user.name); // Call the showDialog function with the booking ID
             });
 
             // Add event listener to the Cancel button (optional)
