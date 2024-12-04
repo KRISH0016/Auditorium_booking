@@ -88,33 +88,37 @@
           <p>Select a reason for cancellation:</p>
           <form id="cancelForm">
             <label>
-              <input type="radio" name="reason" value="Reason 1" required>
-              Reason 1
-            </label><br>
+              <input type="radio" name="reason" value="Reason 1" required />
+              Reason 1 </label
+            ><br />
             <label>
-              <input type="radio" name="reason" value="Reason 2">
-              Reason 2
-            </label><br>
+              <input type="radio" name="reason" value="Reason 2" />
+              Reason 2 </label
+            ><br />
             <label>
-              <input type="radio" name="reason" value="Reason 3">
-              Reason 3
-            </label><br>
+              <input type="radio" name="reason" value="Reason 3" />
+              Reason 3 </label
+            ><br />
             <label>
-              <input type="radio" name="reason" value="Reason 4">
-              Reason 4
-            </label><br>
+              <input type="radio" name="reason" value="Reason 4" />
+              Reason 4 </label
+            ><br />
             <label>
-              <input type="radio" name="reason" value="Custom">
-              Other (Specify below)
-            </label><br>
-            <textarea id="customReason" placeholder="Write your reason here..." disabled></textarea>
-            <br>
+              <input type="radio" name="reason" value="Custom" />
+              Other (Specify below) </label
+            ><br />
+            <textarea
+              id="customReason"
+              placeholder="Write your reason here..."
+              disabled
+            ></textarea>
+            <br />
             <button type="submit" class="submit-button">Submit</button>
             <button type="button" class="close-button">Close</button>
           </form>
         </div>
       </div>
-      
+
       <section class="calendar-section">
         <h2>Calendar View</h2>
         <div id="calendar"></div>
@@ -405,6 +409,46 @@
               openCancelModal(bookingId);
               console.log("Opening Cancel Modal");
             });
+            function openCancelModal(bookingId) {
+              console.log("Opening Cancel Modal");
+
+              const modal = document.getElementById("cancel-modal");
+              modal.classList.remove("hidden"); // Show the modal
+
+              const customReasonTextarea = modal.querySelector("#customReason");
+              const form = modal.querySelector("#cancelForm");
+
+              // Enable custom reason textarea if "Custom" is selected
+              form.addEventListener("change", (e) => {
+                if (e.target.name === "reason" && e.target.value === "Custom") {
+                  customReasonTextarea.disabled = false;
+                } else {
+                  customReasonTextarea.disabled = true;
+                }
+              });
+
+              // Handle form submission
+              form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const selectedReason = form.reason.value;
+                const customReason = customReasonTextarea.value.trim();
+                const reasonToSend =
+                  selectedReason === "Custom" ? customReason : selectedReason;
+
+                // Call cancelBooking with the booking ID and selected reason
+                cancelBooking(bookingId, reasonToSend);
+
+                // Close the modal
+                modal.classList.add("hidden");
+              });
+
+              // Handle close button
+              modal
+                .querySelector(".close-button")
+                .addEventListener("click", () => {
+                  modal.classList.add("hidden");
+                });
+            }
 
             //           function openCancelModal(bookingId) {
             //             // Create modal dynamically
@@ -478,77 +522,77 @@
             //                 document.body.removeChild(modal);
             //               });
             //           }
-            function openCancelModal(bookingId) {
-              console.log("Open Modal called successfully");
-              const modal = document.createElement("div");
-              modal.className = "modal show"; // Add the 'show' class to make it visible
-              modal.innerHTML = `
-    <div class="modal-content">
-      <h2>Cancel Booking</h2>
-      <p>Select a reason for cancellation:</p>
-      <form id="cancelForm">
-        <label>
-          <input type="radio" name="reason" value="Reason 1" required>
-          Reason 1
-        </label><br>
-        <label>
-          <input type="radio" name="reason" value="Reason 2">
-          Reason 2
-        </label><br>
-        <label>
-          <input type="radio" name="reason" value="Reason 3">
-          Reason 3
-        </label><br>
-        <label>
-          <input type="radio" name="reason" value="Reason 4">
-          Reason 4
-        </label><br>
-        <label>
-          <input type="radio" name="reason" value="Custom">
-          Other (Specify below)
-        </label><br>
-        <textarea id="customReason" placeholder="Write your reason here..." disabled></textarea>
-        <br>
-        <button type="submit" class="submit-button">Submit</button>
-        <button type="button" class="close-button">Close</button>
-      </form>
-    </div>
-  `;
-              document.body.appendChild(modal);
+            //           function openCancelModal(bookingId) {
+            //             console.log("Open Modal called successfully");
+            //             const modal = document.createElement("div");
+            //             modal.className = "modal show"; // Add the 'show' class to make it visible
+            //             modal.innerHTML = `
+            //   <div class="modal-content">
+            //     <h2>Cancel Booking</h2>
+            //     <p>Select a reason for cancellation:</p>
+            //     <form id="cancelForm">
+            //       <label>
+            //         <input type="radio" name="reason" value="Reason 1" required>
+            //         Reason 1
+            //       </label><br>
+            //       <label>
+            //         <input type="radio" name="reason" value="Reason 2">
+            //         Reason 2
+            //       </label><br>
+            //       <label>
+            //         <input type="radio" name="reason" value="Reason 3">
+            //         Reason 3
+            //       </label><br>
+            //       <label>
+            //         <input type="radio" name="reason" value="Reason 4">
+            //         Reason 4
+            //       </label><br>
+            //       <label>
+            //         <input type="radio" name="reason" value="Custom">
+            //         Other (Specify below)
+            //       </label><br>
+            //       <textarea id="customReason" placeholder="Write your reason here..." disabled></textarea>
+            //       <br>
+            //       <button type="submit" class="submit-button">Submit</button>
+            //       <button type="button" class="close-button">Close</button>
+            //     </form>
+            //   </div>
+            // `;
+            //             document.body.appendChild(modal);
 
-              // Enable custom reason textarea if "Custom" is selected
-              const form = modal.querySelector("#cancelForm");
-              const customReasonTextarea = form.querySelector("#customReason");
-              form.addEventListener("change", (e) => {
-                if (e.target.name === "reason" && e.target.value === "Custom") {
-                  customReasonTextarea.disabled = false;
-                } else {
-                  customReasonTextarea.disabled = true;
-                }
-              });
+            //             // Enable custom reason textarea if "Custom" is selected
+            //             const form = modal.querySelector("#cancelForm");
+            //             const customReasonTextarea = form.querySelector("#customReason");
+            //             form.addEventListener("change", (e) => {
+            //               if (e.target.name === "reason" && e.target.value === "Custom") {
+            //                 customReasonTextarea.disabled = false;
+            //               } else {
+            //                 customReasonTextarea.disabled = true;
+            //               }
+            //             });
 
-              // Handle form submission
-              form.addEventListener("submit", (e) => {
-                e.preventDefault();
-                const selectedReason = form.reason.value;
-                const customReason = customReasonTextarea.value.trim();
-                const reasonToSend =
-                  selectedReason === "Custom" ? customReason : selectedReason;
+            //             // Handle form submission
+            //             form.addEventListener("submit", (e) => {
+            //               e.preventDefault();
+            //               const selectedReason = form.reason.value;
+            //               const customReason = customReasonTextarea.value.trim();
+            //               const reasonToSend =
+            //                 selectedReason === "Custom" ? customReason : selectedReason;
 
-                // Call cancelBooking with the booking ID and selected reason
-                cancelBooking(bookingId, reasonToSend);
+            //               // Call cancelBooking with the booking ID and selected reason
+            //               cancelBooking(bookingId, reasonToSend);
 
-                // Close the modal
-                document.body.removeChild(modal);
-              });
+            //               // Close the modal
+            //               document.body.removeChild(modal);
+            //             });
 
-              // Handle modal close
-              modal
-                .querySelector(".close-button")
-                .addEventListener("click", () => {
-                  document.body.removeChild(modal);
-                });
-            }
+            //             // Handle modal close
+            //             modal
+            //               .querySelector(".close-button")
+            //               .addEventListener("click", () => {
+            //                 document.body.removeChild(modal);
+            //               });
+            //           }
 
             // Add event listener to the Cancel button (optional)
             // const cancelButton = row.querySelector(".cancel-button");
