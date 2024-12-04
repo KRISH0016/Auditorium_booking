@@ -29,7 +29,7 @@ header {
 #show-admin{
   background-color: #4caf50; /* Green background */
   color: white; /* White text */
-  padding: 30px 15px; /* Padding */
+  padding: 10px 15px; /* Padding */
   border: none; /* No border */
   border-radius: 5px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
@@ -42,7 +42,7 @@ header {
 #show-technician{
   background-color: #4caf50; /* Green background */
   color: white; /* White text */
-  padding: 50px 15px; /* Padding */
+  padding: 10px 15px; /* Padding */
   border: none; /* No border */
   border-radius: 5px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
@@ -52,6 +52,20 @@ header {
 #show-technician:hover{
   background-color: #45a049; /* Darker green on hover */
 }
+#show-user{
+  background-color: #4caf50; /* Green background */
+  color: white; /* White text */
+  padding: 10px 15px; /* Padding */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-bottom: 20px; /* Space below the button */
+  font-size: 16px; /* Font size */
+}
+#show-user:hover{
+  background-color: #45a049; /* Darker green on hover */
+}
+
 
 header h1 {
   margin: 0;

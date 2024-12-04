@@ -65,10 +65,11 @@
         <div id="message-box" class="message-box"></div>
         <button id="print-csv">Print CSV</button>
         <button id="show-user">Show User</button>
-
         <button id="show-admin">Show Admin</button>
-
         <button id="show-technician">Show Technician</button>
+        <button id="print-user">Print User CSV</button>
+        <button id="print-admin">Print Admin CSV</button>
+        <button id="print-technician">Print Technician CSV</button>
       </section>
       <section class="calendar-section">
         <h2>Calendar View</h2>
@@ -942,6 +943,90 @@
           //   button.addEventListener("click", () => cancelBooking(bookingId));
           // });
           // CSV Export button
+          function printCSV(data, headers, filename) {
+            if (!data || data.length === 0) {
+              alert("No data available to print.");
+              return;
+            }
+
+            const csvHeaders = headers.join(",");
+            const csvRows = data.map((row) =>
+              headers
+                .map((header) => {
+                  const key = header.toLowerCase().replace(/ /g, ""); // "Department" -> "dept"
+                  return `"${row[key] || ""}"`; // Handle missing fields gracefully
+                })
+                .join(",")
+            );
+
+            const csvContent = [csvHeaders, ...csvRows].join("\n");
+
+            const blob = new Blob([csvContent], { type: "text/csv" });
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = filename;
+
+            document.body.appendChild(a);
+            a.click();
+
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+          }
+
+          function displayTable(title, headers, data) {
+            const container =
+              document.getElementById("data-display-container") ||
+              document.createElement("div");
+            container.id = "data-display-container";
+            container.innerHTML = ""; // Clear previous content
+
+            const table = document.createElement("table");
+            table.style.borderCollapse = "collapse";
+            table.style.width = "100%";
+            table.style.margin = "20px 0";
+
+            const caption = document.createElement("caption");
+            caption.textContent = title;
+            caption.style.fontSize = "1.5em";
+            caption.style.marginBottom = "10px";
+            table.appendChild(caption);
+
+            const thead = document.createElement("thead");
+            const headerRow = document.createElement("tr");
+            headers.forEach((header) => {
+              const th = document.createElement("th");
+              th.textContent = header;
+              th.style.border = "1px solid #ddd";
+              th.style.padding = "8px";
+              th.style.textAlign = "left";
+              th.style.backgroundColor = "#f4f4f4";
+              headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            const tbody = document.createElement("tbody");
+            data.forEach((row) => {
+              const tr = document.createElement("tr");
+              headers.forEach((header) => {
+                const field = header.toLowerCase().replace(/ /g, ""); // Maps "Department" -> "dept"
+                const td = document.createElement("td");
+                td.textContent = row[field] || "N/A";
+                td.style.border = "1px solid #ddd";
+                td.style.padding = "8px";
+                tr.appendChild(td);
+              });
+              tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+
+            container.appendChild(table);
+            document.body.appendChild(container);
+          }
+
           document.getElementById("show-technician").onclick = async () => {
             try {
               const response = await fetch("/getTechnicianWorkDetails");
@@ -971,12 +1056,14 @@
               const data = await response.json();
 
               if (data.success) {
-                displayTable("Users", ["Name", "Email", "Role"], data.users);
+                const headers = ["Name", "Email", "Department", "Phone No"];
+                displayTable("Users", headers, data.users);
               } else {
                 alert("Failed to fetch user details.");
               }
             } catch (error) {
               console.error("Error fetching users:", error);
+              alert("Error fetching user details.");
             }
           };
 
@@ -986,12 +1073,63 @@
               const data = await response.json();
 
               if (data.success) {
-                displayTable("Admins", ["Name", "Email", "Role"], data.admins);
+                displayTable(
+                  "Admins",
+                  ["Name", "Email", "Department"],
+                  data.admins
+                );
               } else {
                 alert("Failed to fetch admin details.");
               }
             } catch (error) {
               console.error("Error fetching admins:", error);
+            }
+          };
+          document.getElementById("print-user").onclick = async () => {
+            try {
+              const response = await fetch("/getUsers");
+              const data = await response.json();
+
+              if (data.success) {
+                const headers = ["Name", "Email", "Department", "Phone"];
+                printCSV(data.users, headers, "users.csv");
+              } else {
+                alert("Failed to fetch user details for CSV.");
+              }
+            } catch (error) {
+              console.error("Error fetching users for CSV:", error);
+            }
+          };
+
+          document.getElementById("print-admin").onclick = async () => {
+            try {
+              const response = await fetch("/getAdmins");
+              const data = await response.json();
+
+              if (data.success) {
+                const headers = ["Name", "Email", "Role"];
+                printCSV(data.admins, headers, "admins.csv");
+              } else {
+                alert("Failed to fetch admin details for CSV.");
+              }
+            } catch (error) {
+              console.error("Error fetching admins for CSV:", error);
+            }
+          };
+
+          document.getElementById("print-technician").onclick = async () => {
+            try {
+              const response = await fetch("/getTechnicians");
+              const data = await response.json();
+
+              if (data.success) {
+                const headers = ["Name", "Email", "Department", "Phone"];
+                printCSV(data.technicians, headers, "technicians.csv");
+              } else {
+                alert("Failed to fetch technician details for CSV.");
+              }
+            } catch (error) {
+              console.error("Error fetching technicians for CSV:", error);
             }
           };
 
