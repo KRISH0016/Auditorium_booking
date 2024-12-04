@@ -398,7 +398,7 @@ app.get("/admin/bookings", async (req, res) => {
 
 app.post("/admin/approve", async (req, res) => {
   console.log("Approval request");
-  const { bookingId, sectionData } = req.body; // Accept sectionData from frontend
+  const { bookingId } = req.body; // Accept sectionData from frontend
   console.log("Booking id received: " + bookingId);
   const booking = await Booking.findById(bookingId);
 
@@ -415,27 +415,6 @@ app.post("/admin/approve", async (req, res) => {
   // Update booking status to approved
   booking.status = "Approved";
   await booking.save();
-
-  // Save section technician data to SectionTechnician collection
-  const sectionTechnicianPromises = sectionData.map(async (section) => {
-    const { sectionName, technicians } = section;
-
-    // For each technician in the section, create a new SectionTechnician entry
-    const sectionTechnicianEntries = technicians.map((technician) => {
-      return new SectionTechnician({
-        bookingId,
-        sectionName,
-        technicianName: technician,
-        userId: booking.user, // Assuming booking.user is the user object (user ID)
-      }).save();
-    });
-
-    // Wait for all entries in a section to be saved
-    await Promise.all(sectionTechnicianEntries);
-  });
-
-  // Wait for all sections and technicians to be saved
-  await Promise.all(sectionTechnicianPromises);
 
   // Send approval email to user
   const user = await User.findById(booking.user);
@@ -1437,75 +1416,6 @@ app.post("/admin/register", async (req, res) => {
 });
 
 
-// // Admin Registration Route
-// app.post("/admin/register", async (req, res) => {
-//   const {  name, email, password ,department } = req.body;
-
-//   try {
-//     // Check if the email is from the allowed domain
-//     if (!email.endsWith("tce.edu")) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Registration only allowed for tce.edu emails.",
-//       });
-//     }
-
-//     // Check if the admin already exists
-//     const existingAdmin = await Admin.findOne({ email });
-//     if (existingAdmin) {
-//       return res
-//         .status(400)
-//         .json({ success: false, message: "Email already exists." });
-//     }
-
-//     // Hash the password
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     // Create a new admin object
-//     const admin = new Admin({
-//       name,
-//       email,
-//       password: hashedPassword,
-//       department: department,
-      
-//     });
-
-//     // Generate OTP
-//     const otp = crypto.randomInt(100000, 999999).toString();
-//     admin.twoFASecret = otp;
-//     admin.twoFAauthen = false;
-
-//     // Save admin to database
-//     await admin.save();
-
-//     // Configure nodemailer transport using environment variables
-//     const transporter = nodemailer.createTransport({
-//       service: "gmail",
-//       auth: {
-//         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASS,
-//       },
-//     });
-
-//     // Mail options for OTP
-//     const mailOptions = {
-//       from: process.env.EMAIL_USER,
-//       to: email,
-//       subject: "Your OTP Code",
-//       text: `Your OTP code is ${otp}. It is valid for 10 minutes.`,
-//     };
-
-//     // Send OTP email
-//     await transporter.sendMail(mailOptions);
-//     console.log("Sent mail");
-//     //res.redirecturl("https://auditorium-booking-i34f.onrender.com/adminotp");
-//     res.ok;
-//     console.log("Redirecting");
-//   } catch (error) {
-//     console.error("Error during registration: ", error);
-//     res.status(500).json({ message: "Server error during registration." });
-//   }
-// });
 
 // Admin Login Route
 app.post("/admin/login", async (req, res) => {
