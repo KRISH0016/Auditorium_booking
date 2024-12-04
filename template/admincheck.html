@@ -365,8 +365,64 @@
           messageBox.className = `message-box ${type}`;
           setTimeout(() => (messageBox.textContent = ""), 5000); // Clear message after 5 seconds
         }
-
         async function showDialog(bookingId, userId) {
+  const newWindow = window.open("", "_blank", "width=800,height=600,scrollbars=yes");
+
+  // Define the content for the new window
+  newWindow.document.open();
+  newWindow.document.write(`
+    <head>
+      <title>Technician Mapping</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          padding: 0;
+        }
+        #dialogBox {
+          padding: 20px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          background-color: #f9f9f9;
+        }
+        #sectionsContainer {
+          margin-top: 20px;
+          max-height: 400px;
+          overflow-y: auto;
+          border: 1px solid #ddd;
+          padding: 10px;
+        }
+        .section {
+          margin-bottom: 15px;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          background-color: #fff;
+        }
+        .subsections-container {
+          margin-top: 10px;
+        }
+        .remove-subsection-btn,
+        .remove-section-btn,
+        .add-technician-btn {
+          margin-left: 10px;
+        }
+      </style>
+    </head>
+    <body>
+      <div id="dialogBox">
+        <h3>Section Technician Mapping</h3>
+        <div id="sectionsContainer"></div>
+        <button id="addSectionBtn">Add Section</button>
+        <button id="saveBtn">Save</button>
+        <button id="cancelBtn">Cancel</button>
+      </div>
+    </body>
+  `);
+
+  // Append your existing JavaScript code as a <script> element
+  const script = newWindow.document.createElement("script");
+  script.textContent = `async function showDialog(bookingId, userId) {
           const dialogBox = document.getElementById("dialogBox");
           dialogBox.classList.remove("hidden");
 
@@ -505,12 +561,12 @@
             }
 
             const newSection = await saveSection({ name: sectionName });
-           // const newSectionName=sectionName;
+            // const newSectionName=sectionName;
             if (newSection) {
               sectionsData.push(newSection);
               //await fetchTechniciansAndSections();
               console.log(sectionsData.name);
-              console.log("New Section "+ newSection.name);
+              console.log("New Section " + newSection.name);
               //console.log(newSectionName);
               renderSection(newSection.name);
               // Render sections without technicians
@@ -532,7 +588,6 @@
             console.log(
               "Mapping for booking:",
               bookingId,
-              userId,
               sectionTechnicianMapping
             );
 
@@ -565,312 +620,15 @@
           document.getElementById("cancelBtn").onclick = () => {
             dialogBox.classList.add("hidden");
           };
-        }
+        } // Ensure this includes the original dialog functionality
+    showDialog(${JSON.stringify(bookingId)}, ${JSON.stringify(userId)});`;
+  newWindow.document.body.appendChild(script);
 
-        //// LATEST UPDATE IS BELOW
-        // async function showDialog(bookingId, userId) {
-        //   const dialogBox = document.getElementById("dialogBox");
-        //   dialogBox.classList.remove("hidden");
+  newWindow.document.close();
+}
 
-        //   const sectionsContainer =
-        //     document.getElementById("sectionsContainer");
-        //   sectionsContainer.innerHTML = ""; // Clear previous content
 
-        //   let techniciansList = [];
-        //   let sectionsData = [];
-
-        //   // Fetch existing technicians and sections from the server
-        //   async function fetchTechniciansAndSections() {
-        //     try {
-        //       const response = await fetch("/getSectionTechnician"); // Replace with your actual API endpoint
-        //       const data = await response.json();
-
-        //       techniciansList = data.technicians || [];
-        //       sectionsData = data.sections || [];
-        //       console.log(data);
-        //     } catch (error) {
-        //       console.error("Error fetching data:", error);
-        //     }
-        //   }
-
-        //   // Save a new technician to the server
-        //   async function saveTechnician(technician) {
-        //     console.log("Request Body Tech:", technician);
-        //     try {
-        //       const response = await fetch("/addTechnician", {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify(technician),
-        //       });
-
-        //       if (!response.ok) {
-        //         throw new Error("Failed to save technician.");
-        //       }
-        //       const data = await response.json();
-        //       return data.technician;
-        //     } catch (error) {
-        //       console.error(error);
-        //       alert("Error saving technician.");
-        //       return null;
-        //     }
-        //   }
-
-        //   // Save a new section to the server
-        //   async function saveSection(section) {
-        //     console.log("Request Body section:", section);
-        //     try {
-        //       const response = await fetch("/addSection", {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify(section),
-        //       });
-
-        //       if (!response.ok) {
-        //         throw new Error("Failed to save section.");
-        //       }
-        //       const data = await response.json();
-        //       return data.section;
-        //     } catch (error) {
-        //       console.error(error);
-        //       alert("Error saving section.");
-        //       return null;
-        //     }
-        //   }
-
-        //   // Function to render a section with its associated technicians
-        //   async function renderSection(section) {
-        //     const sectionDiv = document.createElement("div");
-        //     sectionDiv.classList.add("section");
-
-        //     const sectionHeader = document.createElement("h4");
-        //     sectionHeader.textContent = section.name;
-
-        //     const subsectionsContainer = document.createElement("div");
-        //     subsectionsContainer.classList.add("subsections-container");
-
-        //     // Render existing technicians for this section
-        //     section.technicians.forEach((technician) => {
-        //       addSubsection(technician.name, subsectionsContainer);
-        //     });
-
-        //     const addSubsectionBtn = document.createElement("button");
-        //     addSubsectionBtn.textContent = "Add Technician";
-        //     addSubsectionBtn.classList.add("add-subsection-btn");
-        //     addSubsectionBtn.onclick = () =>
-        //       addSubsection("", subsectionsContainer);
-
-        //     const removeSectionBtn = document.createElement("button");
-        //     removeSectionBtn.textContent = "Remove Section";
-        //     removeSectionBtn.classList.add("remove-section-btn");
-        //     removeSectionBtn.onclick = () => sectionDiv.remove();
-
-        //     sectionDiv.appendChild(sectionHeader);
-        //     sectionDiv.appendChild(subsectionsContainer);
-        //     sectionDiv.appendChild(addSubsectionBtn);
-        //     sectionDiv.appendChild(removeSectionBtn);
-
-        //     sectionsContainer.appendChild(sectionDiv);
-        //   }
-
-        //   // Function to add a subsection
-        //   async function addSubsection(selectedTechnician, container) {
-        //     const subsectionDiv = document.createElement("div");
-        //     subsectionDiv.classList.add("subsection");
-
-        //     const select = document.createElement("select");
-        //     const defaultOption = document.createElement("option");
-        //     defaultOption.value = "";
-        //     defaultOption.textContent = "Choose Technician";
-        //     defaultOption.disabled = true;
-        //     defaultOption.selected = !selectedTechnician;
-
-        //     select.appendChild(defaultOption);
-
-        //     techniciansList.forEach((technician) => {
-        //       const option = document.createElement("option");
-        //       option.value = technician.name;
-        //       option.textContent = technician.name;
-        //       if (technician.name === selectedTechnician) {
-        //         option.selected = true;
-        //       }
-        //       select.appendChild(option);
-        //     });
-
-        //     const removeSubsectionBtn = document.createElement("button");
-        //     removeSubsectionBtn.textContent = "Remove";
-        //     removeSubsectionBtn.classList.add("remove-subsection-btn");
-        //     removeSubsectionBtn.onclick = () => subsectionDiv.remove();
-
-        //     subsectionDiv.appendChild(select);
-        //     subsectionDiv.appendChild(removeSubsectionBtn);
-        //     container.appendChild(subsectionDiv);
-        //   }
-
-        //   // Initialize dialog with fetched data
-        //   await fetchTechniciansAndSections();
-
-        //   // Render default sections with technicians
-        //   sectionsData.forEach((section) => renderSection(section));
-
-        //   // Add new section handler
-        //   document.getElementById("addSectionBtn").onclick = async () => {
-        //     const sectionName = prompt("Enter Section Name:");
-        //     if (!sectionName) {
-        //       alert("Section name is required.");
-        //       return;
-        //     }
-
-        //     const existingSection = sectionsData.find(
-        //       (sec) => sec.name === sectionName
-        //     );
-        //     if (existingSection) {
-        //       alert("This section already exists.");
-        //       return;
-        //     }
-
-        //     const newSection = await saveSection({ name: sectionName });
-        //     if (newSection) {
-        //       sectionsData.push(newSection);
-        //       renderSection(newSection);
-        //     }
-        //   };
-
-        //   // Save and Cancel handlers
-        //   document.getElementById("saveBtn").onclick = async () => {
-        //     const sectionData = Array.from(
-        //       sectionsContainer.getElementsByClassName("section")
-        //     ).map((section) => {
-        //       const sectionName = section.querySelector("h4").textContent;
-        //       const technicians = Array.from(
-        //         section.getElementsByClassName("subsection")
-        //       ).map((subsection) => subsection.querySelector("select").value);
-
-        //       return { sectionName, technicians };
-        //     });
-
-        //     // Save updated data to the server (you can implement this part)
-        //     console.log("Saving sections and technicians:", sectionData);
-
-        //     dialogBox.classList.add("hidden");
-        //   };
-
-        //   document.getElementById("cancelBtn").onclick = () => {
-        //     dialogBox.classList.add("hidden");
-        //   };
-        // }
-
-        // function showDialog(bookingId) {
-        //   const dialogBox = document.getElementById("dialogBox");
-        //   dialogBox.classList.remove("hidden");
-
-        //   const sectionsContainer =
-        //     document.getElementById("sectionsContainer");
-        //   sectionsContainer.innerHTML = ""; // Clear previous content
-
-        //   // Predefined technician options
-        //   const techniciansList = [
-        //     "John Doe",
-        //     "Jane Smith",
-        //     "Alex Johnson",
-        //     "Emily Davis",
-        //     "Chris Brown",
-        //   ];
-
-        //   // Function to add a new section
-        //   function addSection(sectionName = "") {
-        //     const sectionDiv = document.createElement("div");
-        //     sectionDiv.classList.add("section");
-
-        //     const sectionHeader = document.createElement("h4");
-        //     sectionHeader.textContent = sectionName || "New Section";
-
-        //     const subsectionsContainer = document.createElement("div");
-        //     subsectionsContainer.classList.add("subsections-container");
-
-        //     // Function to add a subsection
-        //     function addSubsection(selectedTechnician = "") {
-        //       const subsectionDiv = document.createElement("div");
-        //       subsectionDiv.classList.add("subsection");
-
-        //       const select = document.createElement("select");
-        //       const defaultOption = document.createElement("option");
-        //       defaultOption.value = "";
-        //       defaultOption.textContent = "Choose Technician";
-        //       defaultOption.disabled = true;
-        //       defaultOption.selected = !selectedTechnician;
-
-        //       select.appendChild(defaultOption);
-
-        //       techniciansList.forEach((technician) => {
-        //         const option = document.createElement("option");
-        //         option.value = technician;
-        //         option.textContent = technician;
-        //         if (technician === selectedTechnician) {
-        //           option.selected = true;
-        //         }
-        //         select.appendChild(option);
-        //       });
-
-        //       const removeSubsectionBtn = document.createElement("button");
-        //       removeSubsectionBtn.textContent = "Remove";
-        //       removeSubsectionBtn.classList.add("remove-subsection-btn");
-        //       removeSubsectionBtn.onclick = () => subsectionDiv.remove();
-
-        //       subsectionDiv.appendChild(select);
-        //       subsectionDiv.appendChild(removeSubsectionBtn);
-        //       subsectionsContainer.appendChild(subsectionDiv);
-        //     }
-
-        //     // Add a default subsection
-        //     addSubsection();
-
-        //     const addSubsectionBtn = document.createElement("button");
-        //     addSubsectionBtn.textContent = "Add Technician";
-        //     addSubsectionBtn.classList.add("add-subsection-btn");
-        //     addSubsectionBtn.onclick = () => addSubsection();
-
-        //     const removeSectionBtn = document.createElement("button");
-        //     removeSectionBtn.textContent = "Remove Section";
-        //     removeSectionBtn.classList.add("remove-section-btn");
-        //     removeSectionBtn.onclick = () => sectionDiv.remove();
-
-        //     sectionDiv.appendChild(sectionHeader);
-        //     sectionDiv.appendChild(subsectionsContainer);
-        //     sectionDiv.appendChild(addSubsectionBtn);
-        //     sectionDiv.appendChild(removeSectionBtn);
-
-        //     sectionsContainer.appendChild(sectionDiv);
-        //   }
-
-        //   // Add default sections
-        //   addSection("Camera");
-        //   addSection("Video");
-
-        //   // Add new section handler
-        //   document.getElementById("addSectionBtn").onclick = () => addSection();
-
-        //   // Save and Cancel handlers
-        //   document.getElementById("saveBtn").onclick = () => {
-        //     const sectionData = Array.from(
-        //       sectionsContainer.getElementsByClassName("section")
-        //     ).map((section) => {
-        //       const sectionName = section.querySelector("h4").textContent;
-        //       const technicians = Array.from(
-        //         section.getElementsByClassName("subsection")
-        //       ).map((subsection) => subsection.querySelector("select").value);
-
-        //       return { sectionName, technicians };
-        //     });
-
-        //     dialogBox.classList.add("hidden");
-        //     approveBooking(bookingId, sectionData); // Pass structured data to approveBooking
-        //   };
-
-        //   document.getElementById("cancelBtn").onclick = () => {
-        //     dialogBox.classList.add("hidden");
-        //   };
-        // }
-
+        
         // Updated `approveBooking` Function
         function approveBooking(bookingId, sectionData) {
           fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
@@ -896,7 +654,6 @@
               showMessage("Error approving booking", "error");
             });
         }
-
 
         // Cancel a booking
         function cancelBooking(bookingId) {
