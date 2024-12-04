@@ -61,6 +61,28 @@
               </div>
             </div>
           </div>
+          <dialog id="dialog-box" class="hidden">
+            <div class="dialog-content">
+              <h2>Choose an Option</h2>
+              <form id="dialogForm">
+                <label>
+                  <input type="radio" name="option" value="Option 1" required />
+                  Option 1
+                </label><br />
+                <label>
+                  <input type="radio" name="option" value="Option 2" />
+                  Option 2
+                </label><br />
+                <label>
+                  <input type="radio" name="option" value="Option 3" />
+                  Option 3
+                </label><br />
+                <button type="submit">Submit</button>
+                <button type="button" class="close-button">Close</button>
+              </form>
+            </div>
+          </dialog>
+          
           <dialog id="cancel-dialog" class="hidden">
             <div class="dialog-content">
               <h2>Cancel Booking</h2>
@@ -407,6 +429,7 @@
             cancelButton.addEventListener("click", () => {
               // Open the modal
               showCancelDialog(bookingId);
+              openDialog();
               console.log("Opening Cancel Modal");
             });
 
@@ -448,6 +471,37 @@
     dialog.classList.add("hidden"); // Hide the dialog when close is clicked
   });
 }
+// Function to open the dialog
+function openDialog() {
+  const dialog = document.getElementById("dialog-box");
+  dialog.classList.remove("hidden"); // Show the dialog
+}
+
+// Function to handle form submission and return the selected option
+function handleFormSubmit(event) {
+  event.preventDefault();
+  
+  const form = document.getElementById("dialogForm");
+  const selectedOption = form.option.value; // Get the selected option
+  console.log("Selected Option:", selectedOption);
+  
+  // You can return or use the selected option as needed
+  alert(`You selected: ${selectedOption}`);
+  
+  // Close the dialog
+  const dialog = document.getElementById("dialog-box");
+  dialog.classList.add("hidden");
+}
+
+// Close the dialog when the close button is clicked
+function closeDialog() {
+  const dialog = document.getElementById("dialog-box");
+  dialog.classList.add("hidden"); // Hide the dialog
+}
+
+// Event listeners for form submission and close button
+document.getElementById("dialogForm").addEventListener("submit", handleFormSubmit);
+document.querySelector(".close-button").addEventListener("click", closeDialog);
 
             //             function openCancelModal(bookingId) {
             //   console.log("Opening Cancel Modal");
@@ -909,6 +963,7 @@
         //     });
         // }
         // Cancel a booking
+
         function cancelBooking(bookingId, reasonToSend) {
           fetch("https://auditorium-booking-i34f.onrender.com/admin/cancel", {
             method: "POST",

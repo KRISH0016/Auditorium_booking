@@ -106,7 +106,7 @@ header {
   background-color: #45a049; /* Darker green on hover */
 }
 
-dialog {
+dialog.hidden {
   display: none;
   width: 400px;
   max-width: 90%;
