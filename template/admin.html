@@ -505,14 +505,14 @@
             }
 
             const newSection = await saveSection({ name: sectionName });
-            const newSectionName=sectionName;
+           // const newSectionName=sectionName;
             if (newSection) {
               sectionsData.push(newSection);
               //await fetchTechniciansAndSections();
               console.log(sectionsData.name);
-              console.log("New Section "+ newSection);
-              console.log(newSectionName);
-              renderSection(newSectionName);
+              console.log("New Section "+ newSection.name);
+              //console.log(newSectionName);
+              renderSection(newSection.name);
               // Render sections without technicians
               //sectionsData.forEach((section) => renderSection(section));
             }
