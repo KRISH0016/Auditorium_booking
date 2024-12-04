@@ -1293,14 +1293,15 @@
               if (data.success) {
                 // Map the data with added checks for technicianNames
                 const technicianData = data.data.map((item) => ({
-                  sectionname: item.sectionName,
-                  techniciannames: Array.isArray(item.technicianNames)
-                    ? item.technicianNames.join(", ")
-                    : item.technicianNames || "N/A", // If it's not an array, show "N/A"
-                  bookingdate: new Date(item.bookingDate).toLocaleDateString(), // Format the date
-                  starttime: item.startTime,
-                  endtime: item.endTime,
+                  sectionname: item.SectionName,
+                  techniciannames: Array.isArray(item.TechnicianNames)
+                    ? item.TechnicianNames.join(", ")
+                    : item.TechnicianNames || "N/A", // If it's not an array, show "N/A"
+                  bookingdate: new Date(item.BookingDate).toLocaleDateString(), // Format the date
+                  starttime: item.StartTime,
+                  endtime: item.EndTime,
                 }));
+                console.log(technicianData);
 
                 // Show modal with the correct data
                 showModal(
