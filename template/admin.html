@@ -411,7 +411,7 @@
                 throw new Error("Failed to save section.");
               }
               const data = await response.json();
-              console.log("Saved Section:", data);
+              console.log("Saved Section:", data.section);
               return data.section;
             } catch (error) {
               console.error(error);
@@ -504,7 +504,7 @@
               return;
             }
 
-            const newSection = await saveSection({ name: sectionName });
+            const newSection = await saveSection({ sectionName: sectionName });
            // const newSectionName=sectionName;
             if (newSection) {
               sectionsData.push(newSection);
