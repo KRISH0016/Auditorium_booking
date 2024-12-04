@@ -505,14 +505,16 @@
             }
 
             const newSection = await saveSection({ name: sectionName });
+            const newSectionName=sectionName;
             if (newSection) {
               sectionsData.push(newSection);
               //await fetchTechniciansAndSections();
               console.log(sectionsData.name);
               console.log("New Section "+ newSection);
-              //renderSection()
+              console.log(newSectionName);
+              renderSection(newSectionName);
               // Render sections without technicians
-              sectionsData.forEach((section) => renderSection(section));
+              //sectionsData.forEach((section) => renderSection(section));
             }
           };
           document.getElementById("saveBtn").onclick = async () => {
