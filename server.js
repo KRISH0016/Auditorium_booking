@@ -1611,11 +1611,11 @@ app.get("/getTechnicianWorkDetails", async (req, res) => {
         (b) => b._id.toString() === work.bookingId.toString()
       );
       return {
-        sectionName: work.sectionName,
-        technicianNames: work.technicianNames,
-        bookingDate: booking ? booking.date : "N/A",
-        startTime: booking ? booking.start : "N/A",
-        endTime: booking ? booking.end : "N/A",
+        SectionName: work.sectionName,
+        TechnicianNames: work.technicianNames,
+        BookingDate: booking ? booking.date : "N/A",
+        StartTime: booking ? booking.start : "N/A",
+        EndTime: booking ? booking.end : "N/A",
       };
     });
     console.log(technicianWorkDetails);  // This should display the final array of technician work details
