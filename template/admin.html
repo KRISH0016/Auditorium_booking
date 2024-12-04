@@ -1283,7 +1283,6 @@
           //     console.error("Error fetching technicians:", error);
           //   }
           // };
-
           document.getElementById("show-technician").onclick = async () => {
             try {
               const response = await fetch("/getTechnicianWorkDetails");
@@ -1292,15 +1291,16 @@
               console.log(data.data);
 
               if (data.success) {
-                // Modify the data to match the column names as lowercase (or use your column names)
+                // Map the data with added checks for technicianNames
                 const technicianData = data.data.map((item) => ({
                   sectionname: item.sectionName,
-                  techniciannames: item.technicianNames.join(", "), // Join array into a string
+                  techniciannames: Array.isArray(item.technicianNames)
+                    ? item.technicianNames.join(", ")
+                    : item.technicianNames || "N/A", // If it's not an array, show "N/A"
                   bookingdate: new Date(item.bookingDate).toLocaleDateString(), // Format the date
                   starttime: item.startTime,
                   endtime: item.endTime,
                 }));
-                console.log(technicianData);
 
                 // Show modal with the correct data
                 showModal(
