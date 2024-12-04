@@ -1047,19 +1047,20 @@ app.post("/addSection", async (req, res) => {
 
 app.post("/saveSectionTechnicianMapping", async (req, res) => {
   try {
+    //const { bookingId, mapping } = req.body; 
     const { bookingId, userId, mapping } = req.body; // mapping is an array of {sectionName, technicians}
-    console.log("booking ID "+bookingId +" user ID "+ userId+" "+ mapping);
-    if (!bookingId || !userId || !Array.isArray(mapping)) {
-      return res.status(400).json({ message: "Invalid request data." });
-    }
+    console.log("booking ID "+bookingId + mapping);
+     if (!bookingId || !userId || !Array.isArray(mapping)) {
+       return res.status(400).json({ message: "Invalid request data." });
+     }
 
     // Save each mapping entry
     const mappingEntries = mapping.flatMap(({ sectionName, technicians }) =>
       technicians.map((technicianName) => ({
         bookingId,
-        userId,
         sectionName,
         technicianName,
+        userId,
       }))
     );
 
