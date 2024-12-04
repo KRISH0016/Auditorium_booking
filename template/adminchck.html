@@ -405,43 +405,45 @@
               console.log("Opening Cancel Modal");
             });
             function openCancelModal(bookingId) {
-  console.log("Opening Cancel Modal");
+              console.log("Opening Cancel Modal");
 
-  const modal = document.getElementById("cancel-modal");
-  modal.classList.remove("hidden"); // Show the modal
+              const modal = document.getElementById("cancel-modal");
+              modal.classList.remove("hidden"); // Show the modal
+              console.log(modal);
+              const customReasonTextarea = modal.querySelector("#customReason");
+              const form = modal.querySelector("#cancelForm");
+              console.log(customReasonTextarea);
+              // Enable custom reason textarea if "Custom" is selected
+              form.addEventListener("change", (e) => {
+                if (e.target.name === "reason" && e.target.value === "Custom") {
+                  customReasonTextarea.disabled = false;
+                } else {
+                  customReasonTextarea.disabled = true;
+                }
+              });
 
-  const customReasonTextarea = modal.querySelector("#customReason");
-  const form = modal.querySelector("#cancelForm");
+              // Handle form submission
+              form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const selectedReason = form.reason.value;
+                const customReason = customReasonTextarea.value.trim();
+                const reasonToSend =
+                  selectedReason === "Custom" ? customReason : selectedReason;
 
-  // Enable custom reason textarea if "Custom" is selected
-  form.addEventListener("change", (e) => {
-    if (e.target.name === "reason" && e.target.value === "Custom") {
-      customReasonTextarea.disabled = false;
-    } else {
-      customReasonTextarea.disabled = true;
-    }
-  });
+                // Call cancelBooking with the booking ID and selected reason
+                cancelBooking(bookingId, reasonToSend);
 
-  // Handle form submission
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const selectedReason = form.reason.value;
-    const customReason = customReasonTextarea.value.trim();
-    const reasonToSend =
-      selectedReason === "Custom" ? customReason : selectedReason;
+                // Close the modal
+                modal.classList.add("hidden");
+              });
 
-    console.log(`Cancel booking ID: ${bookingId}, Reason: ${reasonToSend}`);
-    cancelBooking(bookingId, reasonToSend); // Call your cancel function
-
-    modal.classList.add("hidden"); // Hide the modal
-  });
-
-  // Handle modal close button
-  const closeButton = modal.querySelector(".close-button");
-  closeButton.addEventListener("click", () => {
-    modal.classList.add("hidden"); // Hide the modal
-  });
-}
+              // Handle close button
+              modal
+                .querySelector(".close-button")
+                .addEventListener("click", () => {
+                  modal.classList.add("hidden");
+                });
+            }
 
             //           function openCancelModal(bookingId) {
             //             // Create modal dynamically
