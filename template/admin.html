@@ -414,10 +414,10 @@
 
               const modal = document.getElementById("cancel-modal");
               modal.classList.remove("hidden"); // Show the modal
-
+              console.log(modal);
               const customReasonTextarea = modal.querySelector("#customReason");
               const form = modal.querySelector("#cancelForm");
-
+              console.log(customReasonTextarea);
               // Enable custom reason textarea if "Custom" is selected
               form.addEventListener("change", (e) => {
                 if (e.target.name === "reason" && e.target.value === "Custom") {
