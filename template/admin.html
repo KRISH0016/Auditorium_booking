@@ -1355,14 +1355,27 @@
             }
           };
 
-          // Print Technician CSV
+          //// Click handler for printing technician data
           document.getElementById("print-technician").onclick = async () => {
             try {
               const response = await fetch("/getTechnicianWorkDetails");
               const data = await response.json();
 
               if (data.success) {
-                downloadCSV(data.technicians, "technicians.csv");
+                // Map the data with added checks for technicianNames
+                const technicianData = data.data.map((item) => ({
+                  SectionName: item.SectionName,
+                  TechnicianNames: Array.isArray(item.TechnicianNames)
+                    ? item.TechnicianNames.join(", ") // Join technician names if array
+                    : item.TechnicianNames || "N/A", // If it's not an array, show "N/A"
+                  BookingDate: new Date(item.BookingDate).toLocaleDateString(), // Format the date
+                  StartTime: item.StartTime,
+                  EndTime: item.EndTime,
+                }));
+                console.log(technicianData);
+
+                // Trigger the CSV download with the mapped data
+                downloadCSV(technicianData, "technicians.csv");
               } else {
                 alert("Failed to fetch technician details.");
               }
