@@ -1591,15 +1591,19 @@ app.get("/getTechnicianWorkDetails", async (req, res) => {
     // Fetch all technicians
     const technicians = await Technician.find({}, "name"); // Fetch only the 'name' field
     const technicianNames = technicians.map((tech) => tech.name);
-
+    console.log(technicianNames);
     // Fetch works for these technicians
     const works = await SectionTechnician.find({
       technicianNames: { $in: technicianNames },
     });
+    console.log(works);  // This should show the section and technician works
+
 
     // Create a map for fetching bookings
     const bookingIds = works.map((work) => work.bookingId);
     const bookings = await Booking.find({ _id: { $in: bookingIds } });
+    console.log(bookings);  // This should show the bookings related to the technicians
+
 
     // Combine data
     const technicianWorkDetails = works.map((work) => {
@@ -1614,6 +1618,8 @@ app.get("/getTechnicianWorkDetails", async (req, res) => {
         endTime: booking ? booking.endTime : "N/A",
       };
     });
+    console.log(technicianWorkDetails);  // This should display the final array of technician work details
+
 
     res.status(200).json({ success: true, data: technicianWorkDetails });
   } catch (error) {
