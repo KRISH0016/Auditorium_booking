@@ -1221,7 +1221,7 @@
       try {
         const response = await fetch("/getUsers");
         const data = await response.json();
-        console.log(data);
+        console.log(data.users);
         if (data.success) {
           showModal("User Data", ["Name", "Email", "Department", "Phone"], data.users);
         } else {
@@ -1239,7 +1239,7 @@
         const data = await response.json();
         console.log(data);
         if (data.success) {
-          showModal("Admin Data", ["Name", "Email", "Phone No"], data.admins);
+          showModal("Admin Data", ["Name", "Email", "department"], data.admins);
         } else {
           alert("Failed to fetch admin details.");
         }
