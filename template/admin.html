@@ -1054,6 +1054,7 @@
             try {
               const response = await fetch("/getUsers");
               const data = await response.json();
+              console.log(data);
 
               if (data.success) {
                 const headers = ["Name", "Email", "Department", "Phone No"];
@@ -1071,6 +1072,7 @@
             try {
               const response = await fetch("/getAdmins");
               const data = await response.json();
+              console.log(data);
 
               if (data.success) {
                 displayTable(
@@ -1105,7 +1107,7 @@
             try {
               const response = await fetch("/getAdmins");
               const data = await response.json();
-
+              console.log(data);
               if (data.success) {
                 const headers = ["Name", "Email", "Role"];
                 printCSV(data.admins, headers, "admins.csv");
