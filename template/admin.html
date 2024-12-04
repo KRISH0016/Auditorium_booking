@@ -1262,6 +1262,7 @@
               const response = await fetch("/getTechnicianWorkDetails");
               const data = await response.json();
               console.log(data);
+              console.log(data.data);
 
               if (data.success) {
                 showModal(
