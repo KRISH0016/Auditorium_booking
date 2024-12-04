@@ -491,14 +491,14 @@ app.post("/admin/approve", async (req, res) => {
   await transporter.sendMail(mailOptionsUser);
 
   // Prepare and send SMS to the user
-  const userPhoneNumber = user.phone; // Assuming user phone number is stored in the database
-  if (userPhoneNumber) {
-    await client.messages.create({
-      body: `Your booking for the auditorium on ${booking.date} has been approved. For more details, please check your email.`,
-      to: userPhoneNumber, // User's phone number
-      from: process.env.TWILIO_PHONE_NUMBER, // Your Twilio number
-    });
-  }
+  // const userPhoneNumber = user.phone; // Assuming user phone number is stored in the database
+  // if (userPhoneNumber) {
+  //   await client.messages.create({
+  //     body: `Your booking for the auditorium on ${booking.date} has been approved. For more details, please check your email.`,
+  //     to: userPhoneNumber, // User's phone number
+  //     from: process.env.TWILIO_PHONE_NUMBER, // Your Twilio number
+  //   });
+  // }
 
   const mailOptionsCleaning = {
     from: process.env.EMAIL_USER,
@@ -531,29 +531,29 @@ app.post("/admin/approve", async (req, res) => {
   const powerhousePhoneNumber = process.env.POWERHOUSE_PHONE;
   const audioTechnicianPhoneNumber = process.env.AUDIO_TECHNICIAN_PHONE;
 
-  if (cleaningTeamPhoneNumber) {
-    await client.messages.create({
-      body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Cleaning required. Contact: ${user.phone}.`,
-      to: cleaningTeamPhoneNumber,
-      from: process.env.TWILIO_PHONE_NUMBER,
-    });
-  }
+  // if (cleaningTeamPhoneNumber) {
+  //   await client.messages.create({
+  //     body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Cleaning required. Contact: ${user.phone}.`,
+  //     to: cleaningTeamPhoneNumber,
+  //     from: process.env.TWILIO_PHONE_NUMBER,
+  //   });
+  // }
 
-  if (powerhousePhoneNumber) {
-    await client.messages.create({
-      body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Power setup required. Contact: ${user.phone}.`,
-      to: powerhousePhoneNumber,
-      from: process.env.TWILIO_PHONE_NUMBER,
-    });
-  }
+  // if (powerhousePhoneNumber) {
+  //   await client.messages.create({
+  //     body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Power setup required. Contact: ${user.phone}.`,
+  //     to: powerhousePhoneNumber,
+  //     from: process.env.TWILIO_PHONE_NUMBER,
+  //   });
+  // }
 
-  if (audioTechnicianPhoneNumber) {
-    await client.messages.create({
-      body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Audio setup required. Contact: ${user.phone}.`,
-      to: audioTechnicianPhoneNumber,
-      from: process.env.TWILIO_PHONE_NUMBER,
-    });
-  }
+  // if (audioTechnicianPhoneNumber) {
+  //   await client.messages.create({
+  //     body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Audio setup required. Contact: ${user.phone}.`,
+  //     to: audioTechnicianPhoneNumber,
+  //     from: process.env.TWILIO_PHONE_NUMBER,
+  //   });
+  // }
 
   res.status(200).json({
     success: true,
