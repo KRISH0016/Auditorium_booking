@@ -396,7 +396,12 @@
             } catch (error) {
               console.error("Error creating booking row:", error);
             }
-
+              // Function to open the dialog with a booking ID
+              window.openCancelReasonDialog = function (bookingId) {
+                currentBookingId = bookingId; // Set the booking ID dynamically
+                console.log(`Opening dialog for booking ID: ${bookingId}`);
+                cancelReasonDialog.classList.remove("hidden");
+              };
             const approveButton = row.querySelector(".approve-button");
             approveButton.addEventListener("click", () => {
               showDialog(booking._id, booking.user.name); // Call the showDialog function with the booking ID
@@ -422,12 +427,10 @@
 
 
             document.addEventListener("DOMContentLoaded", () => {
-              const customReasonInput =
-                document.getElementById("customReasonInput");
+              const customReasonInput = document.getElementById("customReasonInput");
               const reasonRadios = document.getElementsByName("cancelReason");
               const cancelPopupBtn = document.getElementById("cancelPopupBtn");
-              const cancelReasonDialog =
-                document.getElementById("cancelReasonDialog");
+              const cancelReasonDialog = document.getElementById("cancelReasonDialog");
               let currentBookingId = null; // To store the current booking ID dynamically
 
               // Enable/Disable custom reason textarea
@@ -481,12 +484,7 @@
                   cancelReasonDialog.classList.add("hidden");
                 });
 
-              // Function to open the dialog with a booking ID
-              window.openCancelReasonDialog = function (bookingId) {
-                currentBookingId = bookingId; // Set the booking ID dynamically
-                console.log(`Opening dialog for booking ID: ${bookingId}`);
-                cancelReasonDialog.classList.remove("hidden");
-              };
+
             });
 
             //             function showCancelDialog(bookingId) {
