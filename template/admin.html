@@ -61,64 +61,50 @@
               </div>
             </div>
           </div>
-          <dialog id="dialog-box" class="hidden">
-            <div class="dialog-content">
-              <h2>Choose an Option</h2>
-              <form id="dialogForm">
-                <label>
-                  <input type="radio" name="option" value="Option 1" required />
-                  Option 1
-                </label><br />
-                <label>
-                  <input type="radio" name="option" value="Option 2" />
-                  Option 2
-                </label><br />
-                <label>
-                  <input type="radio" name="option" value="Option 3" />
-                  Option 3
-                </label><br />
-                <button type="submit">Submit</button>
-                <button type="button" class="close-button">Close</button>
+          <div id="cancelReasonDialog" class="popup hidden">
+            <div class="popup-content">
+              <h3>Select Reason for Cancellation</h3>
+              <form id="cancelReasonForm">
+                <div class="popup-reason-options">
+                  <label>
+                    <input
+                      type="radio"
+                      name="cancelReason"
+                      value="Reason 1"
+                      required
+                    />
+                    Reason 1
+                  </label>
+                  <label>
+                    <input type="radio" name="cancelReason" value="Reason 2" />
+                    Reason 2
+                  </label>
+                  <label>
+                    <input type="radio" name="cancelReason" value="Reason 3" />
+                    Reason 3
+                  </label>
+                  <label>
+                    <input type="radio" name="cancelReason" value="Reason 4" />
+                    Reason 4
+                  </label>
+                  <label>
+                    <input type="radio" name="cancelReason" value="custom" />
+                    Custom Reason
+                  </label>
+                  <textarea
+                    id="customReasonInput"
+                    name="customReason"
+                    placeholder="Enter custom reason"
+                    disabled
+                  ></textarea>
+                </div>
+                <div class="popup-actions">
+                  <button type="button" id="cancelPopupBtn">Cancel</button>
+                  <button type="submit" id="confirmPopupBtn">Confirm</button>
+                </div>
               </form>
             </div>
-          </dialog>
-          
-          <dialog id="cancel-dialog" class="hidden">
-            <div class="dialog-content">
-              <h2>Cancel Booking</h2>
-              <p>Select a reason for cancellation:</p>
-              <form id="cancelForm">
-                <label>
-                  <input type="radio" name="reason" value="Reason 1" required />
-                  Reason 1
-                </label><br />
-                <label>
-                  <input type="radio" name="reason" value="Reason 2" />
-                  Reason 2
-                </label><br />
-                <label>
-                  <input type="radio" name="reason" value="Reason 3" />
-                  Reason 3
-                </label><br />
-                <label>
-                  <input type="radio" name="reason" value="Reason 4" />
-                  Reason 4
-                </label><br />
-                <label>
-                  <input type="radio" name="reason" value="Custom" />
-                  Other (Specify below)
-                </label><br />
-                <textarea
-                  id="customReason"
-                  placeholder="Write your reason here..."
-                  disabled
-                ></textarea><br />
-                <button type="submit" class="submit-button">Submit</button>
-                <button type="button" class="close-button">Close</button>
-              </form>
-            </div>
-          </dialog>
-          
+          </div>
         </table>
         <div id="message-box" class="message-box"></div>
         <button id="print-csv">Print CSV</button>
@@ -428,80 +414,150 @@
 
             cancelButton.addEventListener("click", () => {
               // Open the modal
-              showCancelDialog(bookingId);
-              openDialog();
+              // showCancelDialog(bookingId);
+              // openDialog();
+              openCancelReasonDialog(bookingId);
               console.log("Opening Cancel Modal");
             });
 
-            function showCancelDialog(bookingId) {
-  const dialog = document.getElementById("cancel-dialog");
 
-  // Remove 'hidden' class to show the dialog
-  dialog.classList.remove("hidden");
+            document.addEventListener("DOMContentLoaded", () => {
+              const customReasonInput =
+                document.getElementById("customReasonInput");
+              const reasonRadios = document.getElementsByName("cancelReason");
+              const cancelPopupBtn = document.getElementById("cancelPopupBtn");
+              const cancelReasonDialog =
+                document.getElementById("cancelReasonDialog");
+              let currentBookingId = null; // To store the current booking ID dynamically
 
-  const customReasonTextarea = dialog.querySelector("#customReason");
-  const form = dialog.querySelector("#cancelForm");
+              // Enable/Disable custom reason textarea
+              reasonRadios.forEach((radio) => {
+                radio.addEventListener("change", () => {
+                  console.log(`Selected reason: ${radio.value}`);
+                  customReasonInput.disabled = radio.value !== "custom";
+                });
+              });
 
-  // Enable custom reason textarea if "Custom" is selected
-  form.addEventListener("change", (e) => {
-    if (e.target.name === "reason" && e.target.value === "Custom") {
-      customReasonTextarea.disabled = false;
-    } else {
-      customReasonTextarea.disabled = true;
-    }
-  });
+              // Cancel button to hide dialog
+              cancelPopupBtn.addEventListener("click", () => {
+                console.log("Cancel button clicked, hiding popup.");
+                cancelReasonDialog.classList.add("hidden");
+              });
 
-  // Handle form submission
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const selectedReason = form.reason.value;
-    const customReason = customReasonTextarea.value.trim();
-    const reasonToSend =
-      selectedReason === "Custom" ? customReason : selectedReason;
+              // Form submission logic
+              document
+                .getElementById("cancelReasonForm")
+                .addEventListener("submit", (e) => {
+                  e.preventDefault();
 
-    console.log(`Cancel booking ID: ${bookingId}, Reason: ${reasonToSend}`);
-    cancelBooking(bookingId, reasonToSend); // Call your cancel function
+                  // Find the selected reason
+                  const selectedReasonRadio = [...reasonRadios].find(
+                    (radio) => radio.checked
+                  );
+                  if (!selectedReasonRadio) {
+                    console.log("No reason selected.");
+                    alert("Please select a reason for cancellation.");
+                    return;
+                  }
 
-    dialog.classList.add("hidden"); // Hide the dialog after submission
-  });
+                  const selectedReason = selectedReasonRadio.value;
+                  const customReason = customReasonInput.value.trim();
 
-  // Handle close button
-  const closeButton = dialog.querySelector(".close-button");
-  closeButton.addEventListener("click", () => {
-    dialog.classList.add("hidden"); // Hide the dialog when close is clicked
-  });
-}
-// Function to open the dialog
-function openDialog() {
-  const dialog = document.getElementById("dialog-box");
-  dialog.classList.remove("hidden"); // Show the dialog
-}
+                  // Validate custom reason
+                  if (selectedReason === "custom" && !customReason) {
+                    console.log("Custom reason is empty.");
+                    alert("Please provide a custom reason.");
+                    return;
+                  }
 
-// Function to handle form submission and return the selected option
-function handleFormSubmit(event) {
-  event.preventDefault();
-  
-  const form = document.getElementById("dialogForm");
-  const selectedOption = form.option.value; // Get the selected option
-  console.log("Selected Option:", selectedOption);
-  
-  // You can return or use the selected option as needed
-  alert(`You selected: ${selectedOption}`);
-  
-  // Close the dialog
-  const dialog = document.getElementById("dialog-box");
-  dialog.classList.add("hidden");
-}
+                  const finalReason =
+                    selectedReason === "custom" ? customReason : selectedReason;
 
-// Close the dialog when the close button is clicked
-function closeDialog() {
-  const dialog = document.getElementById("dialog-box");
-  dialog.classList.add("hidden"); // Hide the dialog
-}
+                  // Log and call the cancelBooking function
+                  console.log(`Final cancellation reason: ${finalReason}`);
+                  cancelBooking(currentBookingId, finalReason);
 
-// Event listeners for form submission and close button
-document.getElementById("dialogForm").addEventListener("submit", handleFormSubmit);
-document.querySelector(".close-button").addEventListener("click", closeDialog);
+                  // Hide popup after submission
+                  cancelReasonDialog.classList.add("hidden");
+                });
+
+              // Function to open the dialog with a booking ID
+              window.openCancelReasonDialog = function (bookingId) {
+                currentBookingId = bookingId; // Set the booking ID dynamically
+                console.log(`Opening dialog for booking ID: ${bookingId}`);
+                cancelReasonDialog.classList.remove("hidden");
+              };
+            });
+
+            //             function showCancelDialog(bookingId) {
+            //   const dialog = document.getElementById("cancel-dialog");
+
+            //   // Remove 'hidden' class to show the dialog
+            //   dialog.classList.remove("hidden");
+
+            //   const customReasonTextarea = dialog.querySelector("#customReason");
+            //   const form = dialog.querySelector("#cancelForm");
+
+            //   // Enable custom reason textarea if "Custom" is selected
+            //   form.addEventListener("change", (e) => {
+            //     if (e.target.name === "reason" && e.target.value === "Custom") {
+            //       customReasonTextarea.disabled = false;
+            //     } else {
+            //       customReasonTextarea.disabled = true;
+            //     }
+            //   });
+
+            //   // Handle form submission
+            //   form.addEventListener("submit", (e) => {
+            //     e.preventDefault();
+            //     const selectedReason = form.reason.value;
+            //     const customReason = customReasonTextarea.value.trim();
+            //     const reasonToSend =
+            //       selectedReason === "Custom" ? customReason : selectedReason;
+
+            //     console.log(`Cancel booking ID: ${bookingId}, Reason: ${reasonToSend}`);
+            //     cancelBooking(bookingId, reasonToSend); // Call your cancel function
+
+            //     dialog.classList.add("hidden"); // Hide the dialog after submission
+            //   });
+
+            //   // Handle close button
+            //   const closeButton = dialog.querySelector(".close-button");
+            //   closeButton.addEventListener("click", () => {
+            //     dialog.classList.add("hidden"); // Hide the dialog when close is clicked
+            //   });
+            // }
+            // // Function to open the dialog
+            // function openDialog() {
+            //   const dialog = document.getElementById("dialog-box");
+            //   dialog.classList.remove("hidden"); // Show the dialog
+            // }
+
+            // // Function to handle form submission and return the selected option
+            // function handleFormSubmit(event) {
+            //   event.preventDefault();
+
+            //   const form = document.getElementById("dialogForm");
+            //   const selectedOption = form.option.value; // Get the selected option
+            //   console.log("Selected Option:", selectedOption);
+
+            //   // You can return or use the selected option as needed
+            //   alert(`You selected: ${selectedOption}`);
+
+            //   // Close the dialog
+            //   const dialog = document.getElementById("dialog-box");
+            //   dialog.classList.add("hidden");
+            // }
+
+            // // Close the dialog when the close button is clicked
+            // function closeDialog() {
+            //   const dialog = document.getElementById("dialog-box");
+            //   dialog.classList.add("hidden"); // Hide the dialog
+            // }
+
+            // // Event listeners for form submission and close button
+            // document.getElementById("dialogForm").addEventListener("submit", handleFormSubmit);
+            // document.querySelector(".close-button").addEventListener("click", closeDialog);
 
             //             function openCancelModal(bookingId) {
             //   console.log("Opening Cancel Modal");

@@ -284,4 +284,61 @@
         //     .status(401)
         //     .json({ success: false, message: "Invalid credentials." });
         // });
-        
+        <dialog id="dialog-box" class="hidden">
+            <div class="dialog-content">
+              <h2>Choose an Option</h2>
+              <form id="dialogForm">
+                <label>
+                  <input type="radio" name="option" value="Option 1" required />
+                  Option 1
+                </label><br />
+                <label>
+                  <input type="radio" name="option" value="Option 2" />
+                  Option 2
+                </label><br />
+                <label>
+                  <input type="radio" name="option" value="Option 3" />
+                  Option 3
+                </label><br />
+                <button type="submit">Submit</button>
+                <button type="button" class="close-button">Close</button>
+              </form>
+            </div>
+          </dialog>
+          
+          <dialog id="cancel-dialog" class="hidden">
+            <div class="dialog-content">
+              <h2>Cancel Booking</h2>
+              <p>Select a reason for cancellation:</p>
+              <form id="cancelForm">
+                <label>
+                  <input type="radio" name="reason" value="Reason 1" required />
+                  Reason 1
+                </label><br />
+                <label>
+                  <input type="radio" name="reason" value="Reason 2" />
+                  Reason 2
+                </label><br />
+                <label>
+                  <input type="radio" name="reason" value="Reason 3" />
+                  Reason 3
+                </label><br />
+                <label>
+                  <input type="radio" name="reason" value="Reason 4" />
+                  Reason 4
+                </label><br />
+                <label>
+                  <input type="radio" name="reason" value="Custom" />
+                  Other (Specify below)
+                </label><br />
+                <textarea
+                  id="customReason"
+                  placeholder="Write your reason here..."
+                  disabled
+                ></textarea><br />
+                <button type="submit" class="submit-button">Submit</button>
+                <button type="button" class="close-button">Close</button>
+              </form>
+            </div>
+          </dialog>
+          
