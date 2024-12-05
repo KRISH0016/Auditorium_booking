@@ -396,12 +396,12 @@
             } catch (error) {
               console.error("Error creating booking row:", error);
             }
-              // Function to open the dialog with a booking ID
-              window.openCancelReasonDialog = function (bookingId) {
-                currentBookingId = bookingId; // Set the booking ID dynamically
-                console.log(`Opening dialog for booking ID: ${bookingId}`);
-                cancelReasonDialog.classList.remove("hidden");
-              };
+            // // Function to open the dialog with a booking ID
+            // window.openCancelReasonDialog = function (bookingId) {
+            //   currentBookingId = bookingId; // Set the booking ID dynamically
+            //   console.log(`Opening dialog for booking ID: ${bookingId}`);
+            //   cancelReasonDialog.classList.remove("hidden");
+            // };
             const approveButton = row.querySelector(".approve-button");
             approveButton.addEventListener("click", () => {
               showDialog(booking._id, booking.user.name); // Call the showDialog function with the booking ID
@@ -412,6 +412,82 @@
             //   // Implement the API call or server request here
             //   console.log(`Booking ID: ${bookingId}, Reason: ${reason}`);
             // }
+            async function showCancelReasonDialog(bookingId) {
+              console.log("Function s1");
+              const cancelReasonDialog =
+                document.getElementById("cancelReasonDialog");
+              const customReasonInput =
+                document.getElementById("customReasonInput");
+              const reasonRadios = document.getElementsByName("cancelReason");
+              const cancelPopupBtn = document.getElementById("cancelPopupBtn");
+              const cancelReasonForm =
+                document.getElementById("cancelReasonForm");
+
+              let selectedReason = null;
+
+              // Open the dialog
+              cancelReasonDialog.classList.remove("hidden");
+
+              // Reset inputs
+              reasonRadios.forEach((radio) => (radio.checked = false));
+              customReasonInput.value = "";
+              customReasonInput.disabled = true;
+
+              // Function to enable/disable the custom reason input
+              function handleReasonChange(event) {
+                selectedReason = event.target.value;
+                console.log(`Selected reason: ${selectedReason}`);
+                customReasonInput.disabled = selectedReason !== "custom";
+              }
+
+              // Attach change event listeners to radio buttons
+              reasonRadios.forEach((radio) => {
+                radio.addEventListener("change", handleReasonChange);
+              });
+
+              // Function to hide the dialog
+              function closeDialog() {
+                console.log("Cancel button clicked, hiding popup.");
+                cancelReasonDialog.classList.add("hidden");
+              }
+
+              cancelPopupBtn.addEventListener("click", closeDialog);
+
+              // Handle form submission
+              async function handleFormSubmit(event) {
+                event.preventDefault();
+
+                // Get the selected reason
+                const selectedRadio = Array.from(reasonRadios).find(
+                  (radio) => radio.checked
+                );
+                if (!selectedRadio) {
+                  alert("Please select a reason for cancellation.");
+                  return;
+                }
+
+                const reason = selectedRadio.value;
+                const customReason = customReasonInput.value.trim();
+
+                // Validate custom reason
+                if (reason === "custom" && !customReason) {
+                  alert("Please provide a custom reason.");
+                  return;
+                }
+
+                const finalReason = reason === "custom" ? customReason : reason;
+
+                // Log and perform the cancellation logic
+                console.log(`Final cancellation reason: ${finalReason}`);
+                await cancelBooking(bookingId, finalReason);
+
+                // Close the dialog after submission
+                closeDialog();
+              }
+
+              cancelReasonForm.addEventListener("submit", handleFormSubmit);
+
+            }
 
             // Main functionality
             const cancelButton = row.querySelector(".cancel-button");
@@ -421,71 +497,69 @@
               // Open the modal
               // showCancelDialog(bookingId);
               // openDialog();
-              openCancelReasonDialog(bookingId);
+              showCancelReasonDialog(bookingId);
               console.log("Opening Cancel Modal");
             });
 
+            // document.addEventListener("DOMContentLoaded", () => {
+            //   const customReasonInput = document.getElementById("customReasonInput");
+            //   const reasonRadios = document.getElementsByName("cancelReason");
+            //   const cancelPopupBtn = document.getElementById("cancelPopupBtn");
+            //   const cancelReasonDialog = document.getElementById("cancelReasonDialog");
+            //   let currentBookingId = null; // To store the current booking ID dynamically
 
-            document.addEventListener("DOMContentLoaded", () => {
-              const customReasonInput = document.getElementById("customReasonInput");
-              const reasonRadios = document.getElementsByName("cancelReason");
-              const cancelPopupBtn = document.getElementById("cancelPopupBtn");
-              const cancelReasonDialog = document.getElementById("cancelReasonDialog");
-              let currentBookingId = null; // To store the current booking ID dynamically
+            //   // Enable/Disable custom reason textarea
+            //   reasonRadios.forEach((radio) => {
+            //     radio.addEventListener("change", () => {
+            //       console.log(`Selected reason: ${radio.value}`);
+            //       customReasonInput.disabled = radio.value !== "custom";
+            //     });
+            //   });
 
-              // Enable/Disable custom reason textarea
-              reasonRadios.forEach((radio) => {
-                radio.addEventListener("change", () => {
-                  console.log(`Selected reason: ${radio.value}`);
-                  customReasonInput.disabled = radio.value !== "custom";
-                });
-              });
+            //   // Cancel button to hide dialog
+            //   cancelPopupBtn.addEventListener("click", () => {
+            //     console.log("Cancel button clicked, hiding popup.");
+            //     cancelReasonDialog.classList.add("hidden");
+            //   });
 
-              // Cancel button to hide dialog
-              cancelPopupBtn.addEventListener("click", () => {
-                console.log("Cancel button clicked, hiding popup.");
-                cancelReasonDialog.classList.add("hidden");
-              });
+            //   // Form submission logic
+            //   document
+            //     .getElementById("cancelReasonForm")
+            //     .addEventListener("submit", (e) => {
+            //       e.preventDefault();
 
-              // Form submission logic
-              document
-                .getElementById("cancelReasonForm")
-                .addEventListener("submit", (e) => {
-                  e.preventDefault();
+            //       // Find the selected reason
+            //       const selectedReasonRadio = [...reasonRadios].find(
+            //         (radio) => radio.checked
+            //       );
+            //       if (!selectedReasonRadio) {
+            //         console.log("No reason selected.");
+            //         alert("Please select a reason for cancellation.");
+            //         return;
+            //       }
 
-                  // Find the selected reason
-                  const selectedReasonRadio = [...reasonRadios].find(
-                    (radio) => radio.checked
-                  );
-                  if (!selectedReasonRadio) {
-                    console.log("No reason selected.");
-                    alert("Please select a reason for cancellation.");
-                    return;
-                  }
+            //       const selectedReason = selectedReasonRadio.value;
+            //       const customReason = customReasonInput.value.trim();
 
-                  const selectedReason = selectedReasonRadio.value;
-                  const customReason = customReasonInput.value.trim();
+            //       // Validate custom reason
+            //       if (selectedReason === "custom" && !customReason) {
+            //         console.log("Custom reason is empty.");
+            //         alert("Please provide a custom reason.");
+            //         return;
+            //       }
 
-                  // Validate custom reason
-                  if (selectedReason === "custom" && !customReason) {
-                    console.log("Custom reason is empty.");
-                    alert("Please provide a custom reason.");
-                    return;
-                  }
+            //       const finalReason =
+            //         selectedReason === "custom" ? customReason : selectedReason;
 
-                  const finalReason =
-                    selectedReason === "custom" ? customReason : selectedReason;
+            //       // Log and call the cancelBooking function
+            //       console.log(`Final cancellation reason: ${finalReason}`);
+            //       cancelBooking(currentBookingId, finalReason);
 
-                  // Log and call the cancelBooking function
-                  console.log(`Final cancellation reason: ${finalReason}`);
-                  cancelBooking(currentBookingId, finalReason);
+            //       // Hide popup after submission
+            //       cancelReasonDialog.classList.add("hidden");
+            //     });
 
-                  // Hide popup after submission
-                  cancelReasonDialog.classList.add("hidden");
-                });
-
-
-            });
+            // });
 
             //             function showCancelDialog(bookingId) {
             //   const dialog = document.getElementById("cancel-dialog");
