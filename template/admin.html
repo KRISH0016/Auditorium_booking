@@ -61,6 +61,16 @@
               </div>
             </div>
           </div>
+          <div id="dialogBox" class="dialog-box hidden">
+            <div class="dialog-content">
+              <h3>Select Technician</h3>
+              <select id="technicianDropdown">
+                <!-- Technician options will be populated dynamically -->
+              </select>
+              <button id="okBtn">OK</button>
+              <button id="cancelBtn">Cancel</button>
+            </div>
+          </div>
           <div id="cancelReasonDialog" class="popup hidden">
             <div class="popup-content">
               <h3>Select Reason for Cancellation</h3>
@@ -420,7 +430,8 @@
                 document.getElementById("customReasonInput");
               const reasonRadios = document.getElementsByName("cancelReason");
               const cancelPopupBtn = document.getElementById("cancelPopupBtn");
-              const cancelReasonForm = document.getElementById("cancelReasonForm");
+              const cancelReasonForm =
+                document.getElementById("cancelReasonForm");
 
               let selectedReason = null;
 
@@ -485,7 +496,6 @@
               }
 
               cancelReasonForm.addEventListener("submit", handleFormSubmit);
-
             }
 
             // Main functionality
@@ -1065,32 +1075,6 @@
             });
         }
 
-        // // Cancel a booking
-        // function cancelBooking(bookingId, reasonToSend) {
-        //   fetch("https://auditorium-booking-i34f.onrender.com/admin/cancel", {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ bookingId: bookingId }),
-        //   })
-        //     .then((response) => response.json())
-        //     .then((response) => {
-        //       console.log(response);
-        //       if (response.success) {
-        //         console.log("Booking canceled successfully");
-        //         showMessage("Booking canceled successfully", "success");
-        //       } else {
-        //         console.error("Failed to cancel booking");
-        //         showMessage("Failed to cancel booking", "error");
-        //       }
-        //       return fetchBookings().then(displayBookings);
-        //     })
-        //     .catch((error) => {
-        //       console.error("Error canceling booking:", error);
-        //       showMessage("Error canceling booking", "error");
-        //     });
-        // }
-        // Cancel a booking
-
         function cancelBooking(bookingId, reasonToSend) {
           fetch("https://auditorium-booking-i34f.onrender.com/admin/cancel", {
             method: "POST",
@@ -1120,211 +1104,7 @@
 
         // Attach event listeners to buttons after the bookings are displayed
         function attachEventListeners() {
-          // const approveButtons = document.querySelectorAll(".approve-button");
-          // const cancelButtons = document.querySelectorAll(".cancel-button");
-
-          // approveButtons.forEach((button) => {
-          //   const bookingId = button.getAttribute("data-booking-id");
-          //   button.addEventListener("click", () => approveBooking(bookingId));
-          // });
-
-          // cancelButtons.forEach((button) => {
-          //   const bookingId = button.getAttribute("data-booking-id");
-          //   button.addEventListener("click", () => cancelBooking(bookingId));
-          // });
-          // CSV Export button
-          // function printCSV(data, headers, filename) {
-          //   if (!data || data.length === 0) {
-          //     alert("No data available to print.");
-          //     return;
-          //   }
-
-          //   const csvHeaders = headers.join(",");
-          //   const csvRows = data.map((row) =>
-          //     headers
-          //       .map((header) => {
-          //         const key = header.toLowerCase().replace(/ /g, ""); // "Department" -> "dept"
-          //         return `"${row[key] || ""}"`; // Handle missing fields gracefully
-          //       })
-          //       .join(",")
-          //   );
-
-          //   const csvContent = [csvHeaders, ...csvRows].join("\n");
-
-          //   const blob = new Blob([csvContent], { type: "text/csv" });
-          //   const url = window.URL.createObjectURL(blob);
-
-          //   const a = document.createElement("a");
-          //   a.style.display = "none";
-          //   a.href = url;
-          //   a.download = filename;
-
-          //   document.body.appendChild(a);
-          //   a.click();
-
-          //   window.URL.revokeObjectURL(url);
-          //   document.body.removeChild(a);
-          // }
-
-          // function displayTable(title, headers, data) {
-          //   const container =
-          //     document.getElementById("data-display-container") ||
-          //     document.createElement("div");
-          //   container.id = "data-display-container";
-          //   container.innerHTML = ""; // Clear previous content
-
-          //   const table = document.createElement("table");
-          //   table.style.borderCollapse = "collapse";
-          //   table.style.width = "100%";
-          //   table.style.margin = "20px 0";
-
-          //   const caption = document.createElement("caption");
-          //   caption.textContent = title;
-          //   caption.style.fontSize = "1.5em";
-          //   caption.style.marginBottom = "10px";
-          //   table.appendChild(caption);
-
-          //   const thead = document.createElement("thead");
-          //   const headerRow = document.createElement("tr");
-          //   headers.forEach((header) => {
-          //     const th = document.createElement("th");
-          //     th.textContent = header;
-          //     th.style.border = "1px solid #ddd";
-          //     th.style.padding = "8px";
-          //     th.style.textAlign = "left";
-          //     th.style.backgroundColor = "#f4f4f4";
-          //     headerRow.appendChild(th);
-          //   });
-          //   thead.appendChild(headerRow);
-          //   table.appendChild(thead);
-
-          //   const tbody = document.createElement("tbody");
-          //   data.forEach((row) => {
-          //     const tr = document.createElement("tr");
-          //     headers.forEach((header) => {
-          //       const field = header.toLowerCase().replace(/ /g, ""); // Maps "Department" -> "dept"
-          //       const td = document.createElement("td");
-          //       td.textContent = row[field] || "N/A";
-          //       td.style.border = "1px solid #ddd";
-          //       td.style.padding = "8px";
-          //       tr.appendChild(td);
-          //     });
-          //     tbody.appendChild(tr);
-          //   });
-          //   table.appendChild(tbody);
-
-          //   container.appendChild(table);
-          //   document.body.appendChild(container);
-          // }
-
-          // document.getElementById("show-technician").onclick = async () => {
-          //   try {
-          //     const response = await fetch("/getTechnicianWorkDetails");
-          //     const data = await response.json();
-
-          //     if (data.success) {
-          //       const headers = [
-          //         "Section Name",
-          //         "Technician Names",
-          //         "Booking Date",
-          //         "Start Time",
-          //         "End Time",
-          //       ];
-          //       displayTable("Technician Work Details", headers, data.data);
-          //     } else {
-          //       alert("Failed to fetch technician work details.");
-          //     }
-          //   } catch (error) {
-          //     console.error("Error fetching technician work details:", error);
-          //     alert("Error fetching details.");
-          //   }
-          // };
-
-          // document.getElementById("show-user").onclick = async () => {
-          //   try {
-          //     const response = await fetch("/getUsers");
-          //     const data = await response.json();
-          //     console.log(data);
-
-          //     if (data.success) {
-          //       const headers = ["Name", "Email", "Department", "Phone No"];
-          //       displayTable("Users", headers, data.users);
-          //     } else {
-          //       alert("Failed to fetch user details.");
-          //     }
-          //   } catch (error) {
-          //     console.error("Error fetching users:", error);
-          //     alert("Error fetching user details.");
-          //   }
-          // };
-
-          // document.getElementById("show-admin").onclick = async () => {
-          //   try {
-          //     const response = await fetch("/getAdmins");
-          //     const data = await response.json();
-          //     console.log(data);
-
-          //     if (data.success) {
-          //       displayTable(
-          //         "Admins",
-          //         ["Name", "Email", "Department"],
-          //         data.admins
-          //       );
-          //     } else {
-          //       alert("Failed to fetch admin details.");
-          //     }
-          //   } catch (error) {
-          //     console.error("Error fetching admins:", error);
-          //   }
-          // };
-          // document.getElementById("print-user").onclick = async () => {
-          //   try {
-          //     const response = await fetch("/getUsers");
-          //     const data = await response.json();
-
-          //     if (data.success) {
-          //       const headers = ["Name", "Email", "Department", "Phone"];
-          //       printCSV(data.users, headers, "users.csv");
-          //     } else {
-          //       alert("Failed to fetch user details for CSV.");
-          //     }
-          //   } catch (error) {
-          //     console.error("Error fetching users for CSV:", error);
-          //   }
-          // };
-
-          // document.getElementById("print-admin").onclick = async () => {
-          //   try {
-          //     const response = await fetch("/getAdmins");
-          //     const data = await response.json();
-          //     console.log(data);
-          //     if (data.success) {
-          //       const headers = ["Name", "Email", "Role"];
-          //       printCSV(data.admins, headers, "admins.csv");
-          //     } else {
-          //       alert("Failed to fetch admin details for CSV.");
-          //     }
-          //   } catch (error) {
-          //     console.error("Error fetching admins for CSV:", error);
-          //   }
-          // };
-
-          // document.getElementById("print-technician").onclick = async () => {
-          //   try {
-          //     const response = await fetch("/getTechnicianWorkDetails");
-          //     const data = await response.json();
-
-          //     if (data.success) {
-          //       const headers = ["Name", "Email", "Department", "Phone"];
-          //       printCSV(data.technicians, headers, "technicians.csv");
-          //     } else {
-          //       alert("Failed to fetch technician details for CSV.");
-          //     }
-          //   } catch (error) {
-          //     console.error("Error fetching technicians for CSV:", error);
-          //   }
-          // };
-          //<script>
+          
           // Function to create and download CSV
           function downloadCSV(data, filename) {
             const csvRows = [];
@@ -1435,7 +1215,70 @@
             }
           };
 
-          // Show Technician Data
+          document.getElementById("show-technician").onclick = async () => {
+            // Show the dialog box
+            const dialogBox = document.getElementById("dialogBox");
+            dialogBox.classList.remove("hidden");
+
+            // Fetch technician names from the server
+            try {
+              const response = await fetch("/getTechnicianNames");
+              const data = await response.json();
+              if (data.success) {
+                const technicianDropdown =
+                  document.getElementById("technicianDropdown");
+                technicianDropdown.innerHTML = ""; // Clear existing options
+
+                data.technicianNames.forEach((technician) => {
+                  const option = document.createElement("option");
+                  option.value = technician;
+                  option.textContent = technician;
+                  technicianDropdown.appendChild(option);
+                });
+              } else {
+                alert("Failed to fetch technician names");
+              }
+            } catch (error) {
+              console.error("Error fetching technician names:", error);
+              alert("Error fetching technician names");
+            }
+          };
+
+          // Handle the "OK" button click to send technician name to server
+          document.getElementById("okBtn").onclick = async () => {
+            const technicianName =
+              document.getElementById("technicianDropdown").value;
+            if (!technicianName) {
+              alert("Please select a technician");
+              return;
+            }
+
+            try {
+              const response = await fetch(
+                `/getTechnicianDetails?technicianName=${technicianName}`
+              );
+              const data = await response.json();
+
+              if (data.success) {
+                console.log("Technician Work Details:", data.data);
+                // You can further process or display the technician details here
+              } else {
+                alert("Failed to fetch technician work details");
+              }
+            } catch (error) {
+              console.error("Error fetching technician details:", error);
+              alert("Error fetching technician details");
+            }
+
+            // Hide the dialog box after the action
+            document.getElementById("dialogBox").classList.add("hidden");
+          };
+
+          // Handle the "Cancel" button click to close the dialog
+          document.getElementById("cancelBtn").onclick = () => {
+            document.getElementById("dialogBox").classList.add("hidden");
+          };
+
           // document.getElementById("show-technician").onclick = async () => {
           //   try {
           //     const response = await fetch("/getTechnicianWorkDetails");
@@ -1444,6 +1287,19 @@
           //     console.log(data.data);
 
           //     if (data.success) {
+          //       // Map the data with added checks for technicianNames
+          //       const technicianData = data.data.map((item) => ({
+          //         sectionname: item.SectionName,
+          //         techniciannames: Array.isArray(item.TechnicianNames)
+          //           ? item.TechnicianNames.join(", ")
+          //           : item.TechnicianNames || "N/A", // If it's not an array, show "N/A"
+          //         bookingdate: new Date(item.BookingDate).toLocaleDateString(), // Format the date
+          //         starttime: item.StartTime,
+          //         endtime: item.EndTime,
+          //       }));
+          //       console.log(technicianData);
+
+          //       // Show modal with the correct data
           //       showModal(
           //         "Technician Data",
           //         [
@@ -1453,8 +1309,8 @@
           //           "StartTime",
           //           "EndTime",
           //         ],
-          //         data.data
-          //       ); // Use data.data instead of data.technicians
+          //         technicianData
+          //       );
           //     } else {
           //       alert("Failed to fetch technician details.");
           //     }
@@ -1462,45 +1318,6 @@
           //     console.error("Error fetching technicians:", error);
           //   }
           // };
-          document.getElementById("show-technician").onclick = async () => {
-            try {
-              const response = await fetch("/getTechnicianWorkDetails");
-              const data = await response.json();
-              console.log(data);
-              console.log(data.data);
-
-              if (data.success) {
-                // Map the data with added checks for technicianNames
-                const technicianData = data.data.map((item) => ({
-                  sectionname: item.SectionName,
-                  techniciannames: Array.isArray(item.TechnicianNames)
-                    ? item.TechnicianNames.join(", ")
-                    : item.TechnicianNames || "N/A", // If it's not an array, show "N/A"
-                  bookingdate: new Date(item.BookingDate).toLocaleDateString(), // Format the date
-                  starttime: item.StartTime,
-                  endtime: item.EndTime,
-                }));
-                console.log(technicianData);
-
-                // Show modal with the correct data
-                showModal(
-                  "Technician Data",
-                  [
-                    "SectionName",
-                    "TechnicianNames",
-                    "BookingDate",
-                    "StartTime",
-                    "EndTime",
-                  ],
-                  technicianData
-                );
-              } else {
-                alert("Failed to fetch technician details.");
-              }
-            } catch (error) {
-              console.error("Error fetching technicians:", error);
-            }
-          };
 
           // Print User CSV
           document.getElementById("print-user").onclick = async () => {

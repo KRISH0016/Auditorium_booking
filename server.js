@@ -1368,6 +1368,77 @@ app.get("/getTechnicianWorkDetails", async (req, res) => {
   }
 });
 
+// Endpoint to get technician-specific work details
+app.get("/getTechnicianDetails", async (req, res) => {
+  try {
+    const { technicianName } = req.query; // Get technician's name from query params
+
+    // Validate if technicianName is provided
+    if (!technicianName) {
+      return res.status(400).json({ success: false, message: "Technician name is required" });
+    }
+
+    // Fetch technician details by name
+    const technician = await Technician.findOne({ name: technicianName });
+    if (!technician) {
+      return res.status(404).json({ success: false, message: "Technician not found" });
+    }
+
+    // Fetch work details for the technician
+    const works = await SectionTechnician.find({
+      technicianNames: technicianName, // Match technician by name
+    });
+
+    // If no work found, return empty data
+    if (works.length === 0) {
+      return res.status(200).json({ success: true, data: [] });
+    }
+
+    // Extract booking IDs from the works
+    const bookingIds = works.map((work) => work.bookingId);
+    
+    // Fetch all bookings related to the technician's work
+    const bookings = await Booking.find({ _id: { $in: bookingIds } });
+
+    // Combine work and booking details
+    const technicianWorkDetails = works.map((work) => {
+      const booking = bookings.find(
+        (b) => b._id.toString() === work.bookingId.toString()
+      );
+
+      // Return combined details with work and booking info
+      return {
+        SectionName: work.sectionName,
+        TechnicianNames: work.technicianNames,
+        BookingDate: booking ? booking.date : "N/A",
+        StartTime: booking ? booking.start : "N/A",
+        EndTime: booking ? booking.end : "N/A",
+      };
+    });
+
+    // Respond with the technician's work details
+    res.status(200).json({ success: true, data: technicianWorkDetails });
+  } catch (error) {
+    console.error("Error fetching technician work details:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+
+// Endpoint to fetch technician names for the dropdown
+app.get("/getTechnicianNames", async (req, res) => {
+  try {
+    // Fetch all technicians
+    const technicians = await Technician.find({}, "name");
+    const technicianNames = technicians.map((tech) => tech.name);
+    res.status(200).json({ success: true, technicianNames });
+  } catch (error) {
+    console.error("Error fetching technician names:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+
 // Start server
 app.listen(3000, () => {
   db(); // Connect to MongoDB when server starts
