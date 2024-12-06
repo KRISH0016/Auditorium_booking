@@ -26,6 +26,8 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = new twilio(accountSid, authToken);
 
+
+
 // MongoDB connection
 const db = async () => {
   try {
@@ -530,6 +532,73 @@ app.post("/admin/approve", async (req, res) => {
   const powerhousePhoneNumber = process.env.POWERHOUSE_PHONE;
   const audioTechnicianPhoneNumber = process.env.AUDIO_TECHNICIAN_PHONE;
 
+ // const Vonage = require('@vonage/server-sdk');
+
+// Initialize the Vonage SDK
+// const vonage = new Vonage({
+//   apiKey: process.env.VONAGE_API_KEY,      // Your Vonage API Key
+//   apiSecret: process.env.VONAGE_API_SECRET, // Your Vonage API Secret
+// });
+
+const { Vonage } = require('@vonage/server-sdk')
+
+const vonage = new Vonage({
+  apiKey: "e220f086",
+  apiSecret: "8NBrus4zQpsEduJ8"
+})
+
+// Function to send SMS via Vonage
+async function sendBookingSms(cleaningTeamPhoneNumber, powerhousePhoneNumber, audioTechnicianPhoneNumber, formattedDate, userName, userDept, userPhone) {
+  const fromPhoneNumber = process.env.VONAGE_PHONE_NUMBER; // Your Vonage phone number (sender)
+
+  // Send SMS to the cleaning team
+  if (cleaningTeamPhoneNumber) {
+    const message = `New booking for ${formattedDate} by ${userName} from ${userDept}. Cleaning required. Contact: ${userPhone}.`;
+
+    vonage.messages.sendSms(fromPhoneNumber, cleaningTeamPhoneNumber, message, (err, responseData) => {
+      if (err) {
+        console.log(`Error sending SMS to Cleaning Team: ${err}`);
+      } else if (responseData.messages[0].status === "0") {
+        console.log('Message sent to Cleaning Team');
+      } else {
+        console.log(`Failed to send message to Cleaning Team: ${responseData.messages[0].error_text}`);
+      }
+    });
+  }
+
+  // Send SMS to the powerhouse team
+  if (powerhousePhoneNumber) {
+    const message = `New booking for ${formattedDate} by ${userName} from ${userDept}. Power setup required. Contact: ${userPhone}.`;
+
+    vonage.messages.sendSms(fromPhoneNumber, powerhousePhoneNumber, message, (err, responseData) => {
+      if (err) {
+        console.log(`Error sending SMS to Powerhouse: ${err}`);
+      } else if (responseData.messages[0].status === "0") {
+        console.log('Message sent to Powerhouse');
+      } else {
+        console.log(`Failed to send message to Powerhouse: ${responseData.messages[0].error_text}`);
+      }
+    });
+  }
+
+  // Send SMS to the audio technician
+  if (audioTechnicianPhoneNumber) {
+    const message = `New booking for ${formattedDate} by ${userName} from ${userDept}. Audio setup required. Contact: ${userPhone}.`;
+
+    vonage.messages.sendSms(fromPhoneNumber, audioTechnicianPhoneNumber, message, (err, responseData) => {
+      if (err) {
+        console.log(`Error sending SMS to Audio Technician: ${err}`);
+      } else if (responseData.messages[0].status === "0") {
+        console.log('Message sent to Audio Technician');
+      } else {
+        console.log(`Failed to send message to Audio Technician: ${responseData.messages[0].error_text}`);
+      }
+    });
+  }
+}
+
+sendBookingSms(cleaningTeamPhoneNumber, powerhousePhoneNumber, audioTechnicianPhoneNumber, formattedDate, userName, userDept, user.phone);
+
   // if (cleaningTeamPhoneNumber) {
   //   await client.messages.create({
   //     body: `New booking for ${formattedDate} by ${userName} from ${userDept}. Cleaning required. Contact: ${user.phone}.`,
@@ -992,6 +1061,7 @@ app.post("/cancel", requireAuth, async (req, res) => {
 //         .json({ success: false, message: "Internal server error" });
 //     });
 // });
+
 app.post("/admin/cancel", async (req, res) => {
   const { bookingId, reason } = req.body;
 
