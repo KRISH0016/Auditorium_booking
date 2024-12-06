@@ -389,6 +389,21 @@ h2 {
 }
 /* Dialog Box Styles */
 
+.technician-list {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.subsection {
+  margin-bottom: 10px;
+}
+
+.remove-subsection-btn {
+  margin-top: 10px;
+}
 
 .dialog-box {
   position: fixed;

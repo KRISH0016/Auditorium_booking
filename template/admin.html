@@ -420,7 +420,8 @@
                 document.getElementById("customReasonInput");
               const reasonRadios = document.getElementsByName("cancelReason");
               const cancelPopupBtn = document.getElementById("cancelPopupBtn");
-              const cancelReasonForm = document.getElementById("cancelReasonForm");
+              const cancelReasonForm =
+                document.getElementById("cancelReasonForm");
 
               let selectedReason = null;
 
@@ -485,7 +486,6 @@
               }
 
               cancelReasonForm.addEventListener("submit", handleFormSubmit);
-
             }
 
             // Main functionality
@@ -838,7 +838,6 @@
           messageBox.className = `message-box ${type}`;
           setTimeout(() => (messageBox.textContent = ""), 5000); // Clear message after 5 seconds
         }
-
         async function showDialog(bookingId, userId) {
           const dialogBox = document.getElementById("dialogBox");
           dialogBox.classList.remove("hidden");
@@ -863,7 +862,6 @@
                 technicians: [],
               }));
 
-              console.log(sectionsData);
               console.log("Fetched data:", data);
             } catch (error) {
               console.error("Error fetching data:", error);
@@ -892,25 +890,64 @@
               return null;
             }
           }
+
+          // Add a list of radio buttons for technician selection
+          function addTechnicianOptions(container, sectionName) {
+            const subsectionDiv = document.createElement("div");
+            subsectionDiv.classList.add("subsection");
+
+            const technicianListDiv = document.createElement("div");
+            technicianListDiv.classList.add("technician-list");
+
+            // Add a scrollable container for radio buttons
+            technicianListDiv.style.maxHeight = "150px"; // Set max height for scrolling
+            technicianListDiv.style.overflowY = "auto"; // Enable vertical scrolling
+            technicianListDiv.style.border = "1px solid #ccc"; // Optional: border for better visibility
+            technicianListDiv.style.padding = "10px"; // Optional: padding inside the scrollable box
+
+            techniciansList.forEach((technician) => {
+              const radioLabel = document.createElement("label");
+              radioLabel.style.display = "block"; // Display each radio button on a new line
+
+              const radio = document.createElement("input");
+              radio.type = "radio";
+              radio.name = `technician_${sectionName}`; // Group radio buttons by section
+              radio.value = technician.name;
+
+              radioLabel.appendChild(radio);
+              radioLabel.appendChild(document.createTextNode(technician.name));
+              technicianListDiv.appendChild(radioLabel);
+            });
+
+            const removeSubsectionBtn = document.createElement("button");
+            removeSubsectionBtn.textContent = "Remove";
+            removeSubsectionBtn.classList.add("remove-subsection-btn");
+            removeSubsectionBtn.onclick = () => subsectionDiv.remove();
+
+            subsectionDiv.appendChild(technicianListDiv);
+            subsectionDiv.appendChild(removeSubsectionBtn);
+            container.appendChild(subsectionDiv);
+          }
+
+          // Render the section with technician options (radio buttons)
           function renderSection(section) {
             const sectionDiv = document.createElement("div");
             sectionDiv.classList.add("section");
-            console.log(section + "+" + section.sectionName); // Updated to section.sectionName
 
             const sectionHeader = document.createElement("h4");
-            sectionHeader.textContent = section.sectionName; // Accessing sectionName instead of name
+            sectionHeader.textContent = section.sectionName;
 
             const subsectionsContainer = document.createElement("div");
             subsectionsContainer.classList.add("subsections-container");
 
-            // Add technician dropdown
-            addTechnicianDropdown(subsectionsContainer, section.sectionName);
+            // Add the first set of radio buttons for the section
+            addTechnicianOptions(subsectionsContainer, section.sectionName);
 
             const addTechnicianBtn = document.createElement("button");
-            addTechnicianBtn.textContent = "Add Technician";
+            addTechnicianBtn.textContent = "Add Technician Options";
             addTechnicianBtn.classList.add("add-technician-btn");
             addTechnicianBtn.onclick = () =>
-              addTechnicianDropdown(subsectionsContainer, section.sectionName);
+              addTechnicianOptions(subsectionsContainer, section.sectionName);
 
             const removeSectionBtn = document.createElement("button");
             removeSectionBtn.textContent = "Remove Section";
@@ -923,36 +960,6 @@
             sectionDiv.appendChild(removeSectionBtn);
 
             sectionsContainer.appendChild(sectionDiv);
-          }
-          // Add a dropdown for technician selection
-          function addTechnicianDropdown(container, sectionName) {
-            const subsectionDiv = document.createElement("div");
-            subsectionDiv.classList.add("subsection");
-
-            const select = document.createElement("select");
-            const defaultOption = document.createElement("option");
-            defaultOption.value = "";
-            defaultOption.textContent = "Choose Technician";
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-
-            select.appendChild(defaultOption);
-
-            techniciansList.forEach((technician) => {
-              const option = document.createElement("option");
-              option.value = technician.name;
-              option.textContent = technician.name;
-              select.appendChild(option);
-            });
-
-            const removeSubsectionBtn = document.createElement("button");
-            removeSubsectionBtn.textContent = "Remove";
-            removeSubsectionBtn.classList.add("remove-subsection-btn");
-            removeSubsectionBtn.onclick = () => subsectionDiv.remove();
-
-            subsectionDiv.appendChild(select);
-            subsectionDiv.appendChild(removeSubsectionBtn);
-            container.appendChild(subsectionDiv);
           }
 
           // Initialize dialog with fetched data
@@ -977,19 +984,14 @@
               return;
             }
 
-            const newSection = await saveSection({ name: sectionName });
-            // const newSectionName=sectionName;
+            const newSection = await saveSection({ sectionName: sectionName });
             if (newSection) {
               sectionsData.push(newSection);
-              //await fetchTechniciansAndSections();
-              console.log(sectionsData.name);
-              console.log("New Section " + newSection.name);
-              //console.log(newSectionName);
-              renderSection(newSection.name);
-              // Render sections without technicians
-              //sectionsData.forEach((section) => renderSection(section));
+              renderSection(newSection); // Render the newly added section
             }
           };
+
+          // Save button handler
           document.getElementById("saveBtn").onclick = async () => {
             sectionTechnicianMapping = Array.from(
               sectionsContainer.getElementsByClassName("section")
@@ -997,9 +999,17 @@
               const sectionName = section.querySelector("h4").textContent;
               const technicians = Array.from(
                 section.getElementsByClassName("subsection")
-              ).map((subsection) => subsection.querySelector("select").value);
+              ).map((subsection) => {
+                const selectedTechnician = subsection.querySelector(
+                  "input[type='radio']:checked"
+                );
+                return selectedTechnician ? selectedTechnician.value : null;
+              });
 
-              return { sectionName, technicians: technicians.filter(Boolean) }; // Filter out empty selections
+              return {
+                sectionName,
+                technicians: technicians.filter(Boolean), // Filter out null or empty selections
+              };
             });
 
             console.log(
@@ -1026,20 +1036,222 @@
 
               const data = await response.json();
               console.log("Saved Mapping:", data);
-              approveBooking(bookingId);
-
               alert("Mapping saved successfully.");
               dialogBox.classList.add("hidden");
+              approveBooking(bookingId);
             } catch (error) {
               console.error("Error saving mapping:", error);
               alert("Error saving mapping.");
             }
           };
 
+          // Cancel button handler
           document.getElementById("cancelBtn").onclick = () => {
             dialogBox.classList.add("hidden");
           };
         }
+
+        // async function showDialog(bookingId, userId) {
+        //   const dialogBox = document.getElementById("dialogBox");
+        //   dialogBox.classList.remove("hidden");
+
+        //   const sectionsContainer =
+        //     document.getElementById("sectionsContainer");
+        //   sectionsContainer.innerHTML = ""; // Clear previous content
+
+        //   let techniciansList = [];
+        //   let sectionsData = [];
+        //   let sectionTechnicianMapping = [];
+
+        //   // Fetch existing technicians and sections from the server
+        //   async function fetchTechniciansAndSections() {
+        //     try {
+        //       const response = await fetch("/getSectionTechnician"); // Replace with your actual API endpoint
+        //       const data = await response.json();
+
+        //       techniciansList = data.technicians || [];
+        //       sectionsData = data.sections.map((section) => ({
+        //         sectionName: section.sectionName,
+        //         technicians: [],
+        //       }));
+
+        //       console.log(sectionsData);
+        //       console.log("Fetched data:", data);
+        //     } catch (error) {
+        //       console.error("Error fetching data:", error);
+        //     }
+        //   }
+
+        //   // Save a new section to the server
+        //   async function saveSection(section) {
+        //     console.log("Request Body Section:", section);
+        //     try {
+        //       const response = await fetch("/addSection", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify(section),
+        //       });
+
+        //       if (!response.ok) {
+        //         throw new Error("Failed to save section.");
+        //       }
+        //       const data = await response.json();
+        //       console.log("Saved Section:", data.section);
+        //       return data.section;
+        //     } catch (error) {
+        //       console.error(error);
+        //       alert("Error saving section.");
+        //       return null;
+        //     }
+        //   }
+        //   function renderSection(section) {
+        //     const sectionDiv = document.createElement("div");
+        //     sectionDiv.classList.add("section");
+        //     console.log(section + "+" + section.sectionName); // Updated to section.sectionName
+
+        //     const sectionHeader = document.createElement("h4");
+        //     sectionHeader.textContent = section.sectionName; // Accessing sectionName instead of name
+
+        //     const subsectionsContainer = document.createElement("div");
+        //     subsectionsContainer.classList.add("subsections-container");
+
+        //     // Add technician dropdown
+        //     addTechnicianDropdown(subsectionsContainer, section.sectionName);
+
+        //     const addTechnicianBtn = document.createElement("button");
+        //     addTechnicianBtn.textContent = "Add Technician";
+        //     addTechnicianBtn.classList.add("add-technician-btn");
+        //     addTechnicianBtn.onclick = () =>
+        //       addTechnicianDropdown(subsectionsContainer, section.sectionName);
+
+        //     const removeSectionBtn = document.createElement("button");
+        //     removeSectionBtn.textContent = "Remove Section";
+        //     removeSectionBtn.classList.add("remove-section-btn");
+        //     removeSectionBtn.onclick = () => sectionDiv.remove();
+
+        //     sectionDiv.appendChild(sectionHeader);
+        //     sectionDiv.appendChild(subsectionsContainer);
+        //     sectionDiv.appendChild(addTechnicianBtn);
+        //     sectionDiv.appendChild(removeSectionBtn);
+
+        //     sectionsContainer.appendChild(sectionDiv);
+        //   }
+        //   // Add a dropdown for technician selection
+        //   function addTechnicianDropdown(container, sectionName) {
+        //     const subsectionDiv = document.createElement("div");
+        //     subsectionDiv.classList.add("subsection");
+
+        //     const select = document.createElement("select");
+        //     const defaultOption = document.createElement("option");
+        //     defaultOption.value = "";
+        //     defaultOption.textContent = "Choose Technician";
+        //     defaultOption.disabled = true;
+        //     defaultOption.selected = true;
+
+        //     select.appendChild(defaultOption);
+
+        //     techniciansList.forEach((technician) => {
+        //       const option = document.createElement("option");
+        //       option.value = technician.name;
+        //       option.textContent = technician.name;
+        //       select.appendChild(option);
+        //     });
+
+        //     const removeSubsectionBtn = document.createElement("button");
+        //     removeSubsectionBtn.textContent = "Remove";
+        //     removeSubsectionBtn.classList.add("remove-subsection-btn");
+        //     removeSubsectionBtn.onclick = () => subsectionDiv.remove();
+
+        //     subsectionDiv.appendChild(select);
+        //     subsectionDiv.appendChild(removeSubsectionBtn);
+        //     container.appendChild(subsectionDiv);
+        //   }
+
+        //   // Initialize dialog with fetched data
+        //   await fetchTechniciansAndSections();
+
+        //   // Render sections without technicians
+        //   sectionsData.forEach((section) => renderSection(section));
+
+        //   // Add new section handler
+        //   document.getElementById("addSectionBtn").onclick = async () => {
+        //     const sectionName = prompt("Enter Section Name:");
+        //     if (!sectionName) {
+        //       alert("Section name is required.");
+        //       return;
+        //     }
+
+        //     const existingSection = sectionsData.find(
+        //       (sec) => sec.sectionName === sectionName
+        //     );
+        //     if (existingSection) {
+        //       alert("This section already exists.");
+        //       return;
+        //     }
+
+        //     const newSection = await saveSection({ name: sectionName });
+        //     // const newSectionName=sectionName;
+        //     if (newSection) {
+        //       sectionsData.push(newSection);
+        //       //await fetchTechniciansAndSections();
+        //       console.log(sectionsData.name);
+        //       console.log("New Section " + newSection.name);
+        //       //console.log(newSectionName);
+        //       renderSection(newSection.name);
+        //       // Render sections without technicians
+        //       //sectionsData.forEach((section) => renderSection(section));
+        //     }
+        //   };
+        //   document.getElementById("saveBtn").onclick = async () => {
+        //     sectionTechnicianMapping = Array.from(
+        //       sectionsContainer.getElementsByClassName("section")
+        //     ).map((section) => {
+        //       const sectionName = section.querySelector("h4").textContent;
+        //       const technicians = Array.from(
+        //         section.getElementsByClassName("subsection")
+        //       ).map((subsection) => subsection.querySelector("select").value);
+
+        //       return { sectionName, technicians: technicians.filter(Boolean) }; // Filter out empty selections
+        //     });
+
+        //     console.log(
+        //       "Mapping for booking:",
+        //       bookingId,
+        //       userId,
+        //       sectionTechnicianMapping
+        //     );
+
+        //     try {
+        //       const response = await fetch("/saveSectionTechnicianMapping", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({
+        //           bookingId,
+        //           userId,
+        //           mapping: sectionTechnicianMapping,
+        //         }),
+        //       });
+
+        //       if (!response.ok) {
+        //         throw new Error("Failed to save mapping.");
+        //       }
+
+        //       const data = await response.json();
+        //       console.log("Saved Mapping:", data);
+        //       approveBooking(bookingId);
+
+        //       alert("Mapping saved successfully.");
+        //       dialogBox.classList.add("hidden");
+        //     } catch (error) {
+        //       console.error("Error saving mapping:", error);
+        //       alert("Error saving mapping.");
+        //     }
+        //   };
+
+        //   document.getElementById("cancelBtn").onclick = () => {
+        //     dialogBox.classList.add("hidden");
+        //   };
+        // }
         // Updated `approveBooking` Function
         function approveBooking(bookingId) {
           fetch("https://auditorium-booking-i34f.onrender.com/admin/approve", {
